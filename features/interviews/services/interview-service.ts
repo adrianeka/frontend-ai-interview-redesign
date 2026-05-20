@@ -1,17 +1,8 @@
 import api from "@/lib/axios";
-
-export interface InterviewFilters {
-  search?: string;
-  company?: string;
-  type?: string;
-  level?: string;
-  status?: string;
-  page?: number;
-  size?: number;
-}
+import { InterviewFilters, Interview, InterviewDetail, PaginatedResponse } from "../types/interview";
 
 export const interviewService = {
-  getInterviews: async (filters: InterviewFilters) => {
+  getInterviews: async (filters: InterviewFilters): Promise<PaginatedResponse<Interview>> => {
     const params: Record<string, string | number> = {
       page: filters.page || 0,
       size: filters.size || 10,
@@ -31,6 +22,17 @@ export const interviewService = {
     } catch (error: any) {
       throw new Error(
         error.response?.data?.message || `Failed to fetch interviews: ${error.message}`
+      );
+    }
+  },
+
+  getInterviewById: async (id: string) => {
+    try {
+      const response = await api.get(`/interviews/${id}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || `Failed to fetch interview details: ${error.message}`
       );
     }
   },

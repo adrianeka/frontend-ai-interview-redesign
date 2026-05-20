@@ -5,8 +5,13 @@ interface LoginPayload {
   password: string;
 }
 
-export async function login(payload: LoginPayload) {
-  const response = await api.post("/auth/login", payload);
+export interface LoginResponse {
+  token: string;
+  type: string;
+}
+
+export async function login(payload: LoginPayload): Promise<LoginResponse> {
+  const response = await api.post<LoginResponse>("/auth/login", payload);
 
   return response.data;
 }

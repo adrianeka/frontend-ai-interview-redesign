@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { MoreVertical, ExternalLink, Link as LinkIcon, Edit, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +28,7 @@ interface InterviewCardProps {
   level: string;
   description: string;
   isCompact?: boolean;
+  id?: string;
   onClick?: () => void;
 }
 
@@ -38,8 +40,10 @@ export function InterviewCard({
   level,
   description,
   isCompact,
+  id,
   onClick,
 }: InterviewCardProps) {
+  const router = useRouter();
 
   return (
     <Card
@@ -153,7 +157,13 @@ export function InterviewCard({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <button className="font-semibold bg-[#E0F2FE] text-[#0369A1] pl-5 pr-4 py-2 rounded-[12px] text-[14px] hover:bg-[#BAE6FD] transition-all flex items-center group">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            if (id) router.push(`/interviews/${id}`);
+          }}
+          className="font-semibold bg-[#E0F2FE] text-[#0369A1] pl-5 pr-4 py-2 rounded-[12px] text-[14px] hover:bg-[#BAE6FD] transition-all flex items-center group"
+        >
           View Result
           <img
             src="/ExternalLink.svg"
