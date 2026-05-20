@@ -1,0 +1,95 @@
+export interface Question {
+  id: string;
+  questionText: string;
+  orderNumber: number;
+  isAnswered: boolean | null;
+}
+
+export interface Interview {
+  id: string;
+  name: string;
+  description: string;
+  companyNamePartner: string | null;
+  context: string;
+  objective: string;
+  roleTarget: string;
+  levelTarget: string;
+  technology: string;
+  purpose: "HIRING" | "INTERNAL_ASSESSMENT" | string;
+  status: "DRAFT" | "PUBLISHED" | string;
+  isAnswered: boolean | null;
+  createdAt: string;
+}
+
+export interface InterviewDetail extends Interview {
+  questions: Question[];
+}
+
+export interface InterviewFilters {
+  search?: string;
+  company?: string;
+  type?: string;
+  level?: string;
+  status?: string;
+  page?: number;
+  size?: number;
+}
+
+export interface PaginatedResponse<T> {
+  content: T[];
+  totalPages: number;
+  totalElements: number;
+  size: number;
+  pageable: {
+    pageNumber: number;
+  };
+}
+
+export interface Candidate {
+  name: string;
+  summaryReason: string;
+  recommendation: string;
+  participantId: string;
+  interviewId: string;
+  totalScore: number;
+  startedAt: string;
+  candidateId: string;
+  avgTechnicalFundamentalScore: number;
+  avgCommunicationScore: number;
+  avgProblemSolvingScore: number;
+}
+
+export interface CandidateMonitoring {
+  taskName: string;
+  status: string;
+  messageError: string | null;
+}
+
+export interface CandidateAnswer {
+  questionId: string;
+  participantId: string;
+  questionText: string;
+  questionNumber: number;
+  answerTranscript: string;
+  videoUrl: string;
+  fileName: string;
+  technicalFundamentalScore: number;
+  problemSolvingScore: number;
+  communicationScore: number;
+  breakTime: string;
+  answerTime: string;
+  isValidated: boolean;
+  status: string;
+  monitorings: CandidateMonitoring[];
+}
+
+export interface CandidateResult {
+  interviewId: string;
+  name: string;
+  totalScore: number;
+  recommendation: string;
+  summaryReason: string;
+  answers: CandidateAnswer[];
+}
+
+

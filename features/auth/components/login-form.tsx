@@ -5,10 +5,15 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { login } from "@/features/auth/services/login";
+import { setToken } from "@/lib/auth";
 
 export const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("hc@aiinterview.com");
+  const [password, setPassword] = useState("admin123");
+  const [error, setError] = useState<string | null>(null);
 
   const onSubmit = async (
     e: React.FormEvent<HTMLFormElement>
@@ -16,16 +21,35 @@ export const LoginForm = () => {
     e.preventDefault();
 
     setIsLoading(true);
+    setError(null);
 
     try {
-      // simulasi login
-      await new Promise((resolve) =>
-        setTimeout(resolve, 1500)
-      );
+      const response = await login({ email, password });
+      const token = response.token;
 
-      console.log("login success");
-    } catch (error) {
-      console.log(error);
+      if (token) {
+        setToken(token);
+
+        let redirectUrl = "/interviews";
+        if (typeof window !== "undefined") {
+          const urlParams = new URLSearchParams(window.location.search);
+          const callbackUrl = urlParams.get("callbackUrl");
+          if (callbackUrl && callbackUrl.startsWith("/")) {
+            redirectUrl = callbackUrl;
+          }
+        }
+
+        window.location.href = redirectUrl;
+      } else {
+        throw new Error("Token tidak ditemukan dalam response.");
+      }
+    } catch (err: any) {
+      console.error("Login failed:", err);
+      setError(
+        err.response?.data?.message ||
+        err.message ||
+        "Gagal masuk. Silakan periksa kembali email dan password Anda."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -43,6 +67,12 @@ export const LoginForm = () => {
         </p>
       </div>
 
+      {error && (
+        <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-600">
+          {error}
+        </div>
+      )}
+
       <form
         onSubmit={onSubmit}
         className="space-y-4"
@@ -55,6 +85,8 @@ export const LoginForm = () => {
           <Input
             type="email"
             placeholder="Masukkan email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>
@@ -72,6 +104,8 @@ export const LoginForm = () => {
                   : "password"
               }
               placeholder="Masukkan password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
 
