@@ -1,5 +1,5 @@
 import api from "@/lib/axios";
-import { InterviewFilters, Interview, InterviewDetail, PaginatedResponse, Candidate } from "../types/interview";
+import { InterviewFilters, Interview, InterviewDetail, PaginatedResponse, Candidate, CandidateResult } from "../types/interview";
 
 export const interviewService = {
   getInterviews: async (filters: InterviewFilters): Promise<PaginatedResponse<Interview>> => {
@@ -50,6 +50,17 @@ export const interviewService = {
     } catch (error: any) {
       throw new Error(
         error.response?.data?.message || `Failed to fetch candidates: ${error.message}`
+      );
+    }
+  },
+
+  getCandidateResult: async (interviewId: string, candidateId: string): Promise<CandidateResult> => {
+    try {
+      const response = await api.get(`/answers/candidate-result/${interviewId}/${candidateId}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || `Failed to fetch candidate results: ${error.message}`
       );
     }
   },
