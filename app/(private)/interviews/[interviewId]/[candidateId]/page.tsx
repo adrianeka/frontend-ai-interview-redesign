@@ -95,6 +95,59 @@ export default function CandidateInterviewPage() {
     ? sortedAnswers.reduce((acc, a) => acc + (a.communicationScore || 0), 0) / totalAnswers
     : 0;
 
+  // Step 1: Transcription and Answer Integration (always done once we fetch answers)
+  const step1Status = "completed";
+
+  // Step 2: Candidate Validation (completed if all answers are validated)
+  const step2Status = isFullyValidated ? "completed" : "active";
+
+  // Step 3: Grading Answer by AI (completed if there are scores, active if validated but no scores yet, disabled otherwise)
+  const hasScores = totalAnswers > 0 && sortedAnswers.some(a =>
+    a.technicalFundamentalScore > 0 ||
+    a.problemSolvingScore > 0 ||
+    a.communicationScore > 0
+  );
+  const step3Status = hasScores && isFullyValidated
+    ? "completed"
+    : isFullyValidated
+      ? "active"
+      : "disabled";
+
+  // Step 4: Result (completed if candidate recommendation exists)
+  const hasResult = !!candidateResult.recommendation;
+  const step4Status = hasResult && hasScores && isFullyValidated
+    ? "completed"
+    : step3Status === "completed"
+      ? "active"
+      : "disabled";
+
+  // Stepper visual styles helper
+  const getStepStyles = (status: "completed" | "active" | "disabled") => {
+    switch (status) {
+      case "completed":
+        return {
+          circle: "bg-[#0076D2] text-[#FAFAFA] border-none",
+          text: "text-[#595F6A] font-medium"
+        };
+      case "active":
+        return {
+          circle: "bg-white border-2 border-[#0076D2] text-[#0076D2]",
+          text: "text-[#0076D2] font-semibold"
+        };
+      case "disabled":
+      default:
+        return {
+          circle: "bg-[#E2E4E6] text-[#8C929D] border-none",
+          text: "text-[#A9ADB5] font-medium"
+        };
+    }
+  };
+
+  const step1 = getStepStyles(step1Status);
+  const step2 = getStepStyles(step2Status);
+  const step3 = getStepStyles(step3Status);
+  const step4 = getStepStyles(step4Status);
+
   return (
 
     <Card className="bg-[#FAFAFA] p-4 sm:p-6">
@@ -145,39 +198,36 @@ export default function CandidateInterviewPage() {
             {/* Step 1 */}
             <div className="relative flex flex-col items-center w-[134px]">
               <div className="hidden md:block absolute top-[13px] left-[50%] w-[calc(100%+1.5rem)] h-[2px] bg-[#0076D2] z-0" />
-              <div className="relative z-10 w-7 h-7 shrink-0 bg-[#0076D2] text-[#FAFAFA] font-bold rounded-full flex items-center justify-center text-sm">1</div>
-              <span className="text-center text-[#595F6A] text-sm font-medium leading-tight mt-2">
+              <div className={`relative z-10 w-7 h-7 shrink-0 font-bold rounded-full flex items-center justify-center text-sm ${step1.circle}`}>1</div>
+              <span className={`text-center text-sm leading-tight mt-2 ${step1.text}`}>
                 Transcription and Answer Integration
               </span>
             </div>
 
             {/* Step 2 */}
             <div className="relative flex flex-col items-center w-[134px]">
-              <div className="hidden md:block absolute top-[13px] left-[50%] w-[calc(100%+1.5rem)] h-[2px] bg-[#0076D2] z-0" />
-              <div className={`relative z-10 w-7 h-7 shrink-0 font-bold rounded-full flex items-center justify-center text-sm ${isFullyValidated
-                ? "bg-[#0076D2] text-white"
-                : "bg-[#FAFAFA] border-2 border-[#0076D2] text-[#43474F]"
-                }`}>
+              <div className={`hidden md:block absolute top-[13px] left-[50%] w-[calc(100%+1.5rem)] z-0 ${step3Status !== "disabled" ? "h-[2px] bg-[#0076D2]" : "h-[1px] bg-[#E2E4E6]"}`} />
+              <div className={`relative z-10 w-7 h-7 shrink-0 font-bold rounded-full flex items-center justify-center text-sm ${step2.circle}`}>
                 2
               </div>
-              <span className="text-center text-[#595F6A] text-sm font-medium leading-tight mt-2">
+              <span className={`text-center text-sm leading-tight mt-2 ${step2.text}`}>
                 Candidate Validation
               </span>
             </div>
 
             {/* Step 3 */}
             <div className="relative flex flex-col items-center w-[134px]">
-              <div className="hidden md:block absolute top-[13px] left-[50%] w-[calc(100%+1.5rem)] h-[2px] bg-[#0076D2] z-0" />
-              <div className="relative z-10 w-7 h-7 shrink-0 bg-[#0076D2] text-[#FAFAFA] font-bold rounded-full flex items-center justify-center text-sm">3</div>
-              <span className="text-center text-[#595F6A] text-sm font-medium leading-tight mt-2">
+              <div className={`hidden md:block absolute top-[13px] left-[50%] w-[calc(100%+1.5rem)] z-0 ${step4Status !== "disabled" ? "h-[2px] bg-[#0076D2]" : "h-[1px] bg-[#E2E4E6]"}`} />
+              <div className={`relative z-10 w-7 h-7 shrink-0 font-bold rounded-full flex items-center justify-center text-sm ${step3.circle}`}>3</div>
+              <span className={`text-center text-sm leading-tight mt-2 ${step3.text}`}>
                 Grading Answer by AI
               </span>
             </div>
 
             {/* Step 4 */}
             <div className="relative flex flex-col items-center w-[134px]">
-              <div className="relative z-10 w-7 h-7 shrink-0 bg-[#0076D2] text-white font-bold rounded-full flex items-center justify-center text-sm">4</div>
-              <span className="text-center text-[#595F6A] text-sm font-medium leading-tight mt-2">
+              <div className={`relative z-10 w-7 h-7 shrink-0 font-bold rounded-full flex items-center justify-center text-sm ${step4.circle}`}>4</div>
+              <span className={`text-center text-sm leading-tight mt-2 ${step4.text}`}>
                 Result
               </span>
             </div>
@@ -232,7 +282,7 @@ export default function CandidateInterviewPage() {
 
           <div className="flex items-center mb-2">
             <span className="text-[#43474F] font-semibold text-base w-48">Final Score</span>
-            <span className="text-[#0076D2] font-bold text-lg">
+            <span className="text-[#8C929D] font-semibold text-base">
               {candidateResult.totalScore ? `${Number(candidateResult.totalScore).toFixed(1)}%` : "No data yet"}
             </span>
           </div>
@@ -243,7 +293,7 @@ export default function CandidateInterviewPage() {
                 <span className="text-[#43474F] font-medium">Technical Skill </span>
                 <span className="text-[#A9ADB5]">(50%)</span>
               </div>
-              <span className="text-[#43474F] font-medium text-base">
+              <span className="text-[#8C929D] font-medium text-base">
                 {avgTechnical ? `${avgTechnical.toFixed(1)}%` : "No data yet"}
               </span>
             </div>
@@ -252,7 +302,7 @@ export default function CandidateInterviewPage() {
                 <span className="text-[#43474F] font-medium">Problem Solving </span>
                 <span className="text-[#A9ADB5]">(30%)</span>
               </div>
-              <span className="text-[#43474F] font-medium text-base">
+              <span className="text-[#8C929D] font-medium text-base">
                 {avgProblemSolving ? `${avgProblemSolving.toFixed(1)}%` : "No data yet"}
               </span>
             </div>
@@ -261,7 +311,7 @@ export default function CandidateInterviewPage() {
                 <span className="text-[#43474F] font-medium">Communication </span>
                 <span className="text-[#A9ADB5]">(20%)</span>
               </div>
-              <span className="text-[#43474F] font-medium text-base">
+              <span className="text-[#8C929D] font-medium text-base">
                 {avgCommunication ? `${avgCommunication.toFixed(1)}%` : "No data yet"}
               </span>
             </div>
@@ -342,15 +392,30 @@ export default function CandidateInterviewPage() {
 
                       <div className="flex flex-row gap-2 flex-wrap">
                         {[
-                          { label: "Technical Skill", score: a.technicalFundamentalScore },
-                          { label: "Problem Solving", score: a.problemSolvingScore },
-                          { label: "Communication", score: a.communicationScore }
-                        ].map((item, idx) => (
-                          <Badge
-                            key={idx}
-                            variant={"outline"} className="w-fit h-fit bg-[#F5F5F5] border border-[#E2E4E6] text-[#595F6A] text-sm ">{item.label}: {item.score}%</Badge>
-
-                        ))}
+                          a.technicalFundamentalScore,
+                          a.problemSolvingScore,
+                          a.communicationScore
+                        ].every((score) => score === null || score === undefined) ? (
+                          <p className="text-sm text-[#8C929D]">
+                            The score will be available after AI grading is complete.
+                          </p>
+                        ) : (
+                          [
+                            { label: "Technical Skill", score: a.technicalFundamentalScore },
+                            { label: "Problem Solving", score: a.problemSolvingScore },
+                            { label: "Communication", score: a.communicationScore }
+                          ].map((item, idx) =>
+                            item.score !== null && item.score !== undefined ? (
+                              <Badge
+                                key={idx}
+                                variant={"outline"}
+                                className="w-fit h-fit bg-[#F5F5F5] border border-[#E2E4E6] text-[#595F6A] text-sm"
+                              >
+                                {item.label}: {item.score}%
+                              </Badge>
+                            ) : null
+                          )
+                        )}
                       </div>
                     </div>
                   </div>
