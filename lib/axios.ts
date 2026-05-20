@@ -10,9 +10,8 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const token =
-    typeof window !== "undefined"
-      ? localStorage.getItem("token")
-      : null;
+    (typeof window !== "undefined" ? localStorage.getItem("token") : null) ||
+    process.env.NEXT_PUBLIC_INTERVIEW_TOKEN;
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
