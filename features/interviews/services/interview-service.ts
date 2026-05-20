@@ -1,5 +1,5 @@
 import api from "@/lib/axios";
-import { InterviewFilters, Interview, InterviewDetail, PaginatedResponse } from "../types/interview";
+import { InterviewFilters, Interview, InterviewDetail, PaginatedResponse, Candidate } from "../types/interview";
 
 export const interviewService = {
   getInterviews: async (filters: InterviewFilters): Promise<PaginatedResponse<Interview>> => {
@@ -26,7 +26,7 @@ export const interviewService = {
     }
   },
 
-  getInterviewById: async (id: string) => {
+  getInterviewById: async (id: string): Promise<InterviewDetail> => {
     try {
       const response = await api.get(`/interviews/${id}`);
       return response.data;
@@ -36,4 +36,22 @@ export const interviewService = {
       );
     }
   },
+
+  getCandidates: async (interviewId: string, recommendation?: string): Promise<Candidate[]> => {
+    try {
+      const params: Record<string, string> = {};
+      if (recommendation) {
+        params.recommendation = recommendation;
+      }
+      const response = await api.get(`/answers/list-candidate/${interviewId}`, {
+        params,
+      });
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || `Failed to fetch candidates: ${error.message}`
+      );
+    }
+  },
 };
+
