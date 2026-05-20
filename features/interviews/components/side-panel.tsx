@@ -1,8 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { ChevronLeft, ChevronDown, Minus } from "lucide-react";
+import { ChevronLeft, ChevronDown, Minus, ArrowLeftIcon, DotIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface SidePanelProps {
   interview: {
@@ -37,19 +39,19 @@ export function SidePanel({ interview, onClose }: SidePanelProps) {
   };
 
   return (
-    <aside className="w-full lg:w-[450px] bg-white border border-slate-200 rounded-2xl p-6 sticky top-24 shadow-sm animate-in slide-in-from-right duration-300 h-[calc(100vh-140px)] flex flex-col">
+    <aside className="w-full lg:w-[450px] bg-[#FAFAFA] border border-slate-200 rounded-2xl p-6 sticky top-24 shadow-sm animate-in slide-in-from-right duration-300 h-[calc(100vh-140px)] flex flex-col">
       <div className="overflow-y-auto pr-2 flex-grow custom-scrollbar">
         <div className="flex items-center justify-between mb-6">
-          <button
-            className="text-slate-400 hover:text-slate-600 flex items-center gap-1 text-sm font-medium transition-colors"
-            onClick={onClose}
-          >
-            <ChevronLeft className="w-4 h-4" />
+          {/* Back Button */}
+          <Button variant="ghost" className="text-muted-foreground" onClick={onClose}>
+            <ArrowLeftIcon />
             Back
-          </button>
-          <span className="px-2 py-1 bg-green-50 text-green-600 text-[10px] font-bold rounded flex items-center gap-1 border border-green-100">
-            <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active
-          </span>
+          </Button>
+
+          <Badge className="bg-[#EEF8F4] border-[#C9EBDE] font-medium text-[#4BAC87] text-xs py-1 px-2 h-fit w-fit">
+            <DotIcon strokeWidth={8} data-icon="inline-start" />
+            Active
+          </Badge>
         </div>
 
         <div className="mb-8">
