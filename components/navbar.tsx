@@ -15,6 +15,7 @@ import Image from "next/image";
 import { Separator } from "./ui/separator";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
+import { logout } from "@/lib/auth";
 
 interface NavbarProps {
   user?: {
@@ -90,7 +91,7 @@ export function Navbar({ user }: NavbarProps) {
         <DropdownMenuContent align="end" className="w-56">
           <DropdownMenuItem>Profile</DropdownMenuItem>
           <DropdownMenuItem>Settings</DropdownMenuItem>
-          <DropdownMenuItem className="text-destructive">
+          <DropdownMenuItem className="text-destructive" onClick={() => logout()}>
             Logout
           </DropdownMenuItem>
         </DropdownMenuContent>
