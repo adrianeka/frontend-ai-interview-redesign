@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Plus, ChevronDown, Loader2 } from "lucide-react";
+import { Plus, ChevronDown, Loader2, X } from "lucide-react";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { Pagination } from "@/components/pagination";
@@ -96,6 +96,14 @@ export default function InterviewsPage() {
     setPage(newPage - 1); // API is 0-indexed
   };
 
+  const removeFilter = (key: keyof typeof appliedFilters) => {
+    const defaultVal = key === "search" ? "" : "all";
+    const newFilters = { ...filters, [key]: defaultVal };
+    setFilters(newFilters);
+    setAppliedFilters(newFilters);
+    setPage(0);
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-inter">
       <Navbar />
@@ -138,7 +146,7 @@ export default function InterviewsPage() {
             />
 
             {/* List Meta */}
-            <div className="flex items-center justify-between mb-6 pb-2">
+            <div className="flex items-center justify-between">
               <div className="flex items-center w-full">
                 <span className="text-xs font-bold text-slate-400 tracking-wider pr-4">
                   List
@@ -161,6 +169,37 @@ export default function InterviewsPage() {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Filter Badges */}
+            {Object.entries(appliedFilters).some(([k, v]) => (k === "search" ? v !== "" : v !== "all")) && (
+              <div className="flex flex-wrap gap-2 mb-5">
+                {Object.entries(appliedFilters).map(([key, value]) => {
+                  if (key === "search" ? value === "" : value === "all") return null;
+
+                  return (
+                    <div
+                      key={key}
+                      className="flex h-[24px] items-center gap-1 rounded-[12px] bg-[#F2F2F2] pl-2 pr-2 py-1 animate-in zoom-in-95 duration-200"
+                    >
+                      <span className="text-[12px] leading-[14px] font-medium text-[#595F6A] whitespace-nowrap">
+                        {value}
+                      </span>
+
+                      <button
+                        onClick={() => removeFilter(key as keyof typeof appliedFilters)}
+                        className="flex items-center justify-center rounded-full hover:bg-[#E5E7EB] transition-colors"
+                      >
+                        <img
+                          src="/x-circle.svg"
+                          alt="close"
+                          className="h-[16px] w-[16px]"
+                        />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
             {/* Content Area */}
             {isLoading ? (
