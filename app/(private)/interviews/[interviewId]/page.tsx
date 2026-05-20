@@ -45,7 +45,7 @@ const statusColorMap: Record<string, { color: string; bgColor: string; iconBg: s
 
 export default function InterviewDetailsPage() {
     const params = useParams();
-    const id = params?.id as string;
+    const id = params?.interviewId as string;
 
     const [mounted, setMounted] = useState(false);
     const [activeFilter, setActiveFilter] = useState("");
@@ -523,7 +523,12 @@ export default function InterviewDetailsPage() {
                                         </div>
                                     </div>
 
-                                    <Button variant="ghost" size="icon-lg" className="shrink-0">
+                                    <Button 
+                                        variant="ghost" 
+                                        size="icon-lg" 
+                                        className="shrink-0"
+                                        onClick={() => router.push(`/interviews/${id}/${candidate.candidateId}`)}
+                                    >
                                         <ChevronRightIcon color="#0076D2" />
                                     </Button>
                                 </Card>
