@@ -36,4 +36,36 @@ export const interviewService = {
       );
     }
   },
+
+  createInterview: async (data: any) => {
+    try {
+      const response = await api.post('/interviews', data);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || `Failed to create interview: ${error.message}`
+      );
+    }
+  },
+  updateInterview: async (id: string, data: any) => {
+    try {
+      const response = await api.put(`/interviews/${id}`, data);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || `Failed to update interview: ${error.message}`
+      );
+    }
+  },
+
+  deleteInterview: async (id: string) => {
+    try {
+      const response = await api.delete(`/interviews/${id}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || `Failed to delete interview: ${error.message}`
+      );
+    }
+  },
 };

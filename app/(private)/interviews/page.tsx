@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { FilterSection } from "@/features/interviews/components/filter-section";
 import { InterviewCard } from "@/features/interviews/components/interview-card";
 import { CreateInterviewModal } from "@/features/interviews/components/create-interview-modal";
+import { EditInterviewModal, EditInterviewData } from "@/features/interviews/components/edit-interview-modal";
+import { InterviewAlertModal, AlertType } from "@/features/interviews/components/interview-alert-modal";
 import { SidePanel } from "@/features/interviews/components/side-panel";
 import { cn } from "@/lib/utils";
 import { interviewService } from "@/features/interviews/services/interview-service";
@@ -21,6 +23,13 @@ import {
 
 export default function InterviewsPage() {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
+  const [currentEditData, setCurrentEditData] = React.useState<EditInterviewData | null>(null);
+  
+  const [currentDeleteId, setCurrentDeleteId] = React.useState<string | null>(null);
+  const [deleteAlertType, setDeleteAlertType] = React.useState<AlertType | null>(null);
+  const [isDeleting, setIsDeleting] = React.useState(false);
+
   const [selectedInterview, setSelectedInterview] = React.useState<any | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [data, setData] = React.useState<PaginatedResponse<Interview> | null>(null);
@@ -79,6 +88,65 @@ export default function InterviewsPage() {
   const handleSearch = () => {
     setAppliedFilters(filters);
     setPage(0); // Reset to first page on new search
+  };
+
+  const handleEditClick = (interview: any) => {
+    setCurrentEditData({
+      id: interview.id,
+      name: interview.name,
+      companyNamePartner: interview.companyNamePartner,
+      description: interview.description,
+      context: interview.context,
+      objective: interview.objective,
+      purpose: interview.purpose,
+      roleTarget: interview.roleTarget,
+      levelTarget: interview.levelTarget,
+      technology: interview.technology,
+      number: interview.number || 0,
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteClick = (id: string) => {
+    setCurrentDeleteId(id);
+    setDeleteAlertType("confirmation");
+  };
+
+  const executeDelete = async () => {
+    if (!currentDeleteId) return;
+    setIsDeleting(true);
+    try {
+      await interviewService.deleteInterview(currentDeleteId);
+      setDeleteAlertType("success");
+    } catch (error) {
+      console.error(error);
+      setDeleteAlertType("error");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleDeletePrimary = () => {
+    if (deleteAlertType === "confirmation") {
+      executeDelete();
+    } else if (deleteAlertType === "success" || deleteAlertType === "error") {
+      setDeleteAlertType(null);
+      setCurrentDeleteId(null);
+      if (deleteAlertType === "success") fetchInterviews();
+    }
+  };
+
+  const handleDeleteSecondary = () => {
+    if (deleteAlertType === "confirmation") {
+      setDeleteAlertType(null);
+      setCurrentDeleteId(null);
+    } else if (deleteAlertType === "success") {
+      setDeleteAlertType(null);
+      setCurrentDeleteId(null);
+      fetchInterviews();
+    } else if (deleteAlertType === "error") {
+      executeDelete();
+    }
   };
 
   const handlePageChange = (newPage: number) => {
@@ -216,6 +284,8 @@ export default function InterviewsPage() {
                     description={item.description}
                     isCompact={!!selectedInterview}
                     onClick={() => setSelectedInterview(item)}
+                    onEdit={() => handleEditClick(item)}
+                    onDelete={() => handleDeleteClick(item.id)}
                   />
                 ))}
               </div>
@@ -252,6 +322,31 @@ export default function InterviewsPage() {
         <CreateInterviewModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
+          availableLevels={availableLevels}
+          onSuccess={() => {
+            setIsModalOpen(false);
+            fetchInterviews();
+          }}
+        />
+
+        <EditInterviewModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          availableLevels={availableLevels}
+          initialData={currentEditData}
+          onSuccess={() => {
+            setIsEditModalOpen(false);
+            fetchInterviews();
+          }}
+        />
+
+        <InterviewAlertModal
+          isOpen={!!deleteAlertType}
+          mode="delete"
+          type={deleteAlertType || "confirmation"}
+          isLoading={isDeleting}
+          onPrimaryAction={handleDeletePrimary}
+          onSecondaryAction={handleDeleteSecondary}
         />
       </div>
     </>

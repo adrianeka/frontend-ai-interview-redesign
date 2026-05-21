@@ -30,6 +30,8 @@ interface InterviewCardProps {
   isCompact?: boolean;
   id?: string;
   onClick?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 export function InterviewCard({
@@ -42,6 +44,8 @@ export function InterviewCard({
   isCompact,
   id,
   onClick,
+  onEdit,
+  onDelete,
 }: InterviewCardProps) {
   const router = useRouter();
 
@@ -152,8 +156,18 @@ export function InterviewCard({
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="rounded-xl border-[#E2E4E6]">
-            <DropdownMenuItem className="gap-2 font-medium py-2"><Edit className="w-4 h-4" /> Edit</DropdownMenuItem>
-            <DropdownMenuItem className="gap-2 text-destructive font-medium py-2"><Trash2 className="w-4 h-4" /> Delete</DropdownMenuItem>
+            <DropdownMenuItem 
+              className="gap-2 font-medium py-2 cursor-pointer" 
+              onClick={(e) => { e.stopPropagation(); onEdit?.(); }}
+            >
+              <Edit className="w-4 h-4" /> Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              className="gap-2 text-destructive font-medium py-2 cursor-pointer"
+              onClick={(e) => { e.stopPropagation(); onDelete?.(); }}
+            >
+              <Trash2 className="w-4 h-4" /> Delete
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
