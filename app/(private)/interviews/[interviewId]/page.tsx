@@ -34,13 +34,22 @@ import { useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
 import { interviewService } from "@/features/interviews/services/interview-service";
 import { InterviewDetail, Candidate } from "@/features/interviews/types/interview";
+import { EditInterviewModal, EditInterviewData } from "@/features/interviews/components/edit-interview-modal";
+import { InterviewAlertModal, AlertType } from "@/features/interviews/components/interview-alert-modal";
 
 // Color map for hire decision statuses — keyed by status string
-const statusColorMap: Record<string, { color: string; bgColor: string; iconBg: string; icon: React.ElementType; value: string }> = {
+const hiringColorMap: Record<string, { color: string; bgColor: string; iconBg: string; icon: React.ElementType; value: string }> = {
     "Strong Hire": { color: "#4BAC87", bgColor: "#EEF8F4", iconBg: "#C9EBDE", icon: CheckIcon, value: "strong-hire" },
     "Hire": { color: "#0076D2", bgColor: "#F1F9FA", iconBg: "#DBF2F3", icon: PlusIcon, value: "hire" },
     "Consider": { color: "#E8A01D", bgColor: "#FFF7E9", iconBg: "#FFE7BA", icon: ClockIcon, value: "consider" },
     "Reject": { color: "#E84E2C", bgColor: "#FFEEEA", iconBg: "#FFCBBF", icon: XIcon, value: "reject" },
+};
+
+const internalAssessmentColorMap: Record<string, { color: string; bgColor: string; iconBg: string; icon: React.ElementType; value: string }> = {
+    "Ready for Promotion": { color: "#4BAC87", bgColor: "#EEF8F4", iconBg: "#C9EBDE", icon: CheckIcon, value: "ready-for-promotion" },
+    "Meets Current Level": { color: "#0076D2", bgColor: "#F1F9FA", iconBg: "#DBF2F3", icon: PlusIcon, value: "meets-current-level" },
+    "Needs Improvement": { color: "#E8A01D", bgColor: "#FFF7E9", iconBg: "#FFE7BA", icon: ClockIcon, value: "needs-improvement" },
+    "Significant Improvement Required": { color: "#E84E2C", bgColor: "#FFEEEA", iconBg: "#FFCBBF", icon: XIcon, value: "significant-improvement-required" },
 };
 
 export default function InterviewDetailsPage() {
@@ -54,10 +63,16 @@ export default function InterviewDetailsPage() {
     const [currentPage, setCurrentPage] = useState(1);
 
     const [interviewDetail, setInterviewDetail] = useState<InterviewDetail | null>(null);
+    const [allCandidates, setAllCandidates] = useState<Candidate[]>([]);
     const [candidates, setCandidates] = useState<Candidate[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [retryTrigger, setRetryTrigger] = useState(0);
     const [error, setError] = useState<string | null>(null);
+
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [currentEditData, setCurrentEditData] = useState<EditInterviewData | null>(null);
+    const [deleteAlertType, setDeleteAlertType] = useState<AlertType | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const router = useRouter();
 
@@ -65,33 +80,30 @@ export default function InterviewDetailsPage() {
         setMounted(true);
     }, []);
 
+    const isInternal = interviewDetail?.purpose === "INTERNAL_ASSESSMENT" || interviewDetail?.purpose === "INTERNAL_ASSESMENT";
+    const activeColorMap = isInternal ? internalAssessmentColorMap : hiringColorMap;
+
     // Helper to translate filter slug back to display label
     const getActiveFilterLabel = (filter: string) => {
-        const found = Object.entries(statusColorMap).find(([_, cfg]) => cfg.value === filter);
+        const found = Object.entries(activeColorMap).find(([_, cfg]) => cfg.value === filter);
         return found ? found[0] : filter;
     };
 
-    // Helper to map backend recommendation string strictly to one of our 4 UI status keys
+    // Helper to map backend recommendation string strictly to one of our UI status keys
     const mapRecommendationToStatusKey = (rec: string | null | undefined): string | null => {
         if (!rec) return null;
         
         const lower = rec.toLowerCase();
         
-        if (lower === "strong hire" || lower === "strong-hire") {
-            return "Strong Hire";
-        }
+        if (lower === "strong hire" || lower === "strong-hire") return "Strong Hire";
+        if (lower === "hire") return "Hire";
+        if (lower === "consider") return "Consider";
+        if (lower === "reject") return "Reject";
         
-        if (lower === "hire") {
-            return "Hire";
-        }
-        
-        if (lower === "consider") {
-            return "Consider";
-        }
-        
-        if (lower === "reject") {
-            return "Reject";
-        }
+        if (lower === "ready for promotion" || lower === "ready-for-promotion") return "Ready for Promotion";
+        if (lower === "meets current level" || lower === "meets-current-level") return "Meets Current Level";
+        if (lower === "needs improvement" || lower === "needs-improvement") return "Needs Improvement";
+        if (lower === "significant improvement required" || lower === "significant-improvement-required") return "Significant Improvement Required";
         
         return null;
     };
@@ -130,6 +142,7 @@ export default function InterviewDetailsPage() {
                 setInterviewDetail(detail);
 
                 const fullList = await interviewService.getCandidates(id);
+                setAllCandidates(fullList);
                 setCandidates(fullList);
             } catch (err: any) {
                 console.error("Error fetching initial data:", err);
@@ -144,38 +157,46 @@ export default function InterviewDetailsPage() {
 
     // Calculate dynamic status counts based on full candidates list
     const statusCounts = React.useMemo(() => {
-        const counts = { "Strong Hire": 0, Hire: 0, Consider: 0, Reject: 0 };
-        candidates.forEach(c => {
+        const counts: Record<string, number> = {};
+        Object.keys(activeColorMap).forEach(key => counts[key] = 0);
+        
+        allCandidates.forEach(c => {
             const statusKey = mapRecommendationToStatusKey(c.recommendation);
-            if (statusKey) {
-                counts[statusKey as keyof typeof counts]++;
+            if (statusKey && counts[statusKey] !== undefined) {
+                counts[statusKey]++;
             }
         });
         return counts;
-    }, [candidates]);
+    }, [allCandidates, activeColorMap]);
 
-    const totalCandidatesCount = candidates.length;
+    const totalCandidatesCount = allCandidates.length;
 
-    // Filter candidates by status filter and search query client-side
+    // Fetch filtered candidates
+    const fetchFilteredCandidates = async (filterValue: string) => {
+        setIsLoading(true);
+        try {
+            const list = await interviewService.getCandidates(id, filterValue || undefined);
+            setCandidates(list);
+        } catch (err: any) {
+            console.error("Error fetching filtered candidates:", err);
+            toast.error("Failed to fetch filtered candidates.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Filter candidates by search query client-side
+    // (Status filter is applied via backend hit)
     const filteredCandidates = React.useMemo(() => {
         return candidates.filter(c => {
-            // 1. Status Filter
-            if (activeFilter) {
-                const statusKey = mapRecommendationToStatusKey(c.recommendation);
-                const activeCfg = Object.entries(statusColorMap).find(([_, cfg]) => cfg.value === activeFilter);
-                if (!activeCfg || activeCfg[0] !== statusKey) {
-                    return false;
-                }
-            }
-            
-            // 2. Search Query Filter
+            // 1. Search Query Filter
             if (searchQuery) {
                 return c.name.toLowerCase().includes(searchQuery.toLowerCase());
             }
             
             return true;
         });
-    }, [candidates, activeFilter, searchQuery]);
+    }, [candidates, searchQuery]);
 
     // Pagination calculations
     const totalEntries = filteredCandidates.length;
@@ -228,6 +249,61 @@ export default function InterviewDetailsPage() {
 
     const handleRetry = () => {
         setRetryTrigger(prev => prev + 1);
+    };
+
+    const handleEditClick = () => {
+        if (!interviewDetail) return;
+        setCurrentEditData({
+            id: interviewDetail.id,
+            name: interviewDetail.name,
+            companyNamePartner: interviewDetail.companyNamePartner || "",
+            description: interviewDetail.description,
+            context: interviewDetail.context,
+            objective: interviewDetail.objective,
+            purpose: interviewDetail.purpose,
+            roleTarget: interviewDetail.roleTarget,
+            levelTarget: interviewDetail.levelTarget,
+            technology: interviewDetail.technology,
+            number: (interviewDetail as any).number || 0,
+        });
+        setIsEditModalOpen(true);
+    };
+
+    const handleDeleteClick = () => {
+        setDeleteAlertType("confirmation");
+    };
+
+    const executeDelete = async () => {
+        setIsDeleting(true);
+        try {
+            await interviewService.deleteInterview(id);
+            setDeleteAlertType("success");
+        } catch (err) {
+            console.error(err);
+            setDeleteAlertType("error");
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+    const handleDeletePrimary = () => {
+        if (deleteAlertType === "confirmation") {
+            executeDelete();
+        } else if (deleteAlertType === "success" || deleteAlertType === "error") {
+            setDeleteAlertType(null);
+            if (deleteAlertType === "success") router.push("/interviews");
+        }
+    };
+
+    const handleDeleteSecondary = () => {
+        if (deleteAlertType === "confirmation") {
+            setDeleteAlertType(null);
+        } else if (deleteAlertType === "success") {
+            setDeleteAlertType(null);
+            router.push("/interviews");
+        } else if (deleteAlertType === "error") {
+            executeDelete();
+        }
     };
 
     if (error) {
@@ -286,10 +362,26 @@ export default function InterviewDetailsPage() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
                                 {/* Edit */}
-                                <DropdownMenuItem className="text-[#707784]"><PencilIcon /> Edit</DropdownMenuItem>
+                                <DropdownMenuItem 
+                                    className="gap-2 font-medium py-2 cursor-pointer text-[#707784]" 
+                                    onClick={(e) => { 
+                                        e.stopPropagation(); 
+                                        handleEditClick();
+                                    }}
+                                >
+                                    <PencilIcon className="w-4 h-4" /> Edit
+                                </DropdownMenuItem>
 
                                 {/* Delete */}
-                                <DropdownMenuItem variant="destructive"><Trash2Icon /> Delete</DropdownMenuItem>
+                                <DropdownMenuItem 
+                                    className="gap-2 text-destructive font-medium py-2 cursor-pointer"
+                                    onClick={(e) => { 
+                                        e.stopPropagation(); 
+                                        handleDeleteClick();
+                                    }}
+                                >
+                                    <Trash2Icon className="w-4 h-4" /> Delete
+                                </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     ) : (
@@ -374,15 +466,19 @@ export default function InterviewDetailsPage() {
 
                 {/* Filter section */}
                 <div className="grid grid-cols-2 md:flex md:flex-row gap-3 md:gap-4 w-full">
-                    {Object.entries(statusColorMap).map(([label, cfg], index) => {
+                    {Object.entries(activeColorMap).map(([label, cfg], index) => {
                         const isActive = activeFilter === cfg.value;
                         return (
                             <Button
                                 key={index}
                                 variant="outline"
+                                disabled={isLoading}
                                 onClick={() => {
-                                    setActiveFilter(prev => prev === cfg.value ? "" : cfg.value);
+                                    if (isLoading) return;
+                                    const newFilter = activeFilter === cfg.value ? "" : cfg.value;
+                                    setActiveFilter(newFilter);
                                     setCurrentPage(1);
+                                    fetchFilteredCandidates(newFilter);
                                 }}
                                 style={isActive ? { borderColor: cfg.color, backgroundColor: cfg.bgColor } : {}}
                                 className="flex-1 w-full h-fit bg-[#FAFAFA] flex flex-col items-start gap-2 border-2 border-[#E2E4E6] px-4 py-3 rounded-lg cursor-pointer"
@@ -462,7 +558,14 @@ export default function InterviewDetailsPage() {
                 {/* List filter summary */}
                 <div className="flex flex-row flex-wrap gap-2">
                     {[
-                        activeFilter && { label: getActiveFilterLabel(activeFilter), clear: () => setActiveFilter("") },
+                        activeFilter && { 
+                            label: getActiveFilterLabel(activeFilter), 
+                            clear: () => {
+                                setActiveFilter("");
+                                setCurrentPage(1);
+                                fetchFilteredCandidates("");
+                            } 
+                        },
                         searchQuery && { label: searchQuery, clear: () => setSearchQuery("") },
                     ].filter(Boolean).map((item: any, index) => (
                         <Badge
@@ -479,12 +582,17 @@ export default function InterviewDetailsPage() {
 
                 {/* Candidate list */}
                 <div className="flex flex-col divide-y divide-[#E2E4E6] gap-6">
-                    {currentCandidates.length > 0 ? (
+                    {isLoading ? (
+                        <div className="flex justify-center items-center py-20">
+                            <Loader2 className="w-8 h-8 animate-spin text-[#0076D2]" />
+                            <span className="ml-2 text-[#707784] font-medium">Filtering candidates...</span>
+                        </div>
+                    ) : currentCandidates.length > 0 ? (
                         currentCandidates.map((candidate, index) => {
                             const rec = candidate.recommendation;
                             const mappedKey = mapRecommendationToStatusKey(rec);
-                            const colorCfg = mappedKey 
-                                ? (statusColorMap[mappedKey as keyof typeof statusColorMap] ?? { color: "#A9ADB5", bgColor: "#F5F5F5" })
+                            const colorCfg = mappedKey && activeColorMap[mappedKey]
+                                ? activeColorMap[mappedKey]
                                 : { color: "#595F6A", bgColor: "#F2F2F2" }; // sleek neutral gray for custom recommendations
                             return (
                                 <Card key={candidate.participantId || index} className="flex flex-row p-4 sm:px-1.25 sm:py-2 ring-0 items-center justify-between w-full">
@@ -494,7 +602,7 @@ export default function InterviewDetailsPage() {
                                                 <Badge
                                                     variant="outline"
                                                     style={{ borderColor: colorCfg.color, color: colorCfg.color, backgroundColor: colorCfg.bgColor }}
-                                                    className="py-1 px-2 text-sm font-medium whitespace-normal break-words text-left"
+                                                    className="py-1 px-2 text-sm font-medium whitespace-normal wrap-break-word text-left"
                                                 >
                                                     {mappedKey || rec}
                                                 </Badge>
@@ -594,6 +702,28 @@ export default function InterviewDetailsPage() {
                     )}
                 </div>
             </CardContent>
+
+            {/* Modals */}
+            <EditInterviewModal
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                availableLevels={interviewDetail?.levelTarget ? [interviewDetail.levelTarget] : []}
+                initialData={currentEditData}
+                onSuccess={() => {
+                    setIsEditModalOpen(false);
+                    // trigger re-fetch to reflect updated detail
+                    setRetryTrigger(prev => prev + 1);
+                }}
+            />
+
+            <InterviewAlertModal
+                isOpen={!!deleteAlertType}
+                mode="delete"
+                type={deleteAlertType || "confirmation"}
+                isLoading={isDeleting}
+                onPrimaryAction={handleDeletePrimary}
+                onSecondaryAction={handleDeleteSecondary}
+            />
         </Card>
     );
 }
