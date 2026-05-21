@@ -97,5 +97,67 @@ export const interviewService = {
       );
     }
   },
+
+  updateAnswerTranscript: async (participantId: string, questionId: string, answerTranscript: string) => {
+    try {
+      const response = await api.put(`/answers/update-result/${participantId}/${questionId}`, {
+        answerTranscript
+      });
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || `Failed to update answer transcript: ${error.message}`
+      );
+    }
+  },
+
+  validateAnswer: async (participantId: string, questionId: string) => {
+    try {
+      const response = await api.put(`/answers/validate/${participantId}/${questionId}`, {
+        isValidated: true,
+        validated: true
+      });
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || `Failed to validate answer: ${error.message}`
+      );
+    }
+  },
+
+  downloadVideo: async (fileName: string) => {
+    try {
+      const response = await api.get(`/answers/download/${fileName}`, {
+        responseType: 'blob' // Required to handle binary file download
+      });
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || `Failed to download video: ${error.message}`
+      );
+    }
+  },
+
+  getStepProgress: async (interviewId: string, candidateId: string) => {
+    try {
+      const response = await api.get(`/answers/step-progress/${interviewId}/${candidateId}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || `Failed to fetch step progress: ${error.message}`
+      );
+    }
+  },
+
+  retryStt: async (participantId: string, questionId: string) => {
+    try {
+      const response = await api.put(`/answers/reprocess-stt/${participantId}/${questionId}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || `Failed to retry STT: ${error.message}`
+      );
+    }
+  },
 };
 
