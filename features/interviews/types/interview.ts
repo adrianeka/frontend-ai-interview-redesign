@@ -44,3 +44,52 @@ export interface PaginatedResponse<T> {
     pageNumber: number;
   };
 }
+
+export interface Candidate {
+  name: string;
+  summaryReason: string;
+  recommendation: string;
+  participantId: string;
+  interviewId: string;
+  totalScore: number;
+  startedAt: string;
+  candidateId: string;
+  avgTechnicalFundamentalScore: number;
+  avgCommunicationScore: number;
+  avgProblemSolvingScore: number;
+}
+
+export interface CandidateMonitoring {
+  taskName: string;
+  status: string;
+  messageError: string | null;
+}
+
+export interface CandidateAnswer {
+  questionId: string;
+  participantId: string;
+  questionText: string;
+  questionNumber: number;
+  answerTranscript: string;
+  videoUrl: string;
+  fileName: string;
+  technicalFundamentalScore: number;
+  problemSolvingScore: number;
+  communicationScore: number;
+  breakTime: string;
+  answerTime: string;
+  isValidated: boolean;
+  status: string;
+  monitorings: CandidateMonitoring[];
+}
+
+export interface CandidateResult {
+  interviewId: string;
+  name: string;
+  totalScore: number;
+  recommendation: string;
+  summaryReason: string;
+  answers: CandidateAnswer[];
+}
+
+

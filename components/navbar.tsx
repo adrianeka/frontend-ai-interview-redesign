@@ -44,7 +44,7 @@ export function Navbar({ user }: NavbarProps) {
             className="bg-[#F1F9FA] border-2 border-[#0076D2] px-4 py-3"
           >
             <Grid2x2PlusIcon color="#0076D2" size={20} />
-            <span className="text-[#0076D2] font-medium text-sm">
+            <span className="text-[#0076D2] font-medium text-base">
               Interviews
             </span>
           </Button>
@@ -55,7 +55,7 @@ export function Navbar({ user }: NavbarProps) {
             className="bg-transparent border-2 border-[#E2E4E6] px-4 py-3"
           >
             <ChartNoAxesColumnIncreasingIcon color="#8C929D" size={20} />
-            <span className="text-[#8C929D] font-medium text-sm">
+            <span className="text-[#8C929D] font-medium text-base">
               Monitoring
             </span>
           </Button>
