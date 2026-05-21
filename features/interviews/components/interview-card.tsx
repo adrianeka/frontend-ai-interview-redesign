@@ -14,30 +14,13 @@ import {
 import { cn } from "@/lib/utils";
 
 
-interface InterviewCardProps {
-  title: string;
-  company: {
-    companyNamePartner: string | null;
-    logo: string;
-  };
-  progress: {
-    current: number;
-    total: number;
-  };
-  type: "Hiring" | "Internal Assessment";
-  level: string;
-  description: string;
-  isCompact?: boolean;
-  id?: string;
-  onClick?: () => void;
-  onEdit?: () => void;
-  onDelete?: () => void;
-}
+import { InterviewCardProps } from "../types/interview";
+import Image from "next/image";
 
 export function InterviewCard({
   title,
   company,
-  progress,
+  topCandidate,
   type,
   level,
   description,
@@ -80,9 +63,9 @@ export function InterviewCard({
             />
             <span className="text-[12px] font-medium text-[#A1A1AA]">
               <span className="text-[#4BAC87]">
-                {progress.current}
+                {topCandidate?.split('/')[0] || "0"}
               </span>
-              /{progress.total}
+              /{topCandidate?.split('/')[1] || "0"}
             </span>
           </div>
         </div>
@@ -156,13 +139,22 @@ export function InterviewCard({
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="rounded-xl border-[#E2E4E6]">
-            <DropdownMenuItem 
-              className="gap-2 font-medium py-2 cursor-pointer" 
-              onClick={(e) => { e.stopPropagation(); onEdit?.(); }}
+            <DropdownMenuItem
+              className="flex items-center gap-2 font-medium py-2 cursor-pointer text-[#707784]"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit?.();
+              }}
             >
-              <Edit className="w-4 h-4" /> Edit
+              <Image
+                src="/Pencil.svg"
+                alt="Edit"
+                width={16}
+                height={16}
+              />
+              Edit
             </DropdownMenuItem>
-            <DropdownMenuItem 
+            <DropdownMenuItem
               className="gap-2 text-destructive font-medium py-2 cursor-pointer"
               onClick={(e) => { e.stopPropagation(); onDelete?.(); }}
             >

@@ -19,6 +19,56 @@ export interface Interview {
   status: "DRAFT" | "PUBLISHED" | string;
   isAnswered: boolean | null;
   createdAt: string;
+  number?: number;
+  language?: string;
+  topCandidate?: string;
+}
+
+export interface EditInterviewData {
+  id: string;
+  name: string;
+  companyNamePartner: string;
+  description: string;
+  context: string;
+  objective: string;
+  purpose: string;
+  roleTarget: string;
+  levelTarget: string;
+  technology: string;
+  number: number;
+  language?: string;
+}
+
+export interface InterviewCardProps {
+  title: string;
+  company: {
+    companyNamePartner: string | null;
+    logo: string;
+  };
+  topCandidate: string;
+  type: "Hiring" | "Internal Assessment" | string;
+  level: string;
+  description: string;
+  isCompact?: boolean;
+  id?: string;
+  onClick?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
+}
+
+export interface CreateInterviewModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  availableLevels?: string[];
+  onSuccess?: () => void;
+}
+
+export interface EditInterviewModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  availableLevels?: string[];
+  initialData: EditInterviewData | null;
+  onSuccess?: () => void;
 }
 
 export interface InterviewDetail extends Interview {

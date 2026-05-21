@@ -74,25 +74,25 @@ export default function InterviewDetailsPage() {
     // Helper to map backend recommendation string strictly to one of our 4 UI status keys
     const mapRecommendationToStatusKey = (rec: string | null | undefined): string | null => {
         if (!rec) return null;
-        
+
         const lower = rec.toLowerCase();
-        
+
         if (lower === "strong hire" || lower === "strong-hire") {
             return "Strong Hire";
         }
-        
+
         if (lower === "hire") {
             return "Hire";
         }
-        
+
         if (lower === "consider") {
             return "Consider";
         }
-        
+
         if (lower === "reject") {
             return "Reject";
         }
-        
+
         return null;
     };
 
@@ -121,7 +121,7 @@ export default function InterviewDetailsPage() {
     // Fetch initial details and candidates list once
     useEffect(() => {
         if (!id) return;
-        
+
         const fetchInitialData = async () => {
             setIsLoading(true);
             setError(null);
@@ -167,12 +167,12 @@ export default function InterviewDetailsPage() {
                     return false;
                 }
             }
-            
+
             // 2. Search Query Filter
             if (searchQuery) {
                 return c.name.toLowerCase().includes(searchQuery.toLowerCase());
             }
-            
+
             return true;
         });
     }, [candidates, activeFilter, searchQuery]);
@@ -201,11 +201,11 @@ export default function InterviewDetailsPage() {
         } else {
             pages.push(1);
             if (currentPage > 3) pages.push("ellipsis-1");
-            
+
             const start = Math.max(2, currentPage - 1);
             const end = Math.min(totalPages - 1, currentPage + 1);
             for (let i = start; i <= end; i++) pages.push(i);
-            
+
             if (currentPage < totalPages - 2) pages.push("ellipsis-2");
             pages.push(totalPages);
         }
@@ -284,12 +284,35 @@ export default function InterviewDetailsPage() {
                                     <EllipsisVerticalIcon />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                {/* Edit */}
-                                <DropdownMenuItem className="text-[#707784]"><PencilIcon /> Edit</DropdownMenuItem>
 
-                                {/* Delete */}
-                                <DropdownMenuItem variant="destructive"><Trash2Icon /> Delete</DropdownMenuItem>
+                            <DropdownMenuContent
+                                align="end"
+                                className="
+                                    w-[142px]
+                                    min-h-[112px]
+                                    rounded-[12px]
+                                    p-3
+                                    flex
+                                    flex-col
+                                    gap-2
+                                    border
+                                    border-[#E2E4E6]
+                                    shadow-[0px_4px_12px_rgba(0,0,0,0.08)]
+                                "
+                            >
+                                {/* Edit */}
+                                <DropdownMenuItem className="h-10 rounded-lg px-3 gap-2 text-[#707784] cursor-pointer">
+                                    <PencilIcon className="w-4 h-4" />
+                                    Edit
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem
+                                    variant="destructive"
+                                    className="h-10 rounded-lg px-3 gap-2 cursor-pointer"
+                                >
+                                    <Trash2Icon className="w-4 h-4" />
+                                    Delete
+                                </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     ) : (
@@ -483,7 +506,7 @@ export default function InterviewDetailsPage() {
                         currentCandidates.map((candidate, index) => {
                             const rec = candidate.recommendation;
                             const mappedKey = mapRecommendationToStatusKey(rec);
-                            const colorCfg = mappedKey 
+                            const colorCfg = mappedKey
                                 ? (statusColorMap[mappedKey as keyof typeof statusColorMap] ?? { color: "#A9ADB5", bgColor: "#F5F5F5" })
                                 : { color: "#595F6A", bgColor: "#F2F2F2" }; // sleek neutral gray for custom recommendations
                             return (
@@ -523,9 +546,9 @@ export default function InterviewDetailsPage() {
                                         </div>
                                     </div>
 
-                                    <Button 
-                                        variant="ghost" 
-                                        size="icon-lg" 
+                                    <Button
+                                        variant="ghost"
+                                        size="icon-lg"
                                         className="shrink-0"
                                         onClick={() => router.push(`/interviews/${id}/${candidate.candidateId}`)}
                                     >
@@ -545,7 +568,7 @@ export default function InterviewDetailsPage() {
                 <div className="flex w-full items-center justify-between flex-col sm:flex-row gap-4 sm:gap-0">
                     {/* Showing entries */}
                     <p className="text-[#A9ADB5] italic text-sm text-center sm:text-left">
-                        {totalEntries > 0 
+                        {totalEntries > 0
                             ? `Showing ${startIndex + 1} to ${endIndex} of ${totalEntries} entries`
                             : "Showing 0 to 0 of 0 entries"}
                     </p>
@@ -560,7 +583,7 @@ export default function InterviewDetailsPage() {
                                 <PaginationItem>
                                     <PaginationPrevious text="" href="#" onClick={(e) => { e.preventDefault(); handlePageChange(currentPage - 1); }} />
                                 </PaginationItem>
-                                
+
                                 {getPageNumbers().map((p, index) => {
                                     if (p === "ellipsis-1" || p === "ellipsis-2") {
                                         return (
@@ -572,8 +595,8 @@ export default function InterviewDetailsPage() {
                                     const pageNum = p as number;
                                     return (
                                         <PaginationItem key={pageNum}>
-                                            <PaginationLink 
-                                                href="#" 
+                                            <PaginationLink
+                                                href="#"
                                                 onClick={(e) => { e.preventDefault(); handlePageChange(pageNum); }}
                                                 isActive={currentPage === pageNum}
                                             >
