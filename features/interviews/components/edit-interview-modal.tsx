@@ -23,14 +23,29 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-interface CreateInterviewModalProps {
+export interface EditInterviewData {
+  id: string;
+  name: string;
+  companyNamePartner: string;
+  description: string;
+  context: string;
+  objective: string;
+  purpose: string;
+  roleTarget: string;
+  levelTarget: string;
+  technology: string;
+  number: number;
+}
+
+interface EditInterviewModalProps {
   isOpen: boolean;
   onClose: () => void;
   availableLevels?: string[];
+  initialData: EditInterviewData | null;
   onSuccess?: () => void;
 }
 
-export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], onSuccess }: CreateInterviewModalProps) {
+export function EditInterviewModal({ isOpen, onClose, availableLevels = [], initialData, onSuccess }: EditInterviewModalProps) {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [alertType, setAlertType] = React.useState<AlertType | null>(null);
   const [formData, setFormData] = React.useState<FormData | null>(null);
@@ -62,7 +77,20 @@ export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], on
   React.useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
-      reset();
+      if (initialData) {
+        reset({
+          name: initialData.name || "",
+          companyNamePartner: initialData.companyNamePartner || "",
+          description: initialData.description || "",
+          context: initialData.context || "",
+          objective: initialData.objective || "",
+          purpose: initialData.purpose || "",
+          number: initialData.number ? initialData.number.toString() : "",
+          roleTarget: initialData.roleTarget || "",
+          levelTarget: initialData.levelTarget || "",
+          technology: initialData.technology || "",
+        });
+      }
       setAlertType(null);
       setFormData(null);
     } else {
@@ -71,15 +99,15 @@ export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], on
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [isOpen, reset]);
+  }, [isOpen, initialData, reset]);
 
   const onInitSubmit = (data: FormData) => {
     setFormData(data);
     setAlertType("confirmation");
   };
 
-  const executeCreation = async () => {
-    if (!formData) return;
+  const executeUpdate = async () => {
+    if (!formData || !initialData) return;
     setIsSubmitting(true);
     try {
       const payload = {
@@ -97,7 +125,7 @@ export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], on
         createdBy: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
       };
 
-      await interviewService.createInterview(payload);
+      await interviewService.updateInterview(initialData.id, payload);
       setAlertType("success");
     } catch (error) {
       console.error(error);
@@ -109,7 +137,7 @@ export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], on
 
   const handleAlertPrimary = () => {
     if (alertType === "confirmation") {
-      executeCreation();
+      executeUpdate();
     } else if (alertType === "success" || alertType === "error") {
       // Back to Home
       onClose();
@@ -129,7 +157,7 @@ export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], on
       setAlertType(null);
     } else if (alertType === "error") {
       // Try Again
-      executeCreation();
+      executeUpdate();
     }
   };
 
@@ -137,7 +165,7 @@ export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], on
 
   return (
     <>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" id="interviewModal">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" id="editInterviewModal">
         <div
           className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
           id="modalBackdrop"
@@ -147,12 +175,11 @@ export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], on
         <div className="relative w-full max-w-[684px] bg-white rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-200">
           <div className="px-6 py-5 border-b border-slate-100 flex items-start justify-between bg-white sticky top-0 z-10">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">Create an Interview Session</h2>
-              <p className="text-sm text-slate-500 mt-1">Please fill out the form below to add a new interview session.</p>
+              <h2 className="text-xl font-bold text-slate-900">Edit Session Title</h2>
+              <p className="text-sm text-slate-500 mt-1">Please update the form below to save changes.</p>
             </div>
             <button
               className="text-slate-400 hover:text-slate-600 transition-colors p-1"
-              id="closeModalIcon"
               onClick={onClose}
             >
               <X className="w-5 h-5" />
@@ -160,7 +187,7 @@ export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], on
           </div>
 
           <div className="px-6 py-6 overflow-y-auto">
-            <form className="space-y-6" id="newInterviewForm" onSubmit={handleSubmit(onInitSubmit)}>
+            <form className="space-y-6" id="editInterviewForm" onSubmit={handleSubmit(onInitSubmit)}>
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-2">
                   Interview Session Title <span className="text-red-500">*</span>
@@ -220,6 +247,7 @@ export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], on
                 ></textarea>
                 {errors.objective && <p className="text-red-500 text-xs mt-1">{errors.objective.message}</p>}
               </div>
+
               <div className="flex gap-[16px]">
                 <div className="w-[296.5px]">
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
@@ -310,7 +338,6 @@ export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], on
               type="button"
               disabled={isSubmitting}
               className="px-5 py-2.5 bg-[#dcf3f9] text-[#00a8cc] rounded-lg text-sm font-bold hover:bg-blue-100 transition-colors disabled:opacity-50"
-              id="closeModalBtn"
               onClick={onClose}
             >
               Cancel
@@ -318,10 +345,9 @@ export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], on
             <button
               className="px-5 py-2.5 bg-[#0070c9] text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50 disabled:bg-slate-300 flex items-center justify-center gap-2"
               type="submit"
-              form="newInterviewForm"
-              disabled={isSubmitting || !isDirty || !isValid}
+              form="editInterviewForm"
             >
-              Create Interview
+              Save Changes
             </button>
           </div>
         </div>
@@ -329,6 +355,7 @@ export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], on
 
       <InterviewAlertModal
         isOpen={!!alertType}
+        mode="update"
         type={alertType || "confirmation"}
         isLoading={isSubmitting}
         onPrimaryAction={handleAlertPrimary}
@@ -337,4 +364,3 @@ export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], on
     </>
   );
 }
-
