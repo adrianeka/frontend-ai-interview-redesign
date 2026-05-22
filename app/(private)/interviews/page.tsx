@@ -25,7 +25,7 @@ export default function InterviewsPage() {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
   const [currentEditData, setCurrentEditData] = React.useState<EditInterviewData | null>(null);
-  
+
   const [currentDeleteId, setCurrentDeleteId] = React.useState<string | null>(null);
   const [deleteAlertType, setDeleteAlertType] = React.useState<AlertType | null>(null);
   const [isDeleting, setIsDeleting] = React.useState(false);
@@ -90,22 +90,28 @@ export default function InterviewsPage() {
     setPage(0); // Reset to first page on new search
   };
 
-  const handleEditClick = (interview: any) => {
-    setCurrentEditData({
-      id: interview.id,
-      name: interview.name,
-      companyNamePartner: interview.companyNamePartner,
-      description: interview.description,
-      context: interview.context,
-      objective: interview.objective,
-      purpose: interview.purpose,
-      roleTarget: interview.roleTarget,
-      levelTarget: interview.levelTarget,
-      technology: interview.technology,
-      number: parseInt(interview.number, 10) || 0,
-      language: interview.language || "EN",
-    });
-    setIsEditModalOpen(true);
+  const handleEditClick = async (interview: any) => {
+    try {
+      const detailedInterview = await interviewService.getInterviewById(interview.id);
+      setCurrentEditData({
+        id: detailedInterview.id,
+        name: detailedInterview.name,
+        companyNamePartner: detailedInterview.companyNamePartner || "",
+        description: detailedInterview.description,
+        context: detailedInterview.context,
+        objective: detailedInterview.objective,
+        purpose: detailedInterview.purpose,
+        roleTarget: detailedInterview.roleTarget,
+        levelTarget: detailedInterview.levelTarget,
+        technology: detailedInterview.technology,
+        number: Array.isArray(detailedInterview.questions) ? detailedInterview.questions.length : (parseInt(detailedInterview.number as any, 10) || 0),
+        language: detailedInterview.language || "EN",
+        isEditable: (detailedInterview as any).isEditable ?? true,
+      });
+      setIsEditModalOpen(true);
+    } catch (error) {
+      console.error("Failed to fetch interview details for edit:", error);
+    }
   };
 
   const handleDeleteClick = (id: string) => {
@@ -239,16 +245,18 @@ export default function InterviewsPage() {
                     {value}
                   </span>
 
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => removeFilter(key as keyof typeof appliedFilters)}
-                    className="flex items-center justify-center rounded-full hover:bg-[#E5E7EB] transition-colors"
+                    className="rounded-full hover:bg-[#E5E7EB]"
                   >
                     <img
                       src="/x-circle.svg"
                       alt="close"
                       className="h-[16px] w-[16px]"
                     />
-                  </button>
+                  </Button>
                 </div>
               );
             })}

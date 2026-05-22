@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronDown, Minus, Plus, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { interviewService } from "@/features/interviews/services/interview-service";
 import { Question, InterviewDetail } from "../types/interview";
+import { Button } from "@/components/ui/button";
 
 interface SidePanelProps {
   interviewId: string | null;
@@ -65,13 +66,14 @@ export function SidePanel({ interviewId, onClose }: SidePanelProps) {
     <aside className="w-full h-full lg:w-[450px] bg-white border border-slate-200 rounded-2xl p-6 sticky top-24 shadow-sm animate-in slide-in-from-right duration-300 h-[calc(100vh-140px)] flex flex-col">
       <div className="overflow-y-auto pr-2 flex-grow custom-scrollbar">
         <div className="flex items-center justify-between mb-6">
-          <button
-            className="text-slate-400 hover:text-slate-600 flex items-center gap-1 text-sm font-medium transition-colors"
+          <Button
+            variant="ghost"
             onClick={onClose}
+            className="text-slate-400 hover:text-slate-600 flex items-center gap-1 text-sm font-medium transition-colors p-0"
           >
             <ChevronLeft className="w-4 h-4" />
             Back
-          </button>
+          </Button>
           <span className="px-2 py-1 bg-green-50 text-green-600 text-[10px] font-bold rounded flex items-center gap-1 border border-green-100">
             <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active
           </span>
@@ -127,21 +129,24 @@ export function SidePanel({ interviewId, onClose }: SidePanelProps) {
             <div className="space-y-6">
               {/* Context */}
               <div className="border-t border-slate-100 pt-5">
-                <button
-                  className="w-full flex items-center gap-3 text-left group"
+                <Button
+                  variant="ghost"
                   onClick={() => toggleSection("context")}
+                  className="w-full flex items-center gap-3 text-left group p-0 hover:bg-transparent"
                 >
                   <span className="text-xs text-[#A9ADB5] whitespace-nowrap">
                     Context
                   </span>
+
                   <div className="flex-1 h-px bg-slate-200" />
+
                   <ChevronDown
                     className={cn(
                       "w-4 h-4 text-slate-300 group-hover:text-slate-500 transition-transform",
                       !expandedSections.context && "-rotate-90"
                     )}
                   />
-                </button>
+                </Button>
 
                 {expandedSections.context && (
                   <div className="mt-3">
@@ -154,9 +159,10 @@ export function SidePanel({ interviewId, onClose }: SidePanelProps) {
 
               {/* Objective */}
               <div className="border-t border-slate-100 pt-5">
-                <button
-                  className="w-full flex items-center gap-3 text-left group"
+                <Button
+                  variant="ghost"
                   onClick={() => toggleSection("objective")}
+                  className="w-full flex items-center gap-3 text-left group p-0 hover:bg-transparent"
                 >
                   <span className="text-xs text-[#A9ADB5] whitespace-nowrap">
                     Objective
@@ -170,7 +176,7 @@ export function SidePanel({ interviewId, onClose }: SidePanelProps) {
                       !expandedSections.objective && "-rotate-90"
                     )}
                   />
-                </button>
+                </Button>
 
                 {expandedSections.objective && (
                   <div className="mt-3">
@@ -183,21 +189,24 @@ export function SidePanel({ interviewId, onClose }: SidePanelProps) {
 
               {/* Questions */}
               <div className="border-t border-slate-100 pt-5 mb-4">
-                <button
-                  className="w-full flex items-center gap-3 text-left group mb-4"
+                <Button
+                  variant="ghost"
                   onClick={() => toggleSection("questions")}
+                  className="w-full flex items-center gap-3 text-left group mb-4 p-0 hover:bg-transparent"
                 >
                   <span className="text-xs text-[#A9ADB5] whitespace-nowrap">
                     Questions
                   </span>
+
                   <div className="flex-1 h-px bg-slate-200" />
+
                   <ChevronDown
                     className={cn(
                       "w-4 h-4 text-slate-300 group-hover:text-slate-500 transition-transform",
                       !expandedSections.questions && "-rotate-90"
                     )}
                   />
-                </button>
+                </Button>
                 {expandedSections.questions && (
                   <div className="space-y-3 pb-4">
                     {data.questions.map((q, i) => {
@@ -218,13 +227,17 @@ export function SidePanel({ interviewId, onClose }: SidePanelProps) {
                             <p className="text-[13px] font-bold text-[#0076D2] ml-2">
                               Question {q.orderNumber || i + 1}
                             </p>
-                            <button className="text-[#8FD3FF] hover:text-[#0076D2] transition-colors">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-[#8FD3FF] hover:text-[#0076D2] transition-colors p-0"
+                            >
                               {isExpanded ? (
                                 <Minus className="h-4 w-4" strokeWidth={3} />
                               ) : (
                                 <Plus className="h-4 w-4" strokeWidth={3} />
                               )}
-                            </button>
+                            </Button>
                           </div>
 
                           {/* Content Section */}

@@ -2,6 +2,7 @@ import * as React from "react";
 import { AlertTriangle, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 export type AlertType = "confirmation" | "success" | "error";
 
@@ -113,21 +114,19 @@ export function InterviewAlertModal({ isOpen, type, mode = "create", isLoading, 
             mode === "delete" && type === "success" && "justify-center"
           )}
         >
-          <button
+          <Button
             type="button"
             disabled={isLoading}
             onClick={onPrimaryAction}
             className={cn(
-              cn(
-                mode === "delete" && type === "success"
-                  ? "w-[84px] h-[44px]"
-                  : type === "confirmation"
-                    ? "w-[191px] h-[44px]"
-                    : type === "success"
-                      ? "max-w-[232px] h-[44px]"
-                      : "flex-1",
-                "py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-              ),
+              mode === "delete" && type === "success"
+                ? "w-[84px] h-[44px]"
+                : type === "confirmation"
+                  ? "w-[191px] h-[44px]"
+                  : type === "success"
+                    ? "max-w-[232px] h-[44px]"
+                    : "flex-1 h-[44px]",
+              "px-4 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2",
               mode === "delete" && type === "success"
                 ? "bg-[#0070c9] text-white hover:bg-blue-700"
                 : current.primaryClass || "bg-[#e0f7f9] text-[#0070c9] hover:bg-[#d0f0f2]"
@@ -140,17 +139,18 @@ export function InterviewAlertModal({ isOpen, type, mode = "create", isLoading, 
             {isLoading && type === "confirmation"
               ? "Wait..."
               : current.primaryBtn}
-          </button>
+          </Button>
+
           {!(mode === "delete" && type === "success") && (
-            <button
+            <Button
               type="button"
               disabled={isLoading}
               onClick={onSecondaryAction}
               className={cn(
                 type === "confirmation"
                   ? "w-[172px] h-[44px]"
-                  : "flex-1",
-                "py-2.5 px-4 bg-[#0070c9] text-white hover:bg-blue-700 rounded-lg text-sm  transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  : "flex-1 h-[44px]",
+                "px-4 bg-[#0070c9] text-white hover:bg-blue-700 rounded-lg text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
               )}
             >
               {isLoading && type === "error" ? (
@@ -160,7 +160,7 @@ export function InterviewAlertModal({ isOpen, type, mode = "create", isLoading, 
               {isLoading && type === "error"
                 ? "Wait..."
                 : current.secondaryBtn}
-            </button>
+            </Button>
           )}
         </div>
       </div>

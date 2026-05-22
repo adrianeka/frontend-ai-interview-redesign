@@ -8,6 +8,7 @@ import * as z from "zod";
 import { interviewService } from "@/features/interviews/services/interview-service";
 import { InterviewAlertModal, AlertType } from "./interview-alert-modal";
 import { EditInterviewData, EditInterviewModalProps } from "../types/interview";
+import { Button } from "@/components/ui/button";
 
 const formSchema = z.object({
   name: z.string().min(1, "This field is required."),
@@ -158,12 +159,19 @@ export function EditInterviewModal({ isOpen, onClose, availableLevels = [], init
               <h2 className="text-xl font-bold text-slate-900">Edit Session Title</h2>
               <p className="text-sm text-slate-500 mt-1">Please update the form below to save changes.</p>
             </div>
-            <button
-              className="text-slate-400 hover:text-slate-600 transition-colors p-1"
+            <Button
+              variant="ghost"
+              size="icon"
+              id="closeModalIcon"
               onClick={onClose}
+              className="p-1 text-slate-400 hover:text-slate-600"
             >
-              <X className="w-5 h-5" />
-            </button>
+              <img
+                src="/x-circle.svg"
+                alt="close"
+                className="w-5 h-5"
+              />
+            </Button>
           </div>
 
           <div className="px-6 py-6 overflow-y-auto">
@@ -252,7 +260,8 @@ export function EditInterviewModal({ isOpen, onClose, availableLevels = [], init
                   <input
                     {...register("number")}
                     type="number"
-                    className={`w-full h-[48px] px-4 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow bg-white text-slate-900 ${errors.number ? 'border-red-500' : 'border-slate-200'}`}
+                    readOnly
+                    className={`w-full h-[48px] px-4 py-2.5 border rounded-lg text-sm focus:ring-0 focus:border-slate-200 outline-none transition-shadow bg-slate-50 text-slate-500 cursor-not-allowed ${errors.number ? 'border-red-500' : 'border-slate-200'}`}
                     placeholder="Enter number of questions"
                   />
                   {errors.number && <p className="text-red-500 text-xs mt-1">{errors.number.message}</p>}
@@ -318,21 +327,24 @@ export function EditInterviewModal({ isOpen, onClose, availableLevels = [], init
           </div>
 
           <div className="px-6 py-4 bg-slate-50 rounded-b-2xl border-t border-slate-100 flex items-center justify-end gap-3 sticky bottom-0">
-            <button
+            <Button
               type="button"
+              variant="ghost"
               disabled={isSubmitting}
-              className="px-5 py-2.5 bg-[#dcf3f9] text-[#00a8cc] rounded-lg text-sm font-bold hover:bg-blue-100 transition-colors disabled:opacity-50"
+              id="closeModalBtn"
               onClick={onClose}
+              className="h-[44px] px-5 bg-[#dcf3f9] text-[#00a8cc] rounded-lg text-sm font-bold hover:bg-blue-100 disabled:opacity-50"
             >
               Cancel
-            </button>
-            <button
-              className="px-5 py-2.5 bg-[#0070c9] text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50 disabled:bg-slate-300 flex items-center justify-center gap-2"
+            </Button>
+            <Button
+              className="h-auto px-5 py-2.5 bg-[#0070c9] text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50 disabled:bg-slate-300 flex items-center justify-center gap-2"
               type="submit"
               form="editInterviewForm"
+              disabled={isSubmitting || initialData?.isEditable === false}
             >
               Save Changes
-            </button>
+            </Button>
           </div>
         </div>
       </div>
