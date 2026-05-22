@@ -7,12 +7,12 @@ import { Button } from "@/components/ui/button";
 import { FilterSection } from "@/features/interviews/components/filter-section";
 import { InterviewCard } from "@/features/interviews/components/interview-card";
 import { CreateInterviewModal } from "@/features/interviews/components/create-interview-modal";
-import { EditInterviewModal, EditInterviewData } from "@/features/interviews/components/edit-interview-modal";
+import { EditInterviewModal } from "@/features/interviews/components/edit-interview-modal";
 import { InterviewAlertModal, AlertType } from "@/features/interviews/components/interview-alert-modal";
 import { SidePanel } from "@/features/interviews/components/side-panel";
 import { cn } from "@/lib/utils";
 import { interviewService } from "@/features/interviews/services/interview-service";
-import { Interview, PaginatedResponse, InterviewFilters } from "@/features/interviews/types/interview";
+import { Interview, PaginatedResponse, InterviewFilters, EditInterviewData } from "@/features/interviews/types/interview";
 import {
   Select,
   SelectContent,
@@ -102,7 +102,8 @@ export default function InterviewsPage() {
       roleTarget: interview.roleTarget,
       levelTarget: interview.levelTarget,
       technology: interview.technology,
-      number: interview.number || 0,
+      number: parseInt(interview.number, 10) || 0,
+      language: interview.language || "EN",
     });
     setIsEditModalOpen(true);
   };
@@ -275,10 +276,7 @@ export default function InterviewsPage() {
                       companyNamePartner: item.companyNamePartner,
                       logo: "/Location.svg" // Fallback logo
                     }}
-                    progress={{
-                      current: item.isAnswered ? 10 : 0, // Mocked progress
-                      total: 10
-                    }}
+                    topCandidate={item.topCandidate || "0/0"}
                     type={item.purpose === "HIRING" ? "Hiring" : "Internal Assessment"}
                     level={item.levelTarget}
                     description={item.description}

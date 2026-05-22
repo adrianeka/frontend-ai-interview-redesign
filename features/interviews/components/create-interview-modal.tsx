@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { interviewService } from "@/features/interviews/services/interview-service";
 import { InterviewAlertModal, AlertType } from "./interview-alert-modal";
+import { CreateInterviewModalProps } from "../types/interview";
 
 const formSchema = z.object({
   name: z.string().min(1, "This field is required."),
@@ -19,16 +20,10 @@ const formSchema = z.object({
   roleTarget: z.string().min(1, "This field is required."),
   levelTarget: z.string().min(1, "This field is required."),
   technology: z.string().min(1, "This field is required."),
+  language: z.string().min(1, "This field is required."),
 });
 
 type FormData = z.infer<typeof formSchema>;
-
-interface CreateInterviewModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  availableLevels?: string[];
-  onSuccess?: () => void;
-}
 
 export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], onSuccess }: CreateInterviewModalProps) {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -54,10 +49,9 @@ export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], on
       roleTarget: "",
       levelTarget: "",
       technology: "",
+      language: "",
     },
   });
-
-  const allLevels = Array.from(new Set(["Junior", "Middle", "Senior", ...availableLevels]));
 
   React.useEffect(() => {
     if (isOpen) {
@@ -93,7 +87,7 @@ export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], on
         levelTarget: formData.levelTarget,
         technology: formData.technology,
         number: parseInt(formData.number, 10),
-        language: "EN",
+        language: formData.language,
         createdBy: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
       };
 
@@ -241,16 +235,12 @@ export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], on
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
                     Number of Question(s) <span className="text-red-500">*</span>
                   </label>
-                  <div className="relative">
-                    <select {...register("number")} className={`w-full h-[48px] px-4 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow appearance-none bg-white text-slate-900 ${errors.number ? 'border-red-500' : 'border-slate-200'}`}>
-                      <option value="" disabled>0</option>
-                      <option value="5">5 Questions</option>
-                      <option value="10">10 Questions</option>
-                    </select>
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                      <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
-                    </div>
-                  </div>
+                  <input
+                    {...register("number")}
+                    type="number"
+                    className={`w-full h-[48px] px-4 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow bg-white text-slate-900 ${errors.number ? 'border-red-500' : 'border-slate-200'}`}
+                    placeholder="Enter number of questions"
+                  />
                   {errors.number && <p className="text-red-500 text-xs mt-1">{errors.number.message}</p>}
                 </div>
               </div>
@@ -260,35 +250,43 @@ export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], on
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
                     Role Target <span className="text-red-500">*</span>
                   </label>
-                  <div className="relative">
-                    <select {...register("roleTarget")} className={`w-full h-[48px] px-4 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow appearance-none bg-white text-slate-900 ${errors.roleTarget ? 'border-red-500' : 'border-slate-200'}`}>
-                      <option value="" disabled>Choose Role Target</option>
-                      <option value="Frontend Engineer">Frontend Engineer</option>
-                      <option value="Backend Engineer">Backend Engineer</option>
-                    </select>
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                      <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
-                    </div>
-                  </div>
+                  <input
+                    {...register("roleTarget")}
+                    type="text"
+                    className={`w-full h-[48px] px-4 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow bg-white text-slate-900 ${errors.roleTarget ? 'border-red-500' : 'border-slate-200'}`}
+                    placeholder="Enter role target"
+                  />
                   {errors.roleTarget && <p className="text-red-500 text-xs mt-1">{errors.roleTarget.message}</p>}
                 </div>
                 <div className="w-[296.5px]">
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
                     Level Target <span className="text-red-500">*</span>
                   </label>
-                  <div className="relative">
-                    <select {...register("levelTarget")} className={`w-full h-[48px] px-4 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow appearance-none bg-white text-slate-900 ${errors.levelTarget ? 'border-red-500' : 'border-slate-200'}`}>
-                      <option value="" disabled>Choose Level Target</option>
-                      {allLevels.map((lvl) => (
-                        <option key={lvl} value={lvl}>{lvl}</option>
-                      ))}
-                    </select>
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                      <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
-                    </div>
-                  </div>
+                  <input
+                    {...register("levelTarget")}
+                    type="text"
+                    className={`w-full h-[48px] px-4 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow bg-white text-slate-900 ${errors.levelTarget ? 'border-red-500' : 'border-slate-200'}`}
+                    placeholder="Enter level target"
+                  />
                   {errors.levelTarget && <p className="text-red-500 text-xs mt-1">{errors.levelTarget.message}</p>}
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Language <span className="text-red-500">*</span>
+                </label>
+                <div className="relative w-[609px]">
+                  <select {...register("language")} className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow appearance-none bg-white text-slate-900 ${errors.language ? 'border-red-500' : 'border-slate-200'}`}>
+                    <option value="" disabled>Choose Language</option>
+                    <option value="EN">English</option>
+                    <option value="IN">Indonesia</option>
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path></svg>
+                  </div>
+                </div>
+                {errors.language && <p className="text-red-500 text-xs mt-1">{errors.language.message}</p>}
               </div>
 
               <div>

@@ -34,7 +34,8 @@ import { useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
 import { interviewService } from "@/features/interviews/services/interview-service";
 import { InterviewDetail, Candidate } from "@/features/interviews/types/interview";
-import { EditInterviewModal, EditInterviewData } from "@/features/interviews/components/edit-interview-modal";
+import { EditInterviewModal } from "@/features/interviews/components/edit-interview-modal";
+import { EditInterviewData } from "@/features/interviews/types/interview";
 import { InterviewAlertModal, AlertType } from "@/features/interviews/components/interview-alert-modal";
 
 // Color map for hire decision statuses — keyed by status string
@@ -92,19 +93,19 @@ export default function InterviewDetailsPage() {
     // Helper to map backend recommendation string strictly to one of our UI status keys
     const mapRecommendationToStatusKey = (rec: string | null | undefined): string | null => {
         if (!rec) return null;
-        
+
         const lower = rec.toLowerCase();
-        
+
         if (lower === "strong hire" || lower === "strong-hire") return "Strong Hire";
         if (lower === "hire") return "Hire";
         if (lower === "consider") return "Consider";
         if (lower === "reject") return "Reject";
-        
+
         if (lower === "ready for promotion" || lower === "ready-for-promotion") return "Ready for Promotion";
         if (lower === "meets current level" || lower === "meets-current-level") return "Meets Current Level";
         if (lower === "needs improvement" || lower === "needs-improvement") return "Needs Improvement";
         if (lower === "significant improvement required" || lower === "significant-improvement-required") return "Significant Improvement Required";
-        
+
         return null;
     };
 
@@ -133,7 +134,7 @@ export default function InterviewDetailsPage() {
     // Fetch initial details and candidates list once
     useEffect(() => {
         if (!id) return;
-        
+
         const fetchInitialData = async () => {
             setIsLoading(true);
             setError(null);
@@ -159,7 +160,7 @@ export default function InterviewDetailsPage() {
     const statusCounts = React.useMemo(() => {
         const counts: Record<string, number> = {};
         Object.keys(activeColorMap).forEach(key => counts[key] = 0);
-        
+
         allCandidates.forEach(c => {
             const statusKey = mapRecommendationToStatusKey(c.recommendation);
             if (statusKey && counts[statusKey] !== undefined) {
@@ -193,7 +194,7 @@ export default function InterviewDetailsPage() {
             if (searchQuery) {
                 return c.name.toLowerCase().includes(searchQuery.toLowerCase());
             }
-            
+
             return true;
         });
     }, [candidates, searchQuery]);
@@ -222,11 +223,11 @@ export default function InterviewDetailsPage() {
         } else {
             pages.push(1);
             if (currentPage > 3) pages.push("ellipsis-1");
-            
+
             const start = Math.max(2, currentPage - 1);
             const end = Math.min(totalPages - 1, currentPage + 1);
             for (let i = start; i <= end; i++) pages.push(i);
-            
+
             if (currentPage < totalPages - 2) pages.push("ellipsis-2");
             pages.push(totalPages);
         }
@@ -360,12 +361,27 @@ export default function InterviewDetailsPage() {
                                     <EllipsisVerticalIcon />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent>
+
+                            <DropdownMenuContent
+                                align="end"
+                                className="
+                                    w-[142px]
+                                    min-h-[112px]
+                                    rounded-[12px]
+                                    p-3
+                                    flex
+                                    flex-col
+                                    gap-2
+                                    border
+                                    border-[#E2E4E6]
+                                    shadow-[0px_4px_12px_rgba(0,0,0,0.08)]
+                                "
+                            >
                                 {/* Edit */}
-                                <DropdownMenuItem 
-                                    className="gap-2 font-medium py-2 cursor-pointer text-[#707784]" 
-                                    onClick={(e) => { 
-                                        e.stopPropagation(); 
+                                <DropdownMenuItem
+                                    className="gap-2 font-medium py-2 cursor-pointer text-[#707784]"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
                                         handleEditClick();
                                     }}
                                 >
@@ -373,10 +389,10 @@ export default function InterviewDetailsPage() {
                                 </DropdownMenuItem>
 
                                 {/* Delete */}
-                                <DropdownMenuItem 
+                                <DropdownMenuItem
                                     className="gap-2 text-destructive font-medium py-2 cursor-pointer"
-                                    onClick={(e) => { 
-                                        e.stopPropagation(); 
+                                    onClick={(e) => {
+                                        e.stopPropagation();
                                         handleDeleteClick();
                                     }}
                                 >
@@ -558,13 +574,13 @@ export default function InterviewDetailsPage() {
                 {/* List filter summary */}
                 <div className="flex flex-row flex-wrap gap-2">
                     {[
-                        activeFilter && { 
-                            label: getActiveFilterLabel(activeFilter), 
+                        activeFilter && {
+                            label: getActiveFilterLabel(activeFilter),
                             clear: () => {
                                 setActiveFilter("");
                                 setCurrentPage(1);
                                 fetchFilteredCandidates("");
-                            } 
+                            }
                         },
                         searchQuery && { label: searchQuery, clear: () => setSearchQuery("") },
                     ].filter(Boolean).map((item: any, index) => (
@@ -631,9 +647,9 @@ export default function InterviewDetailsPage() {
                                         </div>
                                     </div>
 
-                                    <Button 
-                                        variant="ghost" 
-                                        size="icon-lg" 
+                                    <Button
+                                        variant="ghost"
+                                        size="icon-lg"
                                         className="shrink-0"
                                         onClick={() => router.push(`/interviews/${id}/${candidate.candidateId}`)}
                                     >
@@ -653,7 +669,7 @@ export default function InterviewDetailsPage() {
                 <div className="flex w-full items-center justify-between flex-col sm:flex-row gap-4 sm:gap-0">
                     {/* Showing entries */}
                     <p className="text-[#A9ADB5] italic text-sm text-center sm:text-left">
-                        {totalEntries > 0 
+                        {totalEntries > 0
                             ? `Showing ${startIndex + 1} to ${endIndex} of ${totalEntries} entries`
                             : "Showing 0 to 0 of 0 entries"}
                     </p>
@@ -668,7 +684,7 @@ export default function InterviewDetailsPage() {
                                 <PaginationItem>
                                     <PaginationPrevious text="" href="#" onClick={(e) => { e.preventDefault(); handlePageChange(currentPage - 1); }} />
                                 </PaginationItem>
-                                
+
                                 {getPageNumbers().map((p, index) => {
                                     if (p === "ellipsis-1" || p === "ellipsis-2") {
                                         return (
@@ -680,8 +696,8 @@ export default function InterviewDetailsPage() {
                                     const pageNum = p as number;
                                     return (
                                         <PaginationItem key={pageNum}>
-                                            <PaginationLink 
-                                                href="#" 
+                                            <PaginationLink
+                                                href="#"
                                                 onClick={(e) => { e.preventDefault(); handlePageChange(pageNum); }}
                                                 isActive={currentPage === pageNum}
                                             >
