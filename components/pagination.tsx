@@ -3,6 +3,7 @@
 import * as React from "react";
 import { ChevronRight, ChevronLeft, ChevronsRight, ChevronsLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "./ui/button";
 
 interface PaginationProps {
   currentPage: number;
@@ -48,55 +49,67 @@ export function Pagination({
         Showing {startEntry} to {endEntry} of {totalEntries} entries
       </p>
       <div className="flex items-center gap-2">
-        <button 
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={() => onPageChange(1)}
           disabled={currentPage === 1}
-          className="flex h-9 w-9 items-center justify-center rounded-[10px] text-[#A1A1AA] transition-colors hover:bg-[#F4F4F5] disabled:opacity-30"
+          className="h-9 w-9 rounded-[10px] text-[#A1A1AA] hover:bg-[#F4F4F5] disabled:opacity-30"
         >
           <ChevronsLeft className="h-4 w-4" />
-        </button>
-        <button 
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="flex h-9 w-9 items-center justify-center rounded-[10px] text-[#A1A1AA] transition-colors hover:bg-[#F4F4F5] disabled:opacity-30"
+          className="h-9 w-9 rounded-[10px] text-[#A1A1AA] hover:bg-[#F4F4F5] disabled:opacity-30"
         >
           <ChevronLeft className="h-4 w-4" />
-        </button>
+        </Button>
 
         {getPageNumbers().map((page, index) => (
           <React.Fragment key={index}>
             {page === "..." ? (
               <span className="px-1 text-[13px] text-[#A1A1AA]">...</span>
             ) : (
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => onPageChange(page as number)}
                 className={cn(
-                  "flex h-9 w-9 items-center justify-center rounded-[10px] text-[13px] font-medium transition-colors",
-                  currentPage === page 
-                    ? "bg-[#DDF4F7] text-[#0284C7]" 
+                  "h-9 w-9 rounded-[10px] text-[13px] font-medium",
+                  currentPage === page
+                    ? "bg-[#DDF4F7] text-[#0284C7] hover:bg-[#DDF4F7]"
                     : "text-[#71717A] hover:bg-[#F4F4F5]"
                 )}
               >
                 {page}
-              </button>
+              </Button>
             )}
           </React.Fragment>
         ))}
 
-        <button 
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="flex h-9 w-9 items-center justify-center rounded-[10px] text-[#A1A1AA] transition-colors hover:bg-[#F4F4F5] disabled:opacity-30"
+          className="h-9 w-9 rounded-[10px] text-[#A1A1AA] hover:bg-[#F4F4F5] disabled:opacity-30"
         >
           <ChevronRight className="h-4 w-4" />
-        </button>
-        <button 
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={() => onPageChange(totalPages)}
           disabled={currentPage === totalPages}
-          className="flex h-9 w-9 items-center justify-center rounded-[10px] text-[#A1A1AA] transition-colors hover:bg-[#F4F4F5] disabled:opacity-30"
+          className="h-9 w-9 rounded-[10px] text-[#A1A1AA] hover:bg-[#F4F4F5] disabled:opacity-30"
         >
           <ChevronsRight className="h-4 w-4" />
-        </button>
+        </Button>
       </div>
     </div>
   );

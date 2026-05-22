@@ -120,18 +120,23 @@ export function InterviewCard({
             </h3>
 
             {/* Link Badge */}
-            <button
+            <Button
               onClick={(e) => {
                 e.stopPropagation();
+
                 if (typeof window !== "undefined" && id) {
                   const link = `${window.location.origin}/interviews/${id}`;
                   navigator.clipboard.writeText(link);
                   toast.success("Link copied!");
                 }
-              }} className="flex h-[26px] w-[26px] items-center justify-center rounded-[6px] bg-[#EEF2FF] shrink-0 mt-0.5 hover:bg-[#DDE5FF] transition-colors"
+              }}
+              className="flex h-[26px] w-[26px] items-center justify-center rounded-[6px] bg-[#EEF2FF] shrink-0 mt-0.5 hover:bg-[#DDE5FF] transition-colors p-0"
             >
-              <LinkIcon size={14} className="text-[#3366FF] stroke-[2.5]" />
-            </button>
+              <LinkIcon
+                size={14}
+                className="text-[#3366FF] stroke-[2.5]"
+              />
+            </Button>
           </div>
 
           <p className="text-[13px] text-[#6B7280] leading-normal line-clamp-3 h-[60px]">
@@ -144,9 +149,13 @@ export function InterviewCard({
       <div className="pt-2 mt-auto border-t border-[#F2F2F2] flex items-center justify-between">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="text-[#0076D2] hover:text-[#4B5563] transition-colors p-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="p-1 text-[#0076D2] hover:text-[#4B5563] transition-colors"
+            >
               <MoreVertical size={20} />
-            </button>
+            </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="rounded-xl border-[#E2E4E6]">
             <DropdownMenuItem
@@ -173,14 +182,16 @@ export function InterviewCard({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <button
+        <Button
           onClick={(e) => {
             e.stopPropagation();
+
             if (id) router.push(`/interviews/${id}`);
           }}
-          className="font-semibold bg-[#E0F2FE] text-[#0369A1] pl-5 pr-4 py-2 rounded-[12px] text-[14px] hover:bg-[#BAE6FD] transition-all flex items-center group"
+          className="h-[44px] font-semibold bg-[#E0F2FE] text-[#0369A1] pl-5 pr-4 py-2 rounded-[12px] text-[14px] hover:bg-[#BAE6FD] transition-all flex items-center group"
         >
           View Result
+
           <img
             src="/ExternalLink.svg"
             alt="external"
@@ -190,7 +201,7 @@ export function InterviewCard({
               height: "11.75px",
             }}
           />
-        </button>
+        </Button>
       </div>
 
     </Card>

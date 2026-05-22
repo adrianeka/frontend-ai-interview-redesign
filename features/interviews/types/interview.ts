@@ -37,6 +37,7 @@ export interface EditInterviewData {
   technology: string;
   number: number;
   language?: string;
+  isEditable?: boolean;
 }
 
 export interface InterviewCardProps {

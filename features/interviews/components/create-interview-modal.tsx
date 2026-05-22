@@ -8,6 +8,7 @@ import * as z from "zod";
 import { interviewService } from "@/features/interviews/services/interview-service";
 import { InterviewAlertModal, AlertType } from "./interview-alert-modal";
 import { CreateInterviewModalProps } from "../types/interview";
+import { Button } from "@/components/ui/button";
 
 const formSchema = z.object({
   name: z.string().min(1, "This field is required."),
@@ -144,13 +145,19 @@ export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], on
               <h2 className="text-xl font-bold text-slate-900">Create an Interview Session</h2>
               <p className="text-sm text-slate-500 mt-1">Please fill out the form below to add a new interview session.</p>
             </div>
-            <button
-              className="text-slate-400 hover:text-slate-600 transition-colors p-1"
+            <Button
+              variant="ghost"
+              size="icon"
               id="closeModalIcon"
               onClick={onClose}
+              className="p-1 text-slate-400 hover:text-slate-600"
             >
-              <X className="w-5 h-5" />
-            </button>
+              <img
+                src="/x-circle.svg"
+                alt="close"
+                className="w-5 h-5"
+              />
+            </Button>
           </div>
 
           <div className="px-6 py-6 overflow-y-auto">
@@ -304,23 +311,25 @@ export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], on
           </div>
 
           <div className="px-6 py-4 bg-slate-50 rounded-b-2xl border-t border-slate-100 flex items-center justify-end gap-3 sticky bottom-0">
-            <button
+            <Button
               type="button"
+              variant="ghost"
               disabled={isSubmitting}
-              className="px-5 py-2.5 bg-[#dcf3f9] text-[#00a8cc] rounded-lg text-sm font-bold hover:bg-blue-100 transition-colors disabled:opacity-50"
               id="closeModalBtn"
               onClick={onClose}
+              className="h-[44px] px-5 bg-[#dcf3f9] text-[#00a8cc] rounded-lg text-sm font-bold hover:bg-blue-100 disabled:opacity-50"
             >
               Cancel
-            </button>
-            <button
-              className="px-5 py-2.5 bg-[#0070c9] text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50 disabled:bg-slate-300 flex items-center justify-center gap-2"
+            </Button>
+
+            <Button
               type="submit"
               form="newInterviewForm"
               disabled={isSubmitting || !isDirty || !isValid}
+              className="h-[44px] px-5 bg-[#0070c9] text-white rounded-lg text-sm font-bold hover:bg-blue-700 shadow-sm disabled:bg-slate-300 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               Create Interview
-            </button>
+            </Button>
           </div>
         </div>
       </div>
