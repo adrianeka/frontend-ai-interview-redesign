@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 
 import { InterviewCardProps } from "../types/interview";
 import Image from "next/image";
+import { toast } from "sonner";
 
 export function InterviewCard({
   title,
@@ -119,9 +120,18 @@ export function InterviewCard({
             </h3>
 
             {/* Link Badge */}
-            <div className="flex h-[26px] w-[26px] items-center justify-center rounded-[6px] bg-[#EEF2FF] shrink-0 mt-0.5">
-              <LinkIcon size={14} className="text-[#3366FF] font-bold" />
-            </div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (typeof window !== "undefined" && id) {
+                  const link = `${window.location.origin}/interviews/${id}`;
+                  navigator.clipboard.writeText(link);
+                  toast.success("Link copied!");
+                }
+              }} className="flex h-[26px] w-[26px] items-center justify-center rounded-[6px] bg-[#EEF2FF] shrink-0 mt-0.5 hover:bg-[#DDE5FF] transition-colors"
+            >
+              <LinkIcon size={14} className="text-[#3366FF] stroke-[2.5]" />
+            </button>
           </div>
 
           <p className="text-[13px] text-[#6B7280] leading-normal line-clamp-3 h-[60px]">

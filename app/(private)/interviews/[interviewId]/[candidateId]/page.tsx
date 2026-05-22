@@ -14,11 +14,45 @@ import {
   Loader2,
   CornerDownRightIcon,
   MapPinIcon,
-  ArrowLeftIcon
+  ArrowLeftIcon,
+  EditIcon,
+  PencilIcon,
+  DownloadIcon,
+  CircleIcon,
+  CheckIcon,
+  PlusIcon,
+  ClockIcon,
+  XIcon,
+  TriangleAlert,
+  CircleCheck
 } from "lucide-react";
 import { interviewService } from "@/features/interviews/services/interview-service";
 import { CandidateResult, InterviewDetail } from "@/features/interviews/types/interview";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+
+const statusColorMap: Record<string, { color: string; bgColor: string; outline: string; icon: React.ElementType }> = {
+  "success": { color: "#4BAC87", bgColor: "#EEF8F4", outline: "#C9EBDE", icon: CheckIcon },
+  "danger": { color: "#E84E2C", bgColor: "#FFEEEA", outline: "#FFCBBF", icon: XIcon },
+  "muted": { color: "#595F6A", bgColor: "#FAFAFA", outline: "#E2E4E6", icon: ClockIcon }
+};
+
+const hiringColorMap: Record<string, { color: string; bgColor: string; iconBg: string; icon: React.ElementType; value: string }> = {
+    "Strong Hire": { color: "#4BAC87", bgColor: "#EEF8F4", iconBg: "#C9EBDE", icon: CheckIcon, value: "strong-hire" },
+    "Hire": { color: "#0076D2", bgColor: "#F1F9FA", iconBg: "#DBF2F3", icon: PlusIcon, value: "hire" },
+    "Consider": { color: "#E8A01D", bgColor: "#FFF7E9", iconBg: "#FFE7BA", icon: ClockIcon, value: "consider" },
+    "Reject": { color: "#E84E2C", bgColor: "#FFEEEA", iconBg: "#FFCBBF", icon: XIcon, value: "reject" },
+};
+
+const internalAssessmentColorMap: Record<string, { color: string; bgColor: string; iconBg: string; icon: React.ElementType; value: string }> = {
+    "Ready for Promotion": { color: "#4BAC87", bgColor: "#EEF8F4", iconBg: "#C9EBDE", icon: CheckIcon, value: "ready-for-promotion" },
+    "Meets Current Level": { color: "#0076D2", bgColor: "#F1F9FA", iconBg: "#DBF2F3", icon: PlusIcon, value: "meets-current-level" },
+    "Needs Improvement": { color: "#E8A01D", bgColor: "#FFF7E9", iconBg: "#FFE7BA", icon: ClockIcon, value: "needs-improvement" },
+    "Significant Improvement Required": { color: "#E84E2C", bgColor: "#FFEEEA", iconBg: "#FFCBBF", icon: XIcon, value: "significant-improvement-required" },
+};
 
 export default function CandidateInterviewPage() {
   const params = useParams();
@@ -28,8 +62,109 @@ export default function CandidateInterviewPage() {
 
   const [candidateResult, setCandidateResult] = useState<CandidateResult | null>(null);
   const [interviewDetail, setInterviewDetail] = useState<InterviewDetail | null>(null);
+  const [stepProgress, setStepProgress] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
+  const [draftTranscript, setDraftTranscript] = useState<string>("");
+  const [isUpdatingTranscript, setIsUpdatingTranscript] = useState(false);
+  const [validatingQuestionId, setValidatingQuestionId] = useState<string | null>(null);
+  const [downloadingQuestionId, setDownloadingQuestionId] = useState<string | null>(null);
+  const [retryingQuestionId, setRetryingQuestionId] = useState<string | null>(null);
+
+  const silentReload = async () => {
+    try {
+      const [resultData, interviewData, progressData] = await Promise.all([
+        interviewService.getCandidateResult(interviewId, candidateId),
+        interviewService.getInterviewById(interviewId),
+        interviewService.getStepProgress(interviewId, candidateId)
+      ]);
+      setCandidateResult(resultData);
+      setInterviewDetail(interviewData);
+      setStepProgress(progressData);
+    } catch (err: any) {
+      console.error(err);
+    }
+  };
+
+  const handleRetryStt = async (participantId: string, questionId: string) => {
+    setRetryingQuestionId(questionId);
+    try {
+      await interviewService.retryStt(participantId, questionId);
+      toast.success("Retry requested successfully");
+      await silentReload();
+    } catch (error: any) {
+      toast.error(error.message || "Failed to retry STT");
+    } finally {
+      setRetryingQuestionId(null);
+    }
+  };
+
+  const handleDownloadVideo = async (fileName: string | null, questionId: string) => {
+    if (!fileName) {
+      toast.error("Video file not found for this answer.");
+      return;
+    }
+    setDownloadingQuestionId(questionId);
+    try {
+      const blob = await interviewService.downloadVideo(fileName);
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error: any) {
+      toast.error(error.message || "Failed to download video");
+    } finally {
+      setDownloadingQuestionId(null);
+    }
+  };
+
+  const handleValidateAnswer = async (questionId: string, participantId: string) => {
+    setValidatingQuestionId(questionId);
+    try {
+      await interviewService.validateAnswer(participantId, questionId);
+      toast.success("Answer validated successfully");
+
+      if (candidateResult) {
+        const updatedAnswers = candidateResult.answers.map(a =>
+          a.questionId === questionId ? { ...a, isValidated: true } : a
+        );
+        setCandidateResult({ ...candidateResult, answers: updatedAnswers });
+      }
+      if (editingQuestionId === questionId) {
+        setEditingQuestionId(null); // Close edit mode if open
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to validate answer");
+    } finally {
+      setValidatingQuestionId(null);
+    }
+  };
+
+  const handleSaveTranscript = async (questionId: string, participantId: string) => {
+    setIsUpdatingTranscript(true);
+    try {
+      await interviewService.updateAnswerTranscript(participantId, questionId, draftTranscript);
+      toast.success("Transcript updated successfully");
+
+      if (candidateResult) {
+        const updatedAnswers = candidateResult.answers.map(a =>
+          a.questionId === questionId ? { ...a, answerTranscript: draftTranscript } : a
+        );
+        setCandidateResult({ ...candidateResult, answers: updatedAnswers });
+      }
+      setEditingQuestionId(null);
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update transcript");
+    } finally {
+      setIsUpdatingTranscript(false);
+    }
+  };
 
   useEffect(() => {
     if (!interviewId || !candidateId) return;
@@ -38,12 +173,14 @@ export default function CandidateInterviewPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const [resultData, interviewData] = await Promise.all([
+        const [resultData, interviewData, progressData] = await Promise.all([
           interviewService.getCandidateResult(interviewId, candidateId),
-          interviewService.getInterviewById(interviewId)
+          interviewService.getInterviewById(interviewId),
+          interviewService.getStepProgress(interviewId, candidateId)
         ]);
         setCandidateResult(resultData);
         setInterviewDetail(interviewData);
+        setStepProgress(progressData);
       } catch (err: any) {
         console.error("Error loading candidate results:", err);
         setError(err.message || "Failed to load candidate results.");
@@ -78,6 +215,23 @@ export default function CandidateInterviewPage() {
   }
 
   // Derived Stepper and Score stats
+  const isInternal = interviewDetail?.purpose === "INTERNAL_ASSESSMENT" || interviewDetail?.purpose === "INTERNAL_ASSESMENT";
+  const activeColorMap = isInternal ? internalAssessmentColorMap : hiringColorMap;
+
+  const mapRecommendationToStatusKey = (rec: string | null | undefined): string | null => {
+      if (!rec) return null;
+      const lower = rec.toLowerCase();
+      if (lower === "strong hire" || lower === "strong-hire") return "Strong Hire";
+      if (lower === "hire") return "Hire";
+      if (lower === "consider") return "Consider";
+      if (lower === "reject") return "Reject";
+      if (lower === "ready for promotion" || lower === "ready-for-promotion") return "Ready for Promotion";
+      if (lower === "meets current level" || lower === "meets-current-level") return "Meets Current Level";
+      if (lower === "needs improvement" || lower === "needs-improvement") return "Needs Improvement";
+      if (lower === "significant improvement required" || lower === "significant-improvement-required") return "Significant Improvement Required";
+      return null;
+  };
+
   const sortedAnswers = [...candidateResult.answers].sort((a, b) => (a.questionNumber || 0) - (b.questionNumber || 0));
   const totalAnswers = sortedAnswers.length;
   const validatedCount = sortedAnswers.filter((a) => a.isValidated).length;
@@ -95,31 +249,29 @@ export default function CandidateInterviewPage() {
     ? sortedAnswers.reduce((acc, a) => acc + (a.communicationScore || 0), 0) / totalAnswers
     : 0;
 
-  // Step 1: Transcription and Answer Integration (always done once we fetch answers)
-  const step1Status = "completed";
+  // Step 1: Transcription and Answer Integration
+  const step1Status = stepProgress?.transcribeAndIntegrationAnswer ? "completed" : "active";
 
-  // Step 2: Candidate Validation (completed if all answers are validated)
-  const step2Status = isFullyValidated ? "completed" : "active";
+  // Step 2: Candidate Validation
+  const step2Status = stepProgress?.validateAnswer ? "completed" : (step1Status === "completed" ? "active" : "disabled");
 
-  // Step 3: Grading Answer by AI (completed if there are scores, active if validated but no scores yet, disabled otherwise)
-  const hasScores = totalAnswers > 0 && sortedAnswers.some(a =>
-    a.technicalFundamentalScore > 0 ||
-    a.problemSolvingScore > 0 ||
-    a.communicationScore > 0
-  );
-  const step3Status = hasScores && isFullyValidated
-    ? "completed"
-    : isFullyValidated
-      ? "active"
-      : "disabled";
+  // Step 3: Grading Answer by AI
+  const step3Status = stepProgress?.gradingAnswer ? "completed" : (step2Status === "completed" ? "active" : "disabled");
 
-  // Step 4: Result (completed if candidate recommendation exists)
-  const hasResult = !!candidateResult.recommendation;
-  const step4Status = hasResult && hasScores && isFullyValidated
-    ? "completed"
-    : step3Status === "completed"
-      ? "active"
-      : "disabled";
+  // Step 4: Result
+  const step4Status = stepProgress?.resultMappingAnswer ? "completed" : (step3Status === "completed" ? "active" : "disabled");
+
+  let activeStep = 1;
+  if (stepProgress?.resultMappingAnswer) activeStep = 5;
+  else if (step4Status === "active") activeStep = 4;
+  else if (step3Status === "active") activeStep = 3;
+  else if (step2Status === "active") activeStep = 2;
+
+  const sttCompletedCount = sortedAnswers.filter(a => a.monitorings?.every((m: any) => m.status === "SUCCESS")).length;
+  const sttErrorQuestions = sortedAnswers.filter(a => a.monitorings?.some((m: any) => m.status === "ERROR")).map(a => a.questionNumber || 0);
+  const isSttError = sttErrorQuestions.length > 0;
+
+  const isGradingError = sortedAnswers.some(a => a.monitorings?.some((m: any) => m.status === "ERROR" && m.taskName?.toLowerCase().includes("grading")));
 
   // Stepper visual styles helper
   const getStepStyles = (status: "completed" | "active" | "disabled") => {
@@ -206,7 +358,7 @@ export default function CandidateInterviewPage() {
 
             {/* Step 2 */}
             <div className="relative flex flex-col items-center w-[134px]">
-              <div className={`hidden md:block absolute top-[13px] left-[50%] w-[calc(100%+1.5rem)] z-0 ${step3Status !== "disabled" ? "h-[2px] bg-[#0076D2]" : "h-[1px] bg-[#E2E4E6]"}`} />
+              <div className={`hidden md:block absolute top-[13px] left-[50%] w-[calc(100%+1.5rem)] z-0 ${step3Status !== "disabled" ? "h-[2px] bg-[#0076D2]" : "h-px bg-[#E2E4E6]"}`} />
               <div className={`relative z-10 w-7 h-7 shrink-0 font-bold rounded-full flex items-center justify-center text-sm ${step2.circle}`}>
                 2
               </div>
@@ -217,7 +369,7 @@ export default function CandidateInterviewPage() {
 
             {/* Step 3 */}
             <div className="relative flex flex-col items-center w-[134px]">
-              <div className={`hidden md:block absolute top-[13px] left-[50%] w-[calc(100%+1.5rem)] z-0 ${step4Status !== "disabled" ? "h-[2px] bg-[#0076D2]" : "h-[1px] bg-[#E2E4E6]"}`} />
+              <div className={`hidden md:block absolute top-[13px] left-[50%] w-[calc(100%+1.5rem)] z-0 ${step4Status !== "disabled" ? "h-[2px] bg-[#0076D2]" : "h-px bg-[#E2E4E6]"}`} />
               <div className={`relative z-10 w-7 h-7 shrink-0 font-bold rounded-full flex items-center justify-center text-sm ${step3.circle}`}>3</div>
               <span className={`text-center text-sm leading-tight mt-2 ${step3.text}`}>
                 Grading Answer by AI
@@ -233,45 +385,75 @@ export default function CandidateInterviewPage() {
             </div>
           </div>
 
-          {/* Validation Alert Banner */}
-          <div className="flex flex-col gap-1.5 p-5 bg-[#F1F9FA] rounded-lg border-l-4 border-[#0076D2]">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Info className="w-5 h-5 text-[#0076D2]" />
-                <span className="text-[#43474F] font-bold text-base">
-                  {isFullyValidated ? "All answers have been validated by candidate" : "Candidate is validating the interview data"}
-                </span>
+          {/* Area 1 Alert */}
+          {activeStep === 1 && !isSttError && (
+            <div className="flex flex-col gap-1.5 p-5 bg-[#F1F9FA] rounded-lg border-l-4 border-[#0076D2]">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Info className="w-5 h-5" fill="#0076D2" color="#F1F9FA" size={48} />
+                  <span className="text-[#43474F] font-bold text-base">Interview transcriptions are being processed</span>
+                </div>
+                <Badge className="bg-[#0076D2] w-fit h-fit text-[#FAFAFA] text-xs font-semibold">
+                  <CircleCheck fill="#FAFAFA" color="#0076D2" data-icon="inline-start" size={48} />
+                  {sttCompletedCount}/{totalAnswers} completed
+                </Badge>
               </div>
-              <div className="bg-[#0076D2] text-[#FAFAFA] text-xs font-semibold px-2.5 py-1 rounded-full">
-                {validatedCount}/{totalAnswers} Validated
-              </div>
+              <p className="text-[#707784] text-sm ml-7">The speech from the interview is being converted to text and queued for insertion into the answer table.</p>
             </div>
-            <p className="text-[#707784] text-sm ml-7">
-              {isFullyValidated
-                ? "The candidate has completed the review process. The validated data and AI scores are fully complete."
-                : "The candidate is currently reviewing their answers. Please wait to see the final validated data."}
-            </p>
-          </div>
-        </div>
+          )}
 
-        {/* AI Evaluation Summary */}
-        {candidateResult.summaryReason && (
-          <div className="flex flex-col gap-3 p-5 bg-[#F8FAFC] rounded-xl border border-[#E2E4E6]">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="text-[#43474F] font-bold text-lg">AI Recommendation Summary</span>
-              <span className={`px-3 py-1 rounded-full text-xs font-bold ${candidateResult.recommendation === "Strong Hire" ? "bg-emerald-50 text-emerald-600 border border-emerald-200" :
-                candidateResult.recommendation === "Hire" ? "bg-blue-50 text-blue-600 border border-blue-200" :
-                  candidateResult.recommendation === "Consider" ? "bg-amber-50 text-amber-600 border border-amber-200" :
-                    "bg-rose-50 text-rose-600 border border-rose-200"
-                }`}>
-                {candidateResult.recommendation}
-              </span>
+          {activeStep === 2 && (
+            <div className="flex flex-col gap-1.5 p-5 bg-[#F1F9FA] rounded-lg border-l-4 border-[#0076D2]">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Info className="w-5 h-5" fill="#0076D2" color="#F1F9FA" size={48} />
+                  <span className="text-[#43474F] font-bold text-base">Candidate is validating the interview data</span>
+                </div>
+                <Badge className="bg-[#0076D2] w-fit h-fit text-[#FAFAFA] text-xs font-semibold">
+                  <CircleCheck fill="#FAFAFA" color="#0076D2" data-icon="inline-start" size={48} />
+                  {validatedCount}/{totalAnswers} Validated
+                </Badge>
+              </div>
+              <p className="text-[#707784] text-sm ml-7">The candidate is reviewing their answers. Please wait to see the validated data.</p>
             </div>
-            <p className="text-[#595F6A] text-sm leading-relaxed">
-              {candidateResult.summaryReason}
-            </p>
-          </div>
-        )}
+          )}
+
+          {activeStep === 3 && !isGradingError && (
+            <div className="flex flex-col gap-1.5 p-5 bg-[#F1F9FA] rounded-lg border-l-4 border-[#0076D2]">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Info className="w-5 h-5" fill="#0076D2" color="#F1F9FA" size={48} />
+                  <span className="text-[#43474F] font-bold text-base">AI is Analyzing Candidate Responses</span>
+                </div>
+              </div>
+              <p className="text-[#707784] text-sm ml-7">The AI is comprehensively assessing the candidate's answers.</p>
+            </div>
+          )}
+
+          {activeStep === 3 && isGradingError && (
+            <div className="flex flex-col gap-1.5 p-5 bg-[#FFEEEA] rounded-lg border-l-4 border-[#FF5630]">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <TriangleAlert className="w-5 h-5" fill="#FF5630" color="#FFEEEA" size={48} />
+                  <span className="text-[#43474F] font-bold text-base">Oops! An error occurred</span>
+                </div>
+              </div>
+              <p className="text-[#707784] text-sm ml-7">We encountered an error while grading. The system is analyzing the issue. Data will be available once grading is complete.</p>
+            </div>
+          )}
+
+          {activeStep >= 4 && candidateResult?.summaryReason && (
+            <div className="flex flex-col gap-1.5 p-5 bg-[#F1F9FA] rounded-lg border-l-4 border-[#0076D2]">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Info className="w-5 h-5" fill="#0076D2" color="#F1F9FA" size={48} />
+                  <span className="text-[#43474F] font-bold text-base">AI Analysis Result</span>
+                </div>
+              </div>
+              <p className="text-[#707784] text-sm ml-7 whitespace-pre-wrap">{candidateResult.summaryReason}</p>
+            </div>
+          )}
+        </div>
 
         {/* Score Breakdown Section */}
         <div className="flex flex-col gap-4 mt-2">
@@ -285,6 +467,24 @@ export default function CandidateInterviewPage() {
             <span className="text-[#8C929D] font-semibold text-base">
               {candidateResult.totalScore ? `${Number(candidateResult.totalScore).toFixed(1)}%` : "No data yet"}
             </span>
+            {candidateResult.recommendation && (() => {
+                const rec = candidateResult.recommendation;
+                const mappedKey = mapRecommendationToStatusKey(rec);
+                const colorCfg = mappedKey && activeColorMap[mappedKey]
+                    ? activeColorMap[mappedKey]
+                    : { color: "#595F6A", bgColor: "#F2F2F2" };
+                return (
+                    <div className="ml-4 flex items-center">
+                        <Badge
+                            variant="outline"
+                            style={{ borderColor: colorCfg.color, color: colorCfg.color, backgroundColor: colorCfg.bgColor }}
+                            className="py-1 px-2 text-sm font-medium whitespace-nowrap"
+                        >
+                            {mappedKey || rec}
+                        </Badge>
+                    </div>
+                );
+            })()}
           </div>
 
           <div className="flex flex-col gap-4 pl-6 border-l-4 border-[#E2E4E6] py-2">
@@ -325,6 +525,27 @@ export default function CandidateInterviewPage() {
             <div className="h-px bg-[#E2E4E6] w-full" />
           </div>
 
+          {activeStep === 1 && isSttError && (
+            <div className="flex flex-col gap-1.5 p-5 bg-[#FFEEEA] rounded-lg border-l-4 border-[#FF5630]">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <TriangleAlert className="w-5 h-5" fill="#FF5630" color="#FFEEEA" size={48} />
+                  <span className="text-[#43474F] font-bold text-base">
+                    Oops! An error occurred
+                  </span>
+                </div>
+
+                <Badge className="bg-[#FF5630] w-fit h-fit text-[#FFEEEA] text-xs font-semibold">
+                  <TriangleAlert fill="#FAFAFA" color="#FF5630" data-icon="inline-start" size={14} />
+                  Issue with questions: {sttErrorQuestions.join(", ")}
+                </Badge>
+              </div>
+              <p className="text-[#707784] text-sm ml-7">
+                An error occurred during transcription. Click ‘retry’ to resolve the issue and finalize the process.
+              </p>
+            </div>
+          )}
+
           <div className="flex flex-col gap-8 py-4">
             {sortedAnswers.map((a, index) => (
               <React.Fragment key={a.questionId || index}>
@@ -353,28 +574,145 @@ export default function CandidateInterviewPage() {
                   {/* Question & Answer Details */}
                   <div className="flex flex-col gap-6 flex-1">
                     <div className="flex flex-col gap-2">
-                      <div className="flex items-center gap-3">
-                        <h3 className="text-[#43474F] font-bold text-base">Question {a.questionNumber || index + 1}</h3>
+                      <div className="flex items-center justify-between gap-3">
 
-                        {/* Status Badge */}
-                        {a.isValidated ? (
-                          <div className="bg-[#EEF8F4] border border-[#C9EBDE] px-2 py-0.5 rounded-full flex items-center gap-1.5">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-[#52BD94]" />
-                            <span className="text-[#4BAC87] text-xs font-medium">Validated</span>
-                          </div>
-                        ) : (
-                          <div className="bg-[#FAFAFA] border border-[#E2E4E6] px-2 py-0.5 rounded-full flex items-center gap-1.5">
-                            <Clock className="w-3.5 h-3.5 text-[#595F6A]" />
-                            <span className="text-[#595F6A] text-xs font-medium">Pending</span>
-                          </div>
-                        )}
+                        <div className="flex items-center gap-3">
+                          <h3 className="text-[#43474F] font-bold text-base">Question {a.questionNumber || index + 1}</h3>
+
+                          {(() => {
+                            const monStatus = (() => {
+                              if (a.isValidated) return { type: "success", label: "Validated" };
+                              if (!a.monitorings || a.monitorings.length === 0) return { type: "muted", label: "Pending" };
+                              const err = a.monitorings.find((m: any) => m.status === "ERROR" || m.messageError);
+                              if (err) return { type: "danger", label: err.messageError || "Error" };
+                              const allSuccess = a.monitorings.every((m: any) => m.status === "SUCCESS");
+                              if (allSuccess) return { type: "success", label: "Success" };
+                              return { type: "muted", label: "Pending" };
+                            })();
+                            const badgeCfg = statusColorMap[monStatus.type] || statusColorMap["muted"];
+                            const BadgeIcon = badgeCfg.icon;
+
+                            return (
+                              <Badge
+                                style={{
+                                  color: badgeCfg.color,
+                                  backgroundColor: badgeCfg.bgColor,
+                                  borderColor: badgeCfg.outline
+                                }}
+                                className="border px-1.5 py-1 h-fit w-fit gap-1.5 flex items-center"
+                              >
+                                <CircleIcon size={48} fill={badgeCfg.color} color={badgeCfg.color}>
+                                  <BadgeIcon
+                                    color={badgeCfg.bgColor}
+                                    size={12}
+                                    x={6}
+                                    y={6}
+                                    absoluteStrokeWidth
+                                  />
+                                </CircleIcon>
+                                <span className="text-xs font-medium whitespace-nowrap">
+                                  {monStatus.label}
+                                </span>
+                              </Badge>
+                            );
+                          })()}
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          {!a.isValidated && (
+                            <Button
+                              variant="ghost"
+                              className="text-muted-foreground"
+                              size="icon"
+                              disabled={a.isValidated}
+                              onClick={() => {
+                                if (editingQuestionId === a.questionId) {
+                                  setEditingQuestionId(null);
+                                } else {
+                                  setEditingQuestionId(a.questionId);
+                                  setDraftTranscript(a.answerTranscript || "");
+                                }
+                              }}
+                            >
+                              <PencilIcon />
+                            </Button>
+                          )}
+
+                          <Button
+                            variant="ghost"
+                            className="text-muted-foreground"
+                            size="icon"
+                            disabled={!a.fileName || downloadingQuestionId === a.questionId}
+                            onClick={() => handleDownloadVideo(a.fileName, a.questionId)}
+                          >
+                            {downloadingQuestionId === a.questionId ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <DownloadIcon />
+                            )}
+                          </Button>
+
+                          {!a.isValidated && (
+                            <div className="flex items-center space-x-2">
+                              <Switch
+                                id={`validate-status-${a.questionId}`}
+                                checked={a.isValidated}
+                                disabled={a.isValidated || validatingQuestionId === a.questionId}
+                                onCheckedChange={(checked) => {
+                                  if (checked && !a.isValidated) {
+                                    handleValidateAnswer(a.questionId, a.participantId);
+                                  }
+                                }}
+                              />
+                              <Label htmlFor={`validate-status-${a.questionId}`} className="text-muted-foreground">
+                                {validatingQuestionId === a.questionId ? "Validating..." : a.isValidated ? "Validated" : "Not Validated"}
+                              </Label>
+                            </div>
+                          )}
+
+                          {a.monitorings?.some((m: any) => m.status === "ERROR" && m.taskName?.toLowerCase().includes("stt")) && (
+                            <Button size="sm" variant="outline" className="border-red-500 text-red-500 hover:bg-red-50" disabled={retryingQuestionId === a.questionId} onClick={() => handleRetryStt(a.participantId, a.questionId)}>
+                              {retryingQuestionId === a.questionId ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
+                              Retry
+                            </Button>
+                          )}
+                        </div>
                       </div>
 
                       <p className="text-[#8C929D] font-medium text-sm">
                         {a.questionText}
                       </p>
 
-                      {a.answerTranscript ? (
+                      {editingQuestionId === a.questionId ? (
+                        <div className="flex flex-col gap-2 mt-1">
+                          <Textarea
+                            value={draftTranscript}
+                            onChange={(e) => setDraftTranscript(e.target.value)}
+                            disabled={isUpdatingTranscript}
+                            className="min-h-[100px]"
+                            placeholder="Enter the transcript manually..."
+                          />
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled={isUpdatingTranscript}
+                              onClick={() => setEditingQuestionId(null)}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              size="sm"
+                              className="bg-[#0076D2] text-white hover:bg-[#005ba3]"
+                              disabled={isUpdatingTranscript}
+                              onClick={() => handleSaveTranscript(a.questionId, a.participantId)}
+                            >
+                              {isUpdatingTranscript ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
+                              Save
+                            </Button>
+                          </div>
+                        </div>
+                      ) : a.answerTranscript ? (
                         <div className="bg-[#F1F9FA] border-l-2 border-l-[#0076D2] p-3 flex items-start gap-3 mt-1">
                           <CornerDownRightIcon className="w-4 h-4 text-[#0076D2] shrink-0 mt-0.5" />
                           <p className="text-[#43474F] text-sm leading-relaxed whitespace-pre-wrap">
@@ -382,7 +720,7 @@ export default function CandidateInterviewPage() {
                           </p>
                         </div>
                       ) : (
-                        <p className="text-[#A9ADB5] text-xs italic">No transcript recorded</p>
+                        <p className="text-[#A9ADB5] text-xs italic mt-1">No transcript recorded</p>
                       )}
                     </div>
 
