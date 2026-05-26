@@ -50,7 +50,7 @@ export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], on
       roleTarget: "",
       levelTarget: "",
       technology: "",
-      language: "",
+      language: "IN",
     },
   });
 
@@ -285,7 +285,6 @@ export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], on
                 </label>
                 <div className="relative w-[609px]">
                   <select {...register("language")} className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow appearance-none bg-white text-slate-900 ${errors.language ? 'border-red-500' : 'border-slate-200'}`}>
-                    <option value="" disabled>Choose Language</option>
                     <option value="EN">English</option>
                     <option value="IN">Indonesia</option>
                   </select>
