@@ -260,8 +260,7 @@ export function EditInterviewModal({ isOpen, onClose, availableLevels = [], init
                   <input
                     {...register("number")}
                     type="number"
-                    readOnly
-                    className={`w-full h-[48px] px-4 py-2.5 border rounded-lg text-sm focus:ring-0 focus:border-slate-200 outline-none transition-shadow bg-slate-50 text-slate-500 cursor-not-allowed ${errors.number ? 'border-red-500' : 'border-slate-200'}`}
+                    className={`w-full h-[48px] px-4 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow bg-white text-slate-900 ${errors.number? 'border-red-500' : 'border-slate-200'}`}
                     placeholder="Enter number of questions"
                   />
                   {errors.number && <p className="text-red-500 text-xs mt-1">{errors.number.message}</p>}

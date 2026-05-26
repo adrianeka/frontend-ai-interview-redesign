@@ -52,6 +52,7 @@ export interface InterviewCardProps {
   description: string;
   isCompact?: boolean;
   id?: string;
+  isEditable?: boolean;
   onClick?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
