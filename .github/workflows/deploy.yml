@@ -23,6 +23,6 @@ jobs:
             cd /opt/ai-interview-v2/frontend-ai-interview-redesign
             git pull origin development
             cd ..
-            docker compose build frontend_redesign
-            docker compose up -d frontend_redesign
+            docker compose build frontend-redesign
+            docker compose up -d frontend-redesign
           EOF
