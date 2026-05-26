@@ -27,6 +27,7 @@ export function InterviewCard({
   description,
   isCompact,
   id,
+  isEditable,
   onClick,
   onEdit,
   onDelete,
@@ -159,9 +160,11 @@ export function InterviewCard({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="rounded-xl border-[#E2E4E6]">
             <DropdownMenuItem
+              disabled={!isEditable}
               className="flex items-center gap-2 font-medium py-2 cursor-pointer text-[#707784]"
               onClick={(e) => {
                 e.stopPropagation();
+                if (!isEditable) return;
                 onEdit?.();
               }}
             >

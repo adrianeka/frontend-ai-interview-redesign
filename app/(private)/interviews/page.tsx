@@ -289,6 +289,7 @@ export default function InterviewsPage() {
                     level={item.levelTarget}
                     description={item.description}
                     isCompact={!!selectedInterview}
+                    isEditable={(item as any).isEditable ?? true}
                     onClick={() => setSelectedInterview(item)}
                     onEdit={() => handleEditClick(item)}
                     onDelete={() => handleDeleteClick(item.id)}
