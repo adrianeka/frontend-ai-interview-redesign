@@ -28,6 +28,7 @@ export function InterviewCard({
   isCompact,
   id,
   isEditable,
+  isDeletable,
   onClick,
   onEdit,
   onDelete,
@@ -177,6 +178,7 @@ export function InterviewCard({
               Edit
             </DropdownMenuItem>
             <DropdownMenuItem
+              disabled={!isDeletable}
               className="gap-2 text-destructive font-medium py-2 cursor-pointer"
               onClick={(e) => { e.stopPropagation(); onDelete?.(); }}
             >

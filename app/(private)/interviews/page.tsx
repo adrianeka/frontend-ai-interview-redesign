@@ -290,6 +290,7 @@ export default function InterviewsPage() {
                     description={item.description}
                     isCompact={!!selectedInterview}
                     isEditable={(item as any).isEditable ?? true}
+                    isDeletable={(item as any).isDeletable ?? true}
                     onClick={() => setSelectedInterview(item)}
                     onEdit={() => handleEditClick(item)}
                     onDelete={() => handleDeleteClick(item.id)}
