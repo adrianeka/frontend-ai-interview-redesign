@@ -108,11 +108,11 @@ export function SidePanel({ interviewId, onClose }: SidePanelProps) {
                   </p>
                 </div>
                 <div>
-                  <p className="text-[11px] text-[#A9ADB5] tracking-wider mb-1" title={data.technology}>
-                    Technology(s)
+                  <p className="text-[11px] text-[#A9ADB5] tracking-wider mb-1">
+                    Language
                   </p>
                   <p className="text-xs text-[#43474F] font-semibold line-clamp-2">
-                    {data.technology}
+                    {data.language === "IN" ? "Indonesia" : data.language === "EN" ? "English" : data.language || "-"}
                   </p>
                 </div>
                 <div>
@@ -121,6 +121,14 @@ export function SidePanel({ interviewId, onClose }: SidePanelProps) {
                   </p>
                   <p className="text-xs text-[#43474F] font-semibold">
                     {data.levelTarget}
+                  </p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-[11px] text-[#A9ADB5] tracking-wider mb-1">
+                    Technology(s)
+                  </p>
+                  <p className="text-xs text-[#43474F] font-semibold leading-relaxed">
+                    {data.technology}
                   </p>
                 </div>
               </div>
