@@ -49,12 +49,14 @@ export default function InterviewsPage() {
     level: "all",
     status: "all",
   });
+  const [isMounted, setIsMounted] = React.useState(false);
 
   const [page, setPage] = React.useState(0);
   const [pageSize, setPageSize] = React.useState(10);
   const [availableLevels, setAvailableLevels] = React.useState<string[]>([]);
 
   const fetchInterviews = React.useCallback(async () => {
+    if (!isMounted) return;
     setIsLoading(true);
     try {
       const result = await interviewService.getInterviews({
@@ -70,6 +72,35 @@ export default function InterviewsPage() {
     }
   }, [page, appliedFilters, pageSize]);
 
+
+  React.useEffect(() => {
+    setIsMounted(true);
+    const saved = localStorage.getItem("interviewFilters");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setFilters(parsed);
+        setAppliedFilters(parsed);
+      } catch (e) {}
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (isMounted) {
+      localStorage.setItem("interviewFilters", JSON.stringify(appliedFilters));
+    }
+  }, [appliedFilters, isMounted]);
+
+  React.useEffect(() => {
+    if (!isMounted) return;
+    const timeout = setTimeout(() => {
+      if (appliedFilters.search !== filters.search) {
+        setAppliedFilters(prev => ({ ...prev, search: filters.search }));
+        setPage(0);
+      }
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [filters.search, appliedFilters.search, isMounted]);
 
   React.useEffect(() => {
     fetchInterviews();

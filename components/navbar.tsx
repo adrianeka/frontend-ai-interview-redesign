@@ -27,23 +27,28 @@ interface NavbarProps {
 
 export function Navbar({ user }: NavbarProps) {
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-[#FAFAFA] px-16 py-4 flex items-center justify-between">
+    <header className="sticky top-0 z-50 w-full border-b bg-[#FAFAFA] px-4 md:px-8 lg:px-16 py-4 flex items-center justify-between">
       {/* <div className="container mx-auto px-4 h-16 flex items-center justify-between"> */}
       {/* Logo and Nav */}
-      <div className="flex items-center gap-8">
-        <Link href="/" className="w-fit h-fit">
+      <div className="flex items-center gap-4 md:gap-8">
+        <Link href="/" className="w-fit h-fit flex-shrink-0">
           <Image src="/Logo.png" alt="Logo P79" width={120} height={44} className="w-[120px] h-[44px] object-cover" />
         </Link>
 
-        <Separator orientation="vertical" />
+        <Separator orientation="vertical" className="hidden md:block h-8" />
 
-        <nav className="flex items-center space-x-3">
+        <nav className="flex items-center space-x-2 md:space-x-3">
           <Button
             variant="outline"
             size="lg"
-            className="bg-[#F1F9FA] border-2 border-[#0076D2] px-4 py-3"
+            className="bg-[#F1F9FA] border-2 border-[#0076D2] px-2 md:px-4 py-3 w-auto md:w-[140px] h-[40px] md:h-[44px]"
           >
-            <Grid2x2PlusIcon color="#0076D2" size={20} />
+            <Image
+              src='/InterviewsNavbar.svg'
+              alt="Interviews"
+              width={15}
+              height={20}
+            />
             <span className="text-[#0076D2] font-medium text-base">
               Interviews
             </span>
@@ -52,10 +57,14 @@ export function Navbar({ user }: NavbarProps) {
           <Button
             variant="outline"
             size="lg"
-            className="bg-transparent border-2 border-[#E2E4E6] px-4 py-3"
+            className="bg-transparent border-2 border-[#E2E4E6] px-2 md:px-4 py-3 w-auto md:w-[140px] h-[40px] md:h-[44px] hidden sm:flex"
           >
-            <ChartNoAxesColumnIncreasingIcon color="#8C929D" size={20} />
-            <span className="text-[#8C929D] font-medium text-base">
+            <Image
+              src='/MonitoringNavbar.svg'
+              alt="Monitoring"
+              width={15}
+              height={20}
+            />            <span className="text-[#8C929D] font-medium text-base">
               Monitoring
             </span>
           </Button>
