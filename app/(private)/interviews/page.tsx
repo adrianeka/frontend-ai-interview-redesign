@@ -35,20 +35,12 @@ export default function InterviewsPage() {
   const [data, setData] = React.useState<PaginatedResponse<Interview> | null>(null);
 
   const [filters, setFilters] = React.useState({
-    search: "",
     company: "all",
     type: "all",
     level: "all",
     status: "all",
   });
 
-  const [appliedFilters, setAppliedFilters] = React.useState({
-    search: "",
-    company: "all",
-    type: "all",
-    level: "all",
-    status: "all",
-  });
   const [isMounted, setIsMounted] = React.useState(false);
 
   const [page, setPage] = React.useState(0);
@@ -60,7 +52,7 @@ export default function InterviewsPage() {
     setIsLoading(true);
     try {
       const result = await interviewService.getInterviews({
-        ...appliedFilters,
+        ...filters,
         page,
         size: pageSize
       });
@@ -70,7 +62,7 @@ export default function InterviewsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [page, appliedFilters, pageSize]);
+  }, [page, filters, pageSize, isMounted]);
 
 
   React.useEffect(() => {
@@ -79,28 +71,21 @@ export default function InterviewsPage() {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        setFilters(parsed);
-        setAppliedFilters(parsed);
+        setFilters({
+          company: parsed.company || "all",
+          type: parsed.type || "all",
+          level: parsed.level || "all",
+          status: parsed.status || "all",
+        });
       } catch (e) {}
     }
   }, []);
 
   React.useEffect(() => {
     if (isMounted) {
-      localStorage.setItem("interviewFilters", JSON.stringify(appliedFilters));
+      localStorage.setItem("interviewFilters", JSON.stringify(filters));
     }
-  }, [appliedFilters, isMounted]);
-
-  React.useEffect(() => {
-    if (!isMounted) return;
-    const timeout = setTimeout(() => {
-      if (appliedFilters.search !== filters.search) {
-        setAppliedFilters(prev => ({ ...prev, search: filters.search }));
-        setPage(0);
-      }
-    }, 500);
-    return () => clearTimeout(timeout);
-  }, [filters.search, appliedFilters.search, isMounted]);
+  }, [filters, isMounted]);
 
   React.useEffect(() => {
     fetchInterviews();
@@ -116,10 +101,7 @@ export default function InterviewsPage() {
     }
   }, [data]);
 
-  const handleSearch = () => {
-    setAppliedFilters(filters);
-    setPage(0); // Reset to first page on new search
-  };
+
 
   const handleEditClick = async (interview: any) => {
     try {
@@ -191,11 +173,9 @@ export default function InterviewsPage() {
     setPage(newPage - 1); // API is 0-indexed
   };
 
-  const removeFilter = (key: keyof typeof appliedFilters) => {
-    const defaultVal = key === "search" ? "" : "all";
-    const newFilters = { ...filters, [key]: defaultVal };
+  const removeFilter = (key: keyof typeof filters) => {
+    const newFilters = { ...filters, [key]: "all" };
     setFilters(newFilters);
-    setAppliedFilters(newFilters);
     setPage(0);
   };
 
@@ -232,8 +212,10 @@ export default function InterviewsPage() {
           <FilterSection
             isSidePanelOpen={!!selectedInterview}
             filters={filters}
-            onFiltersChange={setFilters}
-            onSearch={handleSearch}
+            onFiltersChange={(newFilters) => {
+              setFilters(newFilters);
+              setPage(0);
+            }}
             availableLevels={availableLevels}
           />
 
@@ -264,8 +246,8 @@ export default function InterviewsPage() {
 
           {/* Filter Badges */}
           <div className="flex flex-wrap gap-2 mb-5">
-            {Object.entries(appliedFilters).map(([key, value]) => {
-              if (key === "search" ? value === "" : value === "all") return null;
+            {Object.entries(filters).map(([key, value]) => {
+              if (value === "all") return null;
 
               return (
                 <div
@@ -279,7 +261,7 @@ export default function InterviewsPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => removeFilter(key as keyof typeof appliedFilters)}
+                    onClick={() => removeFilter(key as keyof typeof filters)}
                     className="rounded-full hover:bg-[#E5E7EB]"
                   >
                     <img
