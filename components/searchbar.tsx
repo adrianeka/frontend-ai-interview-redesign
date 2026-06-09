@@ -8,18 +8,22 @@ interface SearchBarProps {
     placeholder?: string;
     value?: string;
     onChange?: (value: string) => void;
+    showLabel?: boolean;
 }
 
 export function SearchBar({
     placeholder = "Search...",
     value,
     onChange,
+    showLabel = true,
 }: SearchBarProps) {
     return (
         <div className="w-full font-inter">
-            <label className="block text-[13px] font-medium text-slate-500 mb-[6px] ml-1">
-                Search
-            </label>
+            {showLabel && (
+                <label className="block text-[13px] font-medium text-slate-500 mb-[6px] ml-1">
+                    Search
+                </label>
+            )}
 
             <div className="relative w-full">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-slate-300" />

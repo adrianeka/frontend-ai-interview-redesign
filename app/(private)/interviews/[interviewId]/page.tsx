@@ -18,7 +18,6 @@ import {
     PlusIcon,
     XIcon,
     ClockIcon,
-    SearchIcon,
     CircleXIcon,
     ChevronRightIcon,
     Loader2,
@@ -27,7 +26,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationFirst, PaginationItem, PaginationLast, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { useRouter, useParams } from "next/navigation";
@@ -37,6 +35,7 @@ import { InterviewDetail, Candidate } from "@/features/interviews/types/intervie
 import { EditInterviewModal } from "@/features/interviews/components/edit-interview-modal";
 import { EditInterviewData } from "@/features/interviews/types/interview";
 import { InterviewAlertModal, AlertType } from "@/features/interviews/components/interview-alert-modal";
+import { SearchBar } from "@/components/searchbar";
 
 // Color map for hire decision statuses — keyed by status string
 const hiringColorMap: Record<string, { color: string; bgColor: string; iconBg: string; icon: React.ElementType; value: string }> = {
@@ -534,19 +533,17 @@ export default function InterviewDetailsPage() {
 
                     <div className="flex flex-row gap-2 w-full sm:w-auto items-center justify-between sm:justify-end">
                         {/* Search input */}
-                        <InputGroup className="w-full sm:w-auto shrink-0 flex-1 sm:flex-none">
-                            <InputGroupInput
+                        <div className="w-full sm:w-[280px] shrink-0 flex-1 sm:flex-none">
+                            <SearchBar
                                 placeholder="Search Candidates..."
                                 value={searchQuery}
-                                onChange={(e) => {
-                                    setSearchQuery(e.target.value);
+                                showLabel={false}
+                                onChange={(val) => {
+                                    setSearchQuery(val);
                                     setCurrentPage(1);
                                 }}
                             />
-                            <InputGroupAddon>
-                                <SearchIcon />
-                            </InputGroupAddon>
-                        </InputGroup>
+                        </div>
 
                         {/* Entries per page */}
                         <Select
@@ -611,7 +608,11 @@ export default function InterviewDetailsPage() {
                                 ? activeColorMap[mappedKey]
                                 : { color: "#595F6A", bgColor: "#F2F2F2" }; // sleek neutral gray for custom recommendations
                             return (
-                                <Card key={candidate.participantId || index} className="flex flex-row p-4 sm:px-1.25 sm:py-2 ring-0 items-center justify-between w-full">
+                                <Card
+                                    key={candidate.participantId || index}
+                                    onClick={() => router.push(`/interviews/${id}/${candidate.candidateId}`)}
+                                    className="flex flex-row p-4 sm:px-1.25 sm:py-2 ring-0 items-center justify-between w-full cursor-pointer hover:bg-slate-50/50 active:scale-[0.995] transition-all duration-200"
+                                >
                                     <div className="flex flex-col sm:flex-row items-start sm:items-center flex-1 gap-3 sm:gap-6 w-full">
                                         {rec && (
                                             <div className="min-w-0 sm:min-w-32 shrink-0 max-w-full sm:max-w-64">
@@ -650,10 +651,12 @@ export default function InterviewDetailsPage() {
                                     <Button
                                         variant="ghost"
                                         size="icon-lg"
-                                        className="shrink-0"
-                                        onClick={() => router.push(`/interviews/${id}/${candidate.candidateId}`)}
+                                        className="shrink-0 pointer-events-none"
+                                        asChild
                                     >
-                                        <ChevronRightIcon color="#0076D2" />
+                                        <div>
+                                            <ChevronRightIcon color="#0076D2" />
+                                        </div>
                                     </Button>
                                 </Card>
                             );

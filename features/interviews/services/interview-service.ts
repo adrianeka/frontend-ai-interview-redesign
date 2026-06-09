@@ -159,5 +159,16 @@ export const interviewService = {
       );
     }
   },
+
+  getMonitoring: async (participantId: string) => {
+    try {
+      const response = await api.get(`/monitoring/${participantId}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || `Failed to fetch monitoring: ${error.message}`
+      );
+    }
+  },
 };
 
