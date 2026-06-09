@@ -65,6 +65,7 @@ export default function CandidateInterviewPage() {
   const [stepProgress, setStepProgress] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [monitoringData, setMonitoringData] = useState<any[]>([]);
 
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
   const [draftTranscript, setDraftTranscript] = useState<string>("");
@@ -83,6 +84,21 @@ export default function CandidateInterviewPage() {
       setCandidateResult(resultData);
       setInterviewDetail(interviewData);
       setStepProgress(progressData);
+
+      let participantId: string | undefined = resultData.answers?.[0]?.participantId;
+      if (!participantId) {
+        try {
+          const candidatesList = await interviewService.getCandidates(interviewId);
+          const currentCandidateObj = candidatesList.find(c => c.candidateId === candidateId);
+          participantId = currentCandidateObj?.participantId;
+        } catch (cErr) {
+          console.error("Failed to fetch candidate list for participantId", cErr);
+        }
+      }
+      if (participantId) {
+        const monitoring = await interviewService.getMonitoring(participantId);
+        setMonitoringData(monitoring);
+      }
     } catch (err: any) {
       console.error(err);
     }
@@ -181,6 +197,21 @@ export default function CandidateInterviewPage() {
         setCandidateResult(resultData);
         setInterviewDetail(interviewData);
         setStepProgress(progressData);
+
+        let participantId: string | undefined = resultData.answers?.[0]?.participantId;
+        if (!participantId) {
+          try {
+            const candidatesList = await interviewService.getCandidates(interviewId);
+            const currentCandidateObj = candidatesList.find(c => c.candidateId === candidateId);
+            participantId = currentCandidateObj?.participantId;
+          } catch (cErr) {
+            console.error("Failed to fetch candidate list for participantId", cErr);
+          }
+        }
+        if (participantId) {
+          const monitoring = await interviewService.getMonitoring(participantId);
+          setMonitoringData(monitoring);
+        }
       } catch (err: any) {
         console.error("Error loading candidate results:", err);
         setError(err.message || "Failed to load candidate results.");
@@ -232,7 +263,15 @@ export default function CandidateInterviewPage() {
       return null;
   };
 
-  const sortedAnswers = [...candidateResult.answers].sort((a, b) => (a.questionNumber || 0) - (b.questionNumber || 0));
+  const sortedAnswers = [...candidateResult.answers]
+    .map(a => {
+      const answerMonitorings = (monitoringData || []).filter((m: any) => m.questionId === a.questionId);
+      return {
+        ...a,
+        monitorings: answerMonitorings.length > 0 ? answerMonitorings : a.monitorings
+      };
+    })
+    .sort((a, b) => (a.questionNumber || 0) - (b.questionNumber || 0));
   const totalAnswers = sortedAnswers.length;
   const validatedCount = sortedAnswers.filter((a) => a.isValidated).length;
   const isFullyValidated = totalAnswers > 0 && validatedCount === totalAnswers;
@@ -268,10 +307,16 @@ export default function CandidateInterviewPage() {
   else if (step2Status === "active") activeStep = 2;
 
   const sttCompletedCount = sortedAnswers.filter(a => a.monitorings?.every((m: any) => m.status === "SUCCESS")).length;
-  const sttErrorQuestions = sortedAnswers.filter(a => a.monitorings?.some((m: any) => m.status === "ERROR")).map(a => a.questionNumber || 0);
+  const sttErrorQuestions = sortedAnswers.filter(a => a.monitorings?.some((m: any) => m.status === "ERROR" || m.status === "FAILED")).map(a => a.questionNumber || 0);
   const isSttError = sttErrorQuestions.length > 0;
 
-  const isGradingError = sortedAnswers.some(a => a.monitorings?.some((m: any) => m.status === "ERROR" && m.taskName?.toLowerCase().includes("grading")));
+  const isGradingError = 
+    sortedAnswers.some(a => a.monitorings?.some((m: any) => (m.status === "ERROR" || m.status === "FAILED") && m.taskName?.toLowerCase().includes("grading"))) ||
+    (monitoringData || []).some((m: any) => (m.status === "ERROR" || m.status === "FAILED") && m.taskName?.toLowerCase().includes("grading"));
+
+  const failedMonitoringItems = (monitoringData || []).filter(
+    (m: any) => m.status === "FAILED" || m.status === "ERROR" || m.messageError
+  );
 
   // Stepper visual styles helper
   const getStepStyles = (status: "completed" | "active" | "disabled") => {
@@ -385,6 +430,32 @@ export default function CandidateInterviewPage() {
             </div>
           </div>
 
+          {/* Failed Monitoring Alert */}
+          {failedMonitoringItems.length > 0 && (
+            <div className="flex flex-col gap-1.5 p-5 bg-[#FFEEEA] rounded-lg border-l-4 border-[#FF5630]">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <TriangleAlert className="w-5 h-5" fill="#FF5630" color="#FFEEEA" size={48} />
+                  <span className="text-[#43474F] font-bold text-base">Oops! An error occurred</span>
+                </div>
+              </div>
+              <div className="flex flex-col gap-1.5 ml-7 text-[#707784] text-sm">
+                {failedMonitoringItems.map((m: any, idx: number) => {
+                  const matchedAns = sortedAnswers.find(ans => ans.questionId === m.questionId);
+                  const displayTarget = matchedAns 
+                    ? `Question ${matchedAns.questionNumber || (sortedAnswers.indexOf(matchedAns) + 1)} (${m.taskName})`
+                    : m.taskName;
+                  return (
+                    <p key={m.id || idx} className="leading-relaxed">
+                      <span className="font-semibold text-[#43474F]">{displayTarget}: </span>
+                      {m.messageError || "Unknown processing error occurred."}
+                    </p>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Area 1 Alert */}
           {activeStep === 1 && !isSttError && (
             <div className="flex flex-col gap-1.5 p-5 bg-[#F1F9FA] rounded-lg border-l-4 border-[#0076D2]">
@@ -430,7 +501,7 @@ export default function CandidateInterviewPage() {
             </div>
           )}
 
-          {activeStep === 3 && isGradingError && (
+          {activeStep === 3 && isGradingError && failedMonitoringItems.length === 0 && (
             <div className="flex flex-col gap-1.5 p-5 bg-[#FFEEEA] rounded-lg border-l-4 border-[#FF5630]">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -525,7 +596,7 @@ export default function CandidateInterviewPage() {
             <div className="h-px bg-[#E2E4E6] w-full" />
           </div>
 
-          {activeStep === 1 && isSttError && (
+          {activeStep === 1 && isSttError && failedMonitoringItems.length === 0 && (
             <div className="flex flex-col gap-1.5 p-5 bg-[#FFEEEA] rounded-lg border-l-4 border-[#FF5630]">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -583,8 +654,8 @@ export default function CandidateInterviewPage() {
                             const monStatus = (() => {
                               if (a.isValidated) return { type: "success", label: "Validated" };
                               if (!a.monitorings || a.monitorings.length === 0) return { type: "muted", label: "Pending" };
-                              const err = a.monitorings.find((m: any) => m.status === "ERROR" || m.messageError);
-                              if (err) return { type: "danger", label: err.messageError || "Error" };
+                              const err = a.monitorings.find((m: any) => m.status === "ERROR" || m.status === "FAILED" || m.messageError);
+                              if (err) return { type: "danger", label: "Error" };
                               const allSuccess = a.monitorings.every((m: any) => m.status === "SUCCESS");
                               if (allSuccess) return { type: "success", label: "Success" };
                               return { type: "muted", label: "Pending" };
@@ -670,7 +741,7 @@ export default function CandidateInterviewPage() {
                             </div>
                           )}
 
-                          {a.monitorings?.some((m: any) => m.status === "ERROR" && m.taskName?.toLowerCase().includes("stt")) && (
+                          {a.monitorings?.some((m: any) => (m.status === "ERROR" || m.status === "FAILED") && m.taskName?.toLowerCase().includes("stt")) && (
                             <Button size="sm" variant="outline" className="border-red-500 text-red-500 hover:bg-red-50" disabled={retryingQuestionId === a.questionId} onClick={() => handleRetryStt(a.participantId, a.questionId)}>
                               {retryingQuestionId === a.questionId ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
                               Retry
