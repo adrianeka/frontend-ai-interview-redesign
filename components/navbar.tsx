@@ -15,7 +15,7 @@ import Image from "next/image";
 import { Separator } from "./ui/separator";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { logout } from "@/lib/auth";
+import { logout, getDecodedToken } from "@/lib/auth";
 
 interface NavbarProps {
   user?: {
@@ -26,6 +26,39 @@ interface NavbarProps {
 }
 
 export function Navbar({ user }: NavbarProps) {
+  const [userName, setUserName] = React.useState<string>(user?.name || "John Doe");
+  const [userRole, setUserRole] = React.useState<string>(user?.role || "Interviewer");
+
+  React.useEffect(() => {
+    if (!user) {
+      const decoded = getDecodedToken();
+      if (decoded) {
+        if (decoded.name) {
+          setUserName(decoded.name);
+        }
+        if (decoded.role) {
+          const formattedRole =
+            decoded.role.charAt(0).toUpperCase() +
+            decoded.role.slice(1).toLowerCase();
+          setUserRole(formattedRole);
+        }
+      }
+    } else {
+      setUserName(user.name);
+      setUserRole(user.role);
+    }
+  }, [user]);
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .filter(Boolean)
+      .join("")
+      .substring(0, 2)
+      .toUpperCase();
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-[#FAFAFA] px-4 md:px-8 lg:px-16 py-4 flex items-center justify-between">
       {/* <div className="container mx-auto px-4 h-16 flex items-center justify-between"> */}
@@ -77,20 +110,20 @@ export function Navbar({ user }: NavbarProps) {
           <div className="flex items-center gap-3">
             <Avatar className="h-10 w-10 border border-[#E2E4E6]">
               <AvatarImage
-                src="https://cdn.rafled.com/anime-icons/images/374yi72bsJLqPnyn3085StHiuZXNgKAc.jpg"
+                src={user?.avatarUrl || "https://cdn.rafled.com/anime-icons/images/374yi72bsJLqPnyn3085StHiuZXNgKAc.jpg"}
                 alt="Profile"
               />
 
-              <AvatarFallback>JD</AvatarFallback>
+              <AvatarFallback>{getInitials(userName)}</AvatarFallback>
             </Avatar>
 
             <div className="hidden sm:flex flex-col items-start justify-center">
               <p className="text-sm font-medium text-[#212121]">
-                {user?.name || "John Doe"}
+                {userName}
               </p>
 
               <Badge className="text-[#4BAC87] text-xs px-2 py-1 border border-[#C9EBDE] bg-[#EEF8F4]">
-                {user?.role || "Interviewer"}
+                {userRole}
               </Badge>
             </div>
             <ChevronDownIcon className="text-[#667085]" />
