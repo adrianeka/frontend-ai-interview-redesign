@@ -1,9 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { MoreVertical, ExternalLink, Link as LinkIcon, Edit, Trash2 } from "lucide-react";
+import { MoreVertical, Link as LinkIcon, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,9 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-
-
-import { InterviewCardProps } from "../types/interview";
+import { InterviewCardProps } from "@/features/interviews/types/interview";
 import Image from "next/image";
 import { toast } from "sonner";
 
