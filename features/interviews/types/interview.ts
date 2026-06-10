@@ -1,3 +1,6 @@
+/**
+ * Represents a single question in an interview session.
+ */
 export interface Question {
   id: string;
   questionText: string;
@@ -5,6 +8,9 @@ export interface Question {
   isAnswered: boolean | null;
 }
 
+/**
+ * Represents the core data model of an Interview session.
+ */
 export interface Interview {
   id: string;
   name: string;

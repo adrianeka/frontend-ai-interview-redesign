@@ -2,8 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { LayoutDashboard, Activity, ChevronDown, Grid2x2PlusIcon, ChartNoAxesColumnIncreasingIcon, ChevronDownIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ChevronDownIcon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,7 +16,11 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { logout, getDecodedToken } from "@/lib/auth";
 
+/**
+ * Props for the Navbar component.
+ */
 interface NavbarProps {
+  /** Optional pre-fetched user details, falls back to JWT decoding if omitted */
   user?: {
     name: string;
     role: string;
@@ -25,27 +28,26 @@ interface NavbarProps {
   };
 }
 
+/**
+ * Top-level application navigation bar.
+ * Handles user profile display via JWT, layout routing, and user logout actions.
+ */
 export function Navbar({ user }: NavbarProps) {
-  const [userName, setUserName] = React.useState<string>(user?.name || "John Doe");
-  const [userRole, setUserRole] = React.useState<string>(user?.role || "Interviewer");
+  const [userName, setUserName] = React.useState<string>(user?.name || "");
+  const [userRole, setUserRole] = React.useState<string>(user?.role || "");
 
   React.useEffect(() => {
-    if (!user) {
-      const decoded = getDecodedToken();
-      if (decoded) {
-        if (decoded.name) {
-          setUserName(decoded.name);
-        }
-        if (decoded.role) {
-          const formattedRole =
-            decoded.role.charAt(0).toUpperCase() +
-            decoded.role.slice(1).toLowerCase();
-          setUserRole(formattedRole);
-        }
-      }
-    } else {
+    if (user) {
       setUserName(user.name);
       setUserRole(user.role);
+    } else {
+      const decoded = getDecodedToken();
+      if (decoded?.name) setUserName(decoded.name);
+      if (decoded?.role) {
+        setUserRole(
+          decoded.role.charAt(0).toUpperCase() + decoded.role.slice(1).toLowerCase()
+        );
+      }
     }
   }, [user]);
 
@@ -64,8 +66,8 @@ export function Navbar({ user }: NavbarProps) {
       {/* <div className="container mx-auto px-4 h-16 flex items-center justify-between"> */}
       {/* Logo and Nav */}
       <div className="flex items-center gap-4 md:gap-8">
-        <Link href="/" className="w-fit h-fit flex-shrink-0">
-          <Image src="/Logo.png" alt="Logo P79" width={120} height={44} className="w-[120px] h-[44px] object-cover" />
+        <Link href="/" className="w-fit h-fit shrink-0">
+          <Image src="/Logo.png" alt="Logo P79" width={120} height={44} priority className="w-[120px] h-[44px] object-cover" />
         </Link>
 
         <Separator orientation="vertical" className="hidden md:block h-8" />
@@ -81,6 +83,7 @@ export function Navbar({ user }: NavbarProps) {
               alt="Interviews"
               width={15}
               height={20}
+              style={{ height: 'auto' }}
             />
             <span className="text-[#0076D2] font-medium text-base">
               Interviews
@@ -97,6 +100,7 @@ export function Navbar({ user }: NavbarProps) {
               alt="Monitoring"
               width={15}
               height={20}
+              style={{ height: 'auto' }}
             />            <span className="text-[#8C929D] font-medium text-base">
               Monitoring
             </span>

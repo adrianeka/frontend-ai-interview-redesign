@@ -1,9 +1,8 @@
 "use client";
 
-import * as React from "react";
-import { MoreVertical, ExternalLink, Link as LinkIcon, Edit, Trash2 } from "lucide-react";
+import { MoreVertical, Link as LinkIcon, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,12 +11,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-
-
-import { InterviewCardProps } from "../types/interview";
+import { InterviewCardProps } from "@/features/interviews/types/interview";
 import Image from "next/image";
 import { toast } from "sonner";
 
+/**
+ * Renders a summary card for an individual interview session.
+ * Used primarily in the Interviews List View. Displays key metrics like
+ * company, top candidate score, type, and level.
+ */
 export function InterviewCard({
   title,
   company,
@@ -39,7 +41,7 @@ export function InterviewCard({
     <Card
       className={cn(
         "bg-white border border-[#E2E4E6] rounded-[15px] p-5 shadow-none flex flex-col w-full font-inter cursor-pointer transition-all hover:shadow-md overflow-hidden",
-        isCompact ? "h-[330px]" : "h-[320px]"
+        isCompact ? "h-[350px]" : "h-[320px]"
       )}
       onClick={onClick}
     >

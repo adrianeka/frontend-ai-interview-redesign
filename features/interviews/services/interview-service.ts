@@ -1,7 +1,21 @@
 import api from "@/lib/axios";
 import { InterviewFilters, Interview, InterviewDetail, PaginatedResponse, Candidate, CandidateResult } from "../types/interview";
 
+const createServiceError = (error: any, fallbackMessage: string): Error => {
+  return new Error(
+    error.response?.data?.message || `${fallbackMessage}: ${error.message}`
+  );
+};
+
+/**
+ * API service for managing interview entities and candidate operations.
+ * Handles fetching, creating, updating, deleting interviews, 
+ * as well as candidate result fetching and AI pipeline retries.
+ */
 export const interviewService = {
+  /**
+   * Fetches a paginated list of interviews based on provided filters.
+   */
   getInterviews: async (filters: InterviewFilters): Promise<PaginatedResponse<Interview>> => {
     const params: Record<string, string | number> = {
       page: filters.page || 0,
@@ -20,9 +34,7 @@ export const interviewService = {
       });
       return response.data;
     } catch (error: any) {
-      throw new Error(
-        error.response?.data?.message || `Failed to fetch interviews: ${error.message}`
-      );
+      throw createServiceError(error, "Failed to fetch interviews");
     }
   },
 
@@ -31,9 +43,7 @@ export const interviewService = {
       const response = await api.get(`/interviews/${id}`);
       return response.data;
     } catch (error: any) {
-      throw new Error(
-        error.response?.data?.message || `Failed to fetch interview details: ${error.message}`
-      );
+      throw createServiceError(error, `Failed to fetch interview details`);
     }
   },
 
@@ -42,9 +52,7 @@ export const interviewService = {
       const response = await api.post('/interviews', data);
       return response.data;
     } catch (error: any) {
-      throw new Error(
-        error.response?.data?.message || `Failed to create interview: ${error.message}`
-      );
+      throw createServiceError(error, "Failed to create interview");
     }
   },
 
@@ -53,9 +61,7 @@ export const interviewService = {
       const response = await api.put(`/interviews/${id}`, data);
       return response.data;
     } catch (error: any) {
-      throw new Error(
-        error.response?.data?.message || `Failed to update interview: ${error.message}`
-      );
+      throw createServiceError(error, "Failed to update interview");
     }
   },
 
@@ -64,9 +70,7 @@ export const interviewService = {
       const response = await api.delete(`/interviews/${id}`);
       return response.data;
     } catch (error: any) {
-      throw new Error(
-        error.response?.data?.message || `Failed to delete interview: ${error.message}`
-      );
+      throw createServiceError(error, "Failed to delete interview");
     }
   },
 
@@ -81,9 +85,7 @@ export const interviewService = {
       });
       return response.data;
     } catch (error: any) {
-      throw new Error(
-        error.response?.data?.message || `Failed to fetch candidates: ${error.message}`
-      );
+      throw createServiceError(error, "Failed to fetch candidates");
     }
   },
 
@@ -92,9 +94,7 @@ export const interviewService = {
       const response = await api.get(`/answers/candidate-result/${interviewId}/${candidateId}`);
       return response.data;
     } catch (error: any) {
-      throw new Error(
-        error.response?.data?.message || `Failed to fetch candidate results: ${error.message}`
-      );
+      throw createServiceError(error, "Failed to fetch candidate results");
     }
   },
 
@@ -105,9 +105,7 @@ export const interviewService = {
       });
       return response.data;
     } catch (error: any) {
-      throw new Error(
-        error.response?.data?.message || `Failed to update answer transcript: ${error.message}`
-      );
+      throw createServiceError(error, "Failed to update answer transcript");
     }
   },
 
@@ -119,22 +117,18 @@ export const interviewService = {
       });
       return response.data;
     } catch (error: any) {
-      throw new Error(
-        error.response?.data?.message || `Failed to validate answer: ${error.message}`
-      );
+      throw createServiceError(error, "Failed to validate answer");
     }
   },
 
   downloadVideo: async (fileName: string) => {
     try {
       const response = await api.get(`/answers/download/${fileName}`, {
-        responseType: 'blob' // Required to handle binary file download
+        responseType: 'blob'
       });
       return response.data;
     } catch (error: any) {
-      throw new Error(
-        error.response?.data?.message || `Failed to download video: ${error.message}`
-      );
+      throw createServiceError(error, "Failed to download video");
     }
   },
 
@@ -143,9 +137,7 @@ export const interviewService = {
       const response = await api.get(`/answers/step-progress/${interviewId}/${candidateId}`);
       return response.data;
     } catch (error: any) {
-      throw new Error(
-        error.response?.data?.message || `Failed to fetch step progress: ${error.message}`
-      );
+      throw createServiceError(error, "Failed to fetch step progress");
     }
   },
 
@@ -154,9 +146,16 @@ export const interviewService = {
       const response = await api.put(`/answers/reprocess-stt/${participantId}/${questionId}`);
       return response.data;
     } catch (error: any) {
-      throw new Error(
-        error.response?.data?.message || `Failed to retry STT: ${error.message}`
-      );
+      throw createServiceError(error, "Failed to retry STT");
+    }
+  },
+
+  retrySttBulk: async (participantId: string) => {
+    try {
+      const response = await api.put(`/answers/reprocess-stt/bulk/${participantId}`);
+      return response.data;
+    } catch (error: any) {
+      throw createServiceError(error, "Failed to bulk retry STT");
     }
   },
 
@@ -165,10 +164,7 @@ export const interviewService = {
       const response = await api.get(`/monitoring/${participantId}`);
       return response.data;
     } catch (error: any) {
-      throw new Error(
-        error.response?.data?.message || `Failed to fetch monitoring: ${error.message}`
-      );
+      throw createServiceError(error, "Failed to fetch monitoring");
     }
   },
 };
-

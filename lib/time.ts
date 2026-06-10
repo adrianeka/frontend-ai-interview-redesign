@@ -1,3 +1,6 @@
+/**
+ * Formats a date string or Date object into a readable date string (e.g., 01 January 2026).
+ */
 export const formatDate = (
   date: string | Date,
   locale = "id-ID"
@@ -9,6 +12,9 @@ export const formatDate = (
   }).format(new Date(date));
 };
 
+/**
+ * Formats a date string or Date object into a readable date and time string.
+ */
 export const formatDateTime = (
   date: string | Date,
   locale = "id-ID"
@@ -22,6 +28,9 @@ export const formatDateTime = (
   }).format(new Date(date));
 };
 
+/**
+ * Calculates and returns a relative time string (e.g., "5 menit lalu").
+ */
 export const relativeTime = (date: string | Date) => {
   const now = new Date().getTime();
   const target = new Date(date).getTime();
@@ -37,4 +46,19 @@ export const relativeTime = (date: string | Date) => {
     return `${Math.floor(diff / 86400)} hari lalu`;
 
   return formatDate(date);
+};
+
+export const formatInterviewTime = (isoString: string) => {
+  try {
+    const date = new Date(isoString);
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+    const day = pad(date.getDate());
+    const month = pad(date.getMonth() + 1);
+    const year = date.getFullYear();
+    return `${hours}:${minutes} | ${day}/${month}/${year}`;
+  } catch {
+    return isoString;
+  }
 };

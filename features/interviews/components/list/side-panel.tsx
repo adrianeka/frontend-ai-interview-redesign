@@ -4,14 +4,23 @@ import * as React from "react";
 import { ChevronLeft, ChevronDown, Minus, Plus, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { interviewService } from "@/features/interviews/services/interview-service";
-import { Question, InterviewDetail } from "../types/interview";
+import { InterviewDetail } from "@/features/interviews/types/interview";
 import { Button } from "@/components/ui/button";
 
+/**
+ * Props for the SidePanel component.
+ */
 interface SidePanelProps {
+  /** ID of the interview to display details for */
   interviewId: string | null;
+  /** Callback to close the side panel */
   onClose: () => void;
 }
 
+/**
+ * Slide-out panel for displaying quick details about a specific interview.
+ * Fetches and shows context, objective, and a list of questions without leaving the list view.
+ */
 export function SidePanel({ interviewId, onClose }: SidePanelProps) {
   const [data, setData] = React.useState<InterviewDetail | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -63,8 +72,8 @@ export function SidePanel({ interviewId, onClose }: SidePanelProps) {
   };
 
   return (
-    <aside className="w-full h-full lg:w-[450px] bg-white border border-slate-200 rounded-2xl p-6 sticky top-24 shadow-sm animate-in slide-in-from-right duration-300 h-[calc(100vh-140px)] flex flex-col">
-      <div className="overflow-y-auto pr-2 flex-grow custom-scrollbar">
+    <aside className="w-full lg:w-[450px] shrink-0 bg-white border border-slate-200 rounded-2xl p-6 sticky top-24 shadow-sm animate-in slide-in-from-right duration-500 h-[calc(100vh-120px)] flex flex-col">
+      <div className="overflow-y-auto pr-2 grow custom-scrollbar">
         <div className="flex items-center justify-between mb-6">
           <Button
             variant="ghost"
@@ -218,49 +227,49 @@ export function SidePanel({ interviewId, onClose }: SidePanelProps) {
                 {expandedSections.questions && (
                   <div className="space-y-3 pb-4">
                     {data.questions.map((q, i) => {
-                      const isExpanded = expandedQuestions[q.id] !== false;
-                      return (
-                        <div
-                          key={q.id || i}
-                          className="relative overflow-hidden border border-[#D0E7FF] bg-white flex flex-col transition-all duration-300"
-                        >
-                          {/* Header Section */}
-                          <div
-                            className="relative bg-[#EBF5FF] px-4 py-3 cursor-pointer flex items-center justify-between"
-                            onClick={() => toggleQuestion(q.id)}
-                          >
-                            {/* Garis kiri Biru */}
-                            <div className="absolute left-0 top-0 h-full w-[4px] bg-[#0076D2]" />
+                       const isExpanded = expandedQuestions[q.id] !== false;
+                       return (
+                         <div
+                           key={q.id || i}
+                           className="relative overflow-hidden border border-[#D0E7FF] bg-white flex flex-col transition-all duration-300"
+                         >
+                           {/* Header Section */}
+                           <div
+                             className="relative bg-[#EBF5FF] px-4 py-3 cursor-pointer flex items-center justify-between"
+                             onClick={() => toggleQuestion(q.id)}
+                           >
+                             {/* Garis kiri Biru */}
+                             <div className="absolute left-0 top-0 h-full w-[4px] bg-[#0076D2]" />
 
-                            <p className="text-[13px] font-bold text-[#0076D2] ml-2">
-                              Question {q.orderNumber || i + 1}
-                            </p>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-[#8FD3FF] hover:text-[#0076D2] transition-colors p-0"
-                            >
-                              {isExpanded ? (
-                                <Minus className="h-4 w-4" strokeWidth={3} />
-                              ) : (
-                                <Plus className="h-4 w-4" strokeWidth={3} />
-                              )}
-                            </Button>
-                          </div>
+                             <p className="text-[13px] font-bold text-[#0076D2] ml-2">
+                               Question {q.orderNumber || i + 1}
+                             </p>
+                             <Button
+                               variant="ghost"
+                               size="icon"
+                               className="text-[#8FD3FF] hover:text-[#0076D2] transition-colors p-0"
+                             >
+                               {isExpanded ? (
+                                 <Minus className="h-4 w-4" strokeWidth={3} />
+                               ) : (
+                                 <Plus className="h-4 w-4" strokeWidth={3} />
+                               )}
+                             </Button>
+                           </div>
 
-                          {/* Content Section */}
-                          {isExpanded && (
-                            <div className="relative bg-[#F8FAFC] px-4 py-3.5 border-t border-[#D0E7FF] animate-in slide-in-from-top-2 duration-300">
-                              {/* Garis kiri Abu-abu */}
-                              <div className="absolute left-0 top-0 h-full w-[4px] bg-[#E2E4E6]" />
+                           {/* Content Section */}
+                           {isExpanded && (
+                             <div className="relative bg-[#F8FAFC] px-4 py-3.5 border-t border-[#D0E7FF] animate-in slide-in-from-top-2 duration-300">
+                               {/* Garis kiri Abu-abu */}
+                               <div className="absolute left-0 top-0 h-full w-[4px] bg-[#E2E4E6]" />
 
-                              <p className="text-[13px] leading-[20px] text-[#4B5563] font-medium ml-2">
-                                {q.questionText}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      );
+                               <p className="text-[13px] leading-[20px] text-[#4B5563] font-medium ml-2">
+                                 {q.questionText}
+                               </p>
+                             </div>
+                           )}
+                         </div>
+                       );
                     })}
                   </div>
                 )}

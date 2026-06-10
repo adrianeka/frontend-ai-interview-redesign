@@ -1,16 +1,26 @@
 "use client";
 
-import * as React from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
+/**
+ * Props for the SearchBar component.
+ */
 interface SearchBarProps {
+    /** Hint text shown inside the input when empty */
     placeholder?: string;
+    /** Controlled value of the input */
     value?: string;
+    /** Callback fired when the input value changes */
     onChange?: (value: string) => void;
+    /** Whether to display the standard "Search" label above the input */
     showLabel?: boolean;
 }
 
+/**
+ * Reusable search input component.
+ * Features an integrated search icon and consistent layout/styling across the dashboard.
+ */
 export function SearchBar({
     placeholder = "Search...",
     value,

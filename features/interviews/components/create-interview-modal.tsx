@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { X, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -10,6 +9,9 @@ import { InterviewAlertModal, AlertType } from "./interview-alert-modal";
 import { CreateInterviewModalProps } from "../types/interview";
 import { Button } from "@/components/ui/button";
 
+/**
+ * Zod schema for validating the interview creation form.
+ */
 const formSchema = z.object({
   name: z.string().min(1, "This field is required."),
   companyNamePartner: z.string().min(1, "This field is required."),
@@ -26,6 +28,11 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
+/**
+ * Modal component for creating a new interview session.
+ * Contains a complex form with multi-field validation using Zod and React Hook Form.
+ * Integrates with `InterviewAlertModal` to confirm successful creation.
+ */
 export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], onSuccess }: CreateInterviewModalProps) {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [alertType, setAlertType] = React.useState<AlertType | null>(null);
@@ -132,7 +139,7 @@ export function CreateInterviewModal({ isOpen, onClose, availableLevels = [], on
 
   return (
     <>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" id="interviewModal">
+      <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6" id="interviewModal">
         <div
           className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
           id="modalBackdrop"

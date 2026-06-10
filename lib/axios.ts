@@ -3,6 +3,10 @@ import { getToken, removeToken } from "./auth";
 
 const isServer = typeof window === "undefined";
 
+/**
+ * Configured Axios instance with interceptors for attaching JWT tokens 
+ * and handling global 401 Unauthorized errors.
+ */
 const api = axios.create({
   baseURL: isServer ? process.env.NEXT_PUBLIC_API_URL : "/api",
   headers: {

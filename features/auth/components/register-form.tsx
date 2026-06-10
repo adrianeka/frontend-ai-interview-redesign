@@ -11,6 +11,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+/**
+ * Client-side form component for registering a new user account.
+ * Includes basic validation and password visibility toggles.
+ */
 export const RegisterForm = () => {
   const [showPassword, setShowPassword] =
     useState(false);

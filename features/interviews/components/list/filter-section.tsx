@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { SlidersHorizontal } from "lucide-react";
 import {
   Select,
@@ -11,18 +10,28 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
+/**
+ * Props for the FilterSection component.
+ */
 interface FilterSectionProps {
+  /** Indicates if the side panel is currently open (adjusts layout) */
   isSidePanelOpen?: boolean;
+  /** Active filter values */
   filters: {
     company: string;
     type: string;
     level: string;
     status: string;
   };
+  /** Callback fired when any filter value changes */
   onFiltersChange: (filters: any) => void;
+  /** List of dynamically available level targets */
   availableLevels?: string[];
 }
 
+/**
+ * Renders the filter controls (Company, Type, Level, Status) for the interview list.
+ */
 export function FilterSection({
   isSidePanelOpen,
   filters,
@@ -50,7 +59,7 @@ export function FilterSection({
         </label>
         <Select value={filters.company} onValueChange={(val) => updateFilter("company", val)}>
           <SelectTrigger className={getTriggerClass()}>
-            <SlidersHorizontal className="h-4 w-4 text-[#43474F] flex-shrink-0" />
+            <SlidersHorizontal className="h-4 w-4 text-[#43474F] shrink-0" />
             <SelectValue placeholder="Show All" />
           </SelectTrigger>
           <SelectContent position="popper" sideOffset={6} className="rounded-[15px] border-[#E2E4E6] p-1.5 shadow-xl min-w-[200px]">
@@ -68,7 +77,7 @@ export function FilterSection({
         </label>
         <Select value={filters.type} onValueChange={(val) => updateFilter("type", val)}>
           <SelectTrigger className={getTriggerClass()}>
-            <SlidersHorizontal className="h-4 w-4 text-[#43474F] flex-shrink-0" />
+            <SlidersHorizontal className="h-4 w-4 text-[#43474F] shrink-0" />
             <SelectValue placeholder="Show All" />
           </SelectTrigger>
           <SelectContent position="popper" sideOffset={6} className="rounded-[15px] border-[#E2E4E6] p-1.5 shadow-xl min-w-[200px]">
@@ -85,7 +94,7 @@ export function FilterSection({
         </label>
         <Select value={filters.level} onValueChange={(val) => updateFilter("level", val)}>
           <SelectTrigger className={getTriggerClass()}>
-            <SlidersHorizontal className="h-4 w-4 text-[#43474F] flex-shrink-0" />
+            <SlidersHorizontal className="h-4 w-4 text-[#43474F] shrink-0" />
             <SelectValue placeholder="Show All" />
           </SelectTrigger>
           <SelectContent position="popper" sideOffset={6} className="rounded-[15px] border-[#E2E4E6] p-1.5 shadow-xl min-w-[200px]">
@@ -105,7 +114,7 @@ export function FilterSection({
         </label>
         <Select value={filters.status} onValueChange={(val) => updateFilter("status", val)}>
           <SelectTrigger className={getTriggerClass()}>
-            <SlidersHorizontal className="h-4 w-4 text-[#43474F] flex-shrink-0" />
+            <SlidersHorizontal className="h-4 w-4 text-[#43474F] shrink-0" />
             <SelectValue placeholder="Show All" />
           </SelectTrigger>
           <SelectContent position="popper" sideOffset={6} className="rounded-[15px] border-[#E2E4E6] p-1.5 shadow-xl min-w-[180px]">

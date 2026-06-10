@@ -1,5 +1,9 @@
 import Image from "next/image";
 
+/**
+ * Application footer component.
+ * Displays the copyright information and application logo.
+ */
 export function Footer() {
   return (
     <footer className="border-t bg-[#FAFAFA] py-4 px-16">
