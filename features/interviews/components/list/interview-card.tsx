@@ -42,7 +42,7 @@ export function InterviewCard({
     <Card
       className={cn(
         "bg-white border border-[#E2E4E6] rounded-[15px] p-5 shadow-none flex flex-col w-full font-inter cursor-pointer transition-all hover:shadow-md overflow-hidden",
-        isCompact ? "h-[330px]" : "h-[320px]"
+        isCompact ? "h-[350px]" : "h-[320px]"
       )}
       onClick={onClick}
     >

@@ -54,10 +54,10 @@ export function InterviewsListView() {
   } = useInterviewsList();
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 items-start">
+    <div className="flex flex-col lg:flex-row gap-6 items-start overflow-x-clip">
       <div className={cn(
-        "rounded-2xl border border-[#E2E4E6] bg-[#FAFAFA] p-6 transition-all duration-500 ease-in-out overflow-hidden",
-        selectedInterview ? "lg:flex-1 w-full" : "w-full"
+        "shrink-0 rounded-2xl border border-[#E2E4E6] bg-[#FAFAFA] p-6 transition-all duration-500 ease-in-out overflow-hidden",
+        selectedInterview ? "lg:w-[calc(100%-474px)] w-full" : "w-full"
       )}>
 
         {/* Title and Action */}

@@ -72,7 +72,7 @@ export function SidePanel({ interviewId, onClose }: SidePanelProps) {
   };
 
   return (
-    <aside className="w-full lg:w-[450px] bg-white border border-slate-200 rounded-2xl p-6 sticky top-24 shadow-sm animate-in slide-in-from-right duration-300 h-[calc(100vh-140px)] flex flex-col">
+    <aside className="w-full lg:w-[450px] shrink-0 bg-white border border-slate-200 rounded-2xl p-6 sticky top-24 shadow-sm animate-in slide-in-from-right duration-500 h-[calc(100vh-120px)] flex flex-col">
       <div className="overflow-y-auto pr-2 grow custom-scrollbar">
         <div className="flex items-center justify-between mb-6">
           <Button
