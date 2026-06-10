@@ -8,6 +8,11 @@ import { Input } from "@/components/ui/input";
 import { login } from "@/features/auth/services/login";
 import { setToken } from "@/lib/auth";
 
+/**
+ * Client-side form component for authenticating users.
+ * Submits credentials to the backend, stores the received JWT in cookies,
+ * and handles redirects (including optional callback URLs).
+ */
 export const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

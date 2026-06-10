@@ -5,15 +5,28 @@ import { ChevronRight, ChevronLeft, ChevronsRight, ChevronsLeft } from "lucide-r
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 
+/**
+ * Props for the Pagination component.
+ */
 interface PaginationProps {
+  /** The current active page (1-indexed) */
   currentPage: number;
+  /** Total number of available pages */
   totalPages: number;
+  /** Total number of items across all pages */
   totalEntries: number;
+  /** Number of items displayed per page */
   entriesPerPage: number;
+  /** Callback fired when a new page is selected */
   onPageChange: (page: number) => void;
+  /** Optional custom CSS classes for the wrapper */
   className?: string;
 }
 
+/**
+ * Reusable pagination controls.
+ * Supports "jump to start/end", previous/next, and rendering dynamic page number gaps (e.g., 1 ... 4 5 6 ... 10).
+ */
 export function Pagination({
   currentPage,
   totalPages,

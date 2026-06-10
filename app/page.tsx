@@ -8,6 +8,10 @@ import {
 
 import { Button } from "@/components/ui/button";
 
+/**
+ * Public landing page (Home) for the AI Interview platform.
+ * Displays marketing copy, features, and call-to-actions for login/registration.
+ */
 export default function Home() {
   return (
     <main className="min-h-screen bg-background">

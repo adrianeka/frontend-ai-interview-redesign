@@ -1,6 +1,10 @@
 import { CheckIcon, PlusIcon, ClockIcon, XIcon } from "lucide-react";
 import React from "react";
 
+/**
+
+* Configuration schema for recommendation status badges and their styling.
+ */
 export interface ColorMapConfig {
   color: string;
   bgColor: string;
@@ -9,6 +13,9 @@ export interface ColorMapConfig {
   value: string;
 }
 
+/**
+ * Color and styling map for 'Hiring' type interviews.
+ */
 export const hiringColorMap: Record<string, ColorMapConfig> = {
   "Strong Hire": { color: "#4BAC87", bgColor: "#EEF8F4", iconBg: "#C9EBDE", icon: CheckIcon, value: "Strong Hire" },
   "Hire": { color: "#0076D2", bgColor: "#F1F9FA", iconBg: "#DBF2F3", icon: PlusIcon, value: "Hire" },
@@ -16,6 +23,9 @@ export const hiringColorMap: Record<string, ColorMapConfig> = {
   "Reject": { color: "#E84E2C", bgColor: "#FFEEEA", iconBg: "#FFCBBF", icon: XIcon, value: "Reject" },
 };
 
+/**
+ * Color and styling map for 'Internal Assessment' type interviews.
+ */
 export const internalAssessmentColorMap: Record<string, ColorMapConfig> = {
   "Ready for Promotion": { color: "#4BAC87", bgColor: "#EEF8F4", iconBg: "#C9EBDE", icon: CheckIcon, value: "Ready for Promotion" },
   "Meets Current Level": { color: "#0076D2", bgColor: "#F1F9FA", iconBg: "#DBF2F3", icon: PlusIcon, value: "Meets Current Level" },
@@ -23,6 +33,13 @@ export const internalAssessmentColorMap: Record<string, ColorMapConfig> = {
   "Significant Improvement Required": { color: "#E84E2C", bgColor: "#FFEEEA", iconBg: "#FFCBBF", icon: XIcon, value: "Significant Improvement Required" },
 };
 
+/**
+ * Normalizes recommendation strings returned from the backend into 
+ * standard keys that match the keys in our color maps.
+ * 
+ * @param rec The raw recommendation string from the API
+ * @returns The normalized status string or null if unknown
+ */
 export const mapRecommendationToStatusKey = (rec: string | null | undefined): string | null => {
   if (!rec) return null;
 

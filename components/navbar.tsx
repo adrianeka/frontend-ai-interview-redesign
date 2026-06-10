@@ -17,7 +17,11 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { logout, getDecodedToken } from "@/lib/auth";
 
+/**
+ * Props for the Navbar component.
+ */
 interface NavbarProps {
+  /** Optional pre-fetched user details, falls back to JWT decoding if omitted */
   user?: {
     name: string;
     role: string;
@@ -25,27 +29,26 @@ interface NavbarProps {
   };
 }
 
+/**
+ * Top-level application navigation bar.
+ * Handles user profile display via JWT, layout routing, and user logout actions.
+ */
 export function Navbar({ user }: NavbarProps) {
-  const [userName, setUserName] = React.useState<string>(user?.name || "John Doe");
-  const [userRole, setUserRole] = React.useState<string>(user?.role || "Interviewer");
+  const [userName, setUserName] = React.useState<string>(user?.name || "");
+  const [userRole, setUserRole] = React.useState<string>(user?.role || "");
 
   React.useEffect(() => {
-    if (!user) {
-      const decoded = getDecodedToken();
-      if (decoded) {
-        if (decoded.name) {
-          setUserName(decoded.name);
-        }
-        if (decoded.role) {
-          const formattedRole =
-            decoded.role.charAt(0).toUpperCase() +
-            decoded.role.slice(1).toLowerCase();
-          setUserRole(formattedRole);
-        }
-      }
-    } else {
+    if (user) {
       setUserName(user.name);
       setUserRole(user.role);
+    } else {
+      const decoded = getDecodedToken();
+      if (decoded?.name) setUserName(decoded.name);
+      if (decoded?.role) {
+        setUserRole(
+          decoded.role.charAt(0).toUpperCase() + decoded.role.slice(1).toLowerCase()
+        );
+      }
     }
   }, [user]);
 

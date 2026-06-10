@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { CheckIcon, XIcon, ClockIcon } from "lucide-react";
@@ -14,6 +14,11 @@ const statusColorMap: Record<string, { color: string; bgColor: string; outline: 
   "muted": { color: "#595F6A", bgColor: "#FAFAFA", outline: "#E2E4E6", icon: ClockIcon }
 };
 
+/**
+ * Custom hook to manage the state and data fetching for a single candidate's interview session.
+ * Connects to the backend to retrieve candidate details, answers, and STT/Grading pipeline monitoring statuses.
+ * Also exposes methods to retry failed background jobs.
+ */
 export function useCandidateInterview() {
   const params = useParams();
   const router = useRouter();
@@ -29,13 +34,24 @@ export function useCandidateInterview() {
 
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
   const [draftTranscript, setDraftTranscript] = useState<string>("");
+  // Action States
   const [isUpdatingTranscript, setIsUpdatingTranscript] = useState(false);
-  const [validatingQuestionId, setValidatingQuestionId] = useState<string | null>(null);
+  const [isRetryingStt, setIsRetryingStt] = useState(false);
+  const [isRetryingGrading, setIsRetryingGrading] = useState(false);
   const [isRetryingBulk, setIsRetryingBulk] = useState(false);
+
+  // Derived States
+  const [hasPendingTasks, setHasPendingTasks] = useState(false);
+  const [hasFailedTasks, setHasFailedTasks] = useState(false);
+
+  const [validatingQuestionId, setValidatingQuestionId] = useState<string | null>(null);
   const [downloadingQuestionId, setDownloadingQuestionId] = useState<string | null>(null);
   const [retryingQuestionId, setRetryingQuestionId] = useState<string | null>(null);
 
-  const silentReload = async () => {
+  /**
+   * Helper function to refresh all candidate-related data (answers, details, monitoring)
+   */
+  const silentReload = useCallback(async () => {
     try {
       const [resultData, interviewData, progressData] = await Promise.all([
         interviewService.getCandidateResult(interviewId, candidateId),
@@ -63,7 +79,7 @@ export function useCandidateInterview() {
     } catch (err: any) {
       console.error(err);
     }
-  };
+  }, [interviewId, candidateId]);
 
   const handleRetryStt = async (participantId: string, questionId: string) => {
     setRetryingQuestionId(questionId);
@@ -78,6 +94,10 @@ export function useCandidateInterview() {
     }
   };
 
+  /**
+   * Triggers a bulk retry (reprocess-stt) for the entire candidate pipeline.
+   * This restarts the process from transcription to AI grading.
+   */
   const handleRetrySttBulk = async (participantId: string) => {
     setIsRetryingBulk(true);
     try {

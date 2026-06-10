@@ -16,6 +16,11 @@ import { InterviewCardProps } from "@/features/interviews/types/interview";
 import Image from "next/image";
 import { toast } from "sonner";
 
+/**
+ * Renders a summary card for an individual interview session.
+ * Used primarily in the Interviews List View. Displays key metrics like
+ * company, top candidate score, type, and level.
+ */
 export function InterviewCard({
   title,
   company,

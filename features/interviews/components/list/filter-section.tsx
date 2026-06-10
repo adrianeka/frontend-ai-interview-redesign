@@ -11,18 +11,28 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
+/**
+ * Props for the FilterSection component.
+ */
 interface FilterSectionProps {
+  /** Indicates if the side panel is currently open (adjusts layout) */
   isSidePanelOpen?: boolean;
+  /** Active filter values */
   filters: {
     company: string;
     type: string;
     level: string;
     status: string;
   };
+  /** Callback fired when any filter value changes */
   onFiltersChange: (filters: any) => void;
+  /** List of dynamically available level targets */
   availableLevels?: string[];
 }
 
+/**
+ * Renders the filter controls (Company, Type, Level, Status) for the interview list.
+ */
 export function FilterSection({
   isSidePanelOpen,
   filters,

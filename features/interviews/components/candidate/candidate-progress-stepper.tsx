@@ -2,7 +2,14 @@
 
 import React from "react";
 
+/**
+ * Props for the CandidateProgressStepper component.
+ */
 interface CandidateProgressStepperProps {
+  /** 
+   * Holds boolean flags for the status of each pipeline stage.
+   * Based on Backend monitoring task statuses.
+   */
   stepProgress: {
     transcribeAndIntegrationAnswer?: boolean;
     validateAnswer?: boolean;
@@ -11,6 +18,10 @@ interface CandidateProgressStepperProps {
   } | null | undefined;
 }
 
+/**
+ * Renders a vertical stepper indicating the candidate's backend processing progress.
+ * The states depend on STT transcription, grading, mapping, and validation statuses.
+ */
 export function CandidateProgressStepper({ stepProgress }: CandidateProgressStepperProps) {
   // Step 1: Transcription and Answer Integration
   const step1Status = stepProgress?.transcribeAndIntegrationAnswer ? "completed" : "active";

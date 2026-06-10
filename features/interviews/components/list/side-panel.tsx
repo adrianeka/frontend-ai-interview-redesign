@@ -7,11 +7,20 @@ import { interviewService } from "@/features/interviews/services/interview-servi
 import { Question, InterviewDetail } from "@/features/interviews/types/interview";
 import { Button } from "@/components/ui/button";
 
+/**
+ * Props for the SidePanel component.
+ */
 interface SidePanelProps {
+  /** ID of the interview to display details for */
   interviewId: string | null;
+  /** Callback to close the side panel */
   onClose: () => void;
 }
 
+/**
+ * Slide-out panel for displaying quick details about a specific interview.
+ * Fetches and shows context, objective, and a list of questions without leaving the list view.
+ */
 export function SidePanel({ interviewId, onClose }: SidePanelProps) {
   const [data, setData] = React.useState<InterviewDetail | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);

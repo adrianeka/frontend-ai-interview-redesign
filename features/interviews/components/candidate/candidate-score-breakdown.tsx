@@ -9,15 +9,29 @@ interface ColorConfig {
   bgColor: string;
 }
 
+/**
+ * Props for the CandidateScoreBreakdown component.
+ */
 interface CandidateScoreBreakdownProps {
+  /** The calculated final score of the candidate */
   totalScore: number | string | null | undefined;
+  /** The final string recommendation from AI */
   recommendation: string | null | undefined;
+  /** Map of color configurations for the badges */
   activeColorMap: Record<string, ColorConfig>;
+  /** The average score for technical skill (weighted 50%) */
   avgTechnical: number | null | undefined;
+  /** The average score for problem solving (weighted 30%) */
   avgProblemSolving: number | null | undefined;
+  /** The average score for communication (weighted 20%) */
   avgCommunication: number | null | undefined;
 }
 
+/**
+ * Renders the score breakdown for an individual candidate.
+ * Includes the final total score, the recommendation badge, and
+ * the individual sub-scores (Technical, Problem Solving, Communication).
+ */
 export function CandidateScoreBreakdown({
   totalScore,
   recommendation,

@@ -7,12 +7,23 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/
 import { MapPinIcon, UserPlusIcon, CircleUserIcon, DotIcon } from "lucide-react";
 import { InterviewDetail } from "@/features/interviews/types/interview";
 
+/**
+ * Props for the InterviewGeneralInfo component.
+ */
 interface InterviewGeneralInfoProps {
+  /** The core interview details object retrieved from the API */
   interviewDetail: InterviewDetail | null;
+  /** Total number of candidates in this interview */
   totalCandidatesCount: number;
+  /** Array of required technologies/skills */
   techStack: string[];
 }
 
+/**
+ * Renders the top-level metadata for an interview in the details view.
+ * Includes the company location, purpose (Hiring/Internal), target level,
+ * title, description, and an expandable tech stack list.
+ */
 export function InterviewGeneralInfo({
   interviewDetail,
   totalCandidatesCount,

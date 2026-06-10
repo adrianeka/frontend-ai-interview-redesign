@@ -4,18 +4,33 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { ColorMapConfig, mapRecommendationToStatusKey } from "@/features/interviews/utils/recommendation";
 
+/**
+ * Minimal candidate interface required to calculate recommendation counts.
+ */
 interface CandidateCountable {
   recommendation?: string | null;
 }
 
+/**
+ * Props for the InterviewFilterGroup component.
+ */
 interface InterviewFilterGroupProps {
+  /** The currently active filter string (value) */
   activeFilter: string;
+  /** Configuration object containing labels, colors, and icons */
   activeColorMap: Record<string, ColorMapConfig>;
+  /** Array of candidates to calculate counts for each category */
   candidates: CandidateCountable[];
+  /** Whether the list is currently loading (disables buttons) */
   isLoading: boolean;
+  /** Callback fired when a filter is clicked */
   onFilterChange: (newFilter: string) => void;
 }
 
+/**
+ * Renders a grid of clickable filter cards for candidate recommendations
+ * (e.g., "Strong Hire", "Reject"). Displays counts based on current candidate data.
+ */
 export function InterviewFilterGroup({
   activeFilter,
   activeColorMap,

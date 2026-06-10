@@ -11,6 +11,11 @@ import { CandidateAlerts } from "@/features/interviews/components/candidate/cand
 import { CandidateScoreBreakdown } from "@/features/interviews/components/candidate/candidate-score-breakdown";
 import { CandidateAnswerItem } from "@/features/interviews/components/candidate/candidate-answer-item";
 
+/**
+ * Main View component for an individual candidate's interview results.
+ * Displays overall scoring, detailed question-by-question breakdown,
+ * video answers, and handles retry mechanisms for failed pipeline steps.
+ */
 export function CandidateInterviewView() {
   const {
     interviewId,
@@ -88,6 +93,7 @@ export function CandidateInterviewView() {
 
       <CardContent className="flex flex-col gap-6 p-0">
         {/* Candidate Profile Header */}
+        {/* List of answers/videos and their specific scores */}
         <div className="flex flex-col gap-4">
           <div className="flex flex-col md:flex-row md:items-center gap-4">
             <div className="w-12 h-12 rounded-full border-2 border-[#E2E4E6] bg-blue-100 text-[#0076D2] font-bold text-lg flex items-center justify-center uppercase shrink-0">

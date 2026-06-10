@@ -1,3 +1,6 @@
+/**
+ * Formats a date string or Date object into a readable date string (e.g., 01 January 2026).
+ */
 export const formatDate = (
   date: string | Date,
   locale = "id-ID"
@@ -9,6 +12,9 @@ export const formatDate = (
   }).format(new Date(date));
 };
 
+/**
+ * Formats a date string or Date object into a readable date and time string.
+ */
 export const formatDateTime = (
   date: string | Date,
   locale = "id-ID"
@@ -22,6 +28,9 @@ export const formatDateTime = (
   }).format(new Date(date));
 };
 
+/**
+ * Calculates and returns a relative time string (e.g., "5 menit lalu").
+ */
 export const relativeTime = (date: string | Date) => {
   const now = new Date().getTime();
   const target = new Date(date).getTime();

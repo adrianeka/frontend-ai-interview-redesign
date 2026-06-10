@@ -5,7 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TriangleAlert, Info, CircleCheck, RefreshCwIcon, Loader2 } from "lucide-react";
 
+/**
+ * Props for the CandidateAlerts component.
+ */
 interface CandidateAlertsProps {
+  /** The current active step in the interview pipeline (1-5) */
   activeStep: number;
   failedMonitoringItems: any[];
   sortedAnswers: any[];
@@ -17,9 +21,14 @@ interface CandidateAlertsProps {
   summaryReason?: string | null;
   participantId?: string | null;
   isRetryingBulk?: boolean;
+  /** Callback to trigger bulk retry */
   onRetryBulk?: (participantId: string) => void;
 }
 
+/**
+ * Renders contextual alert banners at the top of the candidate details page.
+ * Displays information about pending AI grading pipelines or errors requiring intervention.
+ */
 export function CandidateAlerts({
   activeStep,
   failedMonitoringItems,

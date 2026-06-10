@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
     ArrowLeftIcon,
     EllipsisVerticalIcon,
+    Loader2,
     PencilIcon,
     Trash2Icon,
     CircleXIcon
@@ -33,11 +34,17 @@ import { InterviewGeneralInfo } from "@/features/interviews/components/details/i
 import { InterviewFilterGroup } from "@/features/interviews/components/details/interview-filter-group";
 import { InterviewCandidateList } from "@/features/interviews/components/details/interview-candidate-list";
 import { useInterviewDetails } from "@/features/interviews/hooks/use-interview-details";
+import { Separator } from "@/components/ui/separator";
 
+/**
+ * Main View component for the Interview Details page.
+ * Displays interview metadata, filtering/search controls, and delegating candidate list rendering
+ * to the InterviewCandidateList component.
+ * Integrates directly with the `useInterviewDetails` hook for state and action dispatching.
+ */
 export function InterviewDetailsView() {
     const {
         id,
-        mounted,
         activeFilter,
         setActiveFilter,
         searchQuery,
@@ -86,13 +93,25 @@ export function InterviewDetailsView() {
         );
     }
 
-    if (!mounted) return null;
-
     const totalCandidatesCount = allCandidates.length;
+
+    if (isLoading && !interviewDetail) {
+        /*
+         * Full-Page Skeleton State
+         * Shown on initial load before metadata is available to prevent 
+         * flashing default fallback values in the header. 
+         */
+        return (
+            <div className="flex justify-center items-center min-h-[calc(100vh-8rem)]">
+                <Loader2 className="w-8 h-8 animate-spin text-[#0076D2]" />
+            </div>
+        );
+    }
+
 
     return (
         <Card className="bg-[#FAFAFA] p-4 sm:p-6 shadow-none border-none">
-            {/* Top Action Bar */}
+            {/* Top Action Bar: Back Navigation and Link Copy */}
             <CardHeader className="flex flex-row items-center justify-between w-full p-0 mb-4 sm:mb-6">
                 <Button
                     variant="ghost"
@@ -179,14 +198,21 @@ export function InterviewDetailsView() {
             </CardHeader>
 
             <CardContent className="flex flex-col gap-6 p-0">
-                {/* General Info Section */}
+                {/* 
+                 * General Info Section:
+                 * Renders interview description, purpose, required tech stack, 
+                 * and the overall candidate count.
+                 */}
                 <InterviewGeneralInfo
                     interviewDetail={interviewDetail}
                     totalCandidatesCount={totalCandidatesCount}
                     techStack={techStack}
                 />
 
-                {/* Filter section */}
+                {/* 
+                 * Status Filter Group:
+                 * Renders clickable badges for different recommendation statuses (Strong Hire, Reject, etc).
+                 */}
                 <InterviewFilterGroup
                     activeFilter={activeFilter}
                     activeColorMap={activeColorMap}
@@ -199,22 +225,28 @@ export function InterviewDetailsView() {
                     }}
                 />
 
-                {/* Search section */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mt-2">
-                    <div className="w-full sm:max-w-md">
-                        <SearchBar
-                            placeholder="Search candidates by name, score, status..."
-                            value={searchQuery}
-                            onChange={(val) => {
-                                setSearchQuery(val);
-                                setCurrentPage(1);
-                            }}
-                            showLabel={false}
-                        />
+                {/* List and Pagination Controls Header */}
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 w-full sm:items-center">
+                    <div className="flex items-center gap-2 flex-1 w-full">
+                        <h4 className="text-sm text-[#A9ADB5]">List</h4>
+                        <Separator orientation="horizontal" className="flex-1" />
                     </div>
 
-                    <div className="flex flex-row items-center gap-2 self-end sm:self-auto shrink-0">
-                        <span className="text-sm font-medium text-[#707784] font-inter whitespace-nowrap">Show:</span>
+                    <div className="flex flex-row gap-2 w-full sm:w-auto items-center justify-between sm:justify-end">
+                        {/* Search Bar for Client-Side Filtering */}
+                        <div className="w-full sm:w-[280px] shrink-0 flex-1 sm:flex-none">
+                            <SearchBar
+                                placeholder="Search Candidates..."
+                                value={searchQuery}
+                                showLabel={false}
+                                onChange={(val) => {
+                                    setSearchQuery(val);
+                                    setCurrentPage(1);
+                                }}
+                            />
+                        </div>
+
+                        {/* Entries per page */}
                         <Select
                             value={entriesPerPage.toString()}
                             onValueChange={(val) => {
@@ -273,6 +305,7 @@ export function InterviewDetailsView() {
                     endIndex={endIndex}
                     totalPages={totalPages}
                     currentPage={currentPage}
+                    entriesPerPage={entriesPerPage}
                     onPageChange={handlePageChange}
                 />
             </CardContent>

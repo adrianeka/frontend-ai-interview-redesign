@@ -13,7 +13,11 @@ import {
   DownloadIcon
 } from "lucide-react";
 
+/**
+ * Props for the CandidateAnswerItem component.
+ */
 interface CandidateAnswerItemProps {
+  /** Complex object containing all answer details */
   answer: {
     questionId: string;
     questionNumber?: number;
@@ -44,6 +48,11 @@ interface CandidateAnswerItemProps {
   handleRetryStt: (participantId: string, questionId: string) => Promise<void>;
 }
 
+/**
+ * Renders an individual candidate answer including the question text, video recording,
+ * STT transcript, and individual AI grading scores (Technical, Problem Solving, Communication).
+ * Also provides controls for editing the transcript, downloading the video, and toggling validation.
+ */
 export function CandidateAnswerItem({
   answer,
   index,

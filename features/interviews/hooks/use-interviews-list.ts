@@ -5,34 +5,53 @@ import { interviewService } from "@/features/interviews/services/interview-servi
 import { Interview, PaginatedResponse, EditInterviewData } from "@/features/interviews/types/interview";
 import { AlertType } from "@/features/interviews/components/interview-alert-modal";
 
+/**
+ * Custom hook to manage state and logic for the Interviews List View.
+ * Handles server-side pagination, fetching interview lists, local storage filtering,
+ * and state management for editing/deleting interviews.
+ */
 export function useInterviewsList() {
+  // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentEditData, setCurrentEditData] = useState<EditInterviewData | null>(null);
 
+  // Delete Confirmation States
   const [currentDeleteId, setCurrentDeleteId] = useState<string | null>(null);
   const [deleteAlertType, setDeleteAlertType] = useState<AlertType | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // Data & Loading States
   const [selectedInterview, setSelectedInterview] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<PaginatedResponse<Interview> | null>(null);
 
-  const [filters, setFilters] = useState({
-    company: "all",
-    type: "all",
-    level: "all",
-    status: "all",
+  // Pagination & Filter States
+  const [filters, setFilters] = useState(() => {
+    if (typeof window === "undefined") return { company: "all", type: "all", level: "all", status: "all" };
+    try {
+      const saved = localStorage.getItem("interviewFilters");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return {
+          company: parsed.company || "all",
+          type: parsed.type || "all",
+          level: parsed.level || "all",
+          status: parsed.status || "all",
+        };
+      }
+    } catch (e) {}
+    return { company: "all", type: "all", level: "all", status: "all" };
   });
-
-  const [isMounted, setIsMounted] = useState(false);
 
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [availableLevels, setAvailableLevels] = useState<string[]>([]);
 
+  /**
+   * Fetches the paginated list of interviews from the backend based on current filters.
+   */
   const fetchInterviews = useCallback(async () => {
-    if (!isMounted) return;
     setIsLoading(true);
     try {
       const result = await interviewService.getInterviews({
@@ -46,29 +65,12 @@ export function useInterviewsList() {
     } finally {
       setIsLoading(false);
     }
-  }, [page, filters, pageSize, isMounted]);
+  }, [page, filters, pageSize]);
 
+  // Persist filters to localStorage
   useEffect(() => {
-    setIsMounted(true);
-    const saved = localStorage.getItem("interviewFilters");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        setFilters({
-          company: parsed.company || "all",
-          type: parsed.type || "all",
-          level: parsed.level || "all",
-          status: parsed.status || "all",
-        });
-      } catch (e) {}
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isMounted) {
-      localStorage.setItem("interviewFilters", JSON.stringify(filters));
-    }
-  }, [filters, isMounted]);
+    localStorage.setItem("interviewFilters", JSON.stringify(filters));
+  }, [filters]);
 
   useEffect(() => {
     fetchInterviews();
@@ -84,6 +86,9 @@ export function useInterviewsList() {
     }
   }, [data]);
 
+  /**
+   * Opens the edit modal and populates it with detailed interview data.
+   */
   const handleEditClick = async (interview: any) => {
     try {
       const detailedInterview = await interviewService.getInterviewById(interview.id);
@@ -108,6 +113,9 @@ export function useInterviewsList() {
     }
   };
 
+  /**
+   * Prepares the deletion flow for a specific interview ID.
+   */
   const handleDeleteClick = (id: string) => {
     setCurrentDeleteId(id);
     setDeleteAlertType("confirmation");
@@ -154,6 +162,9 @@ export function useInterviewsList() {
     setPage(newPage - 1); // API is 0-indexed
   };
 
+  /**
+   * Removes a specific active filter and resets pagination.
+   */
   const removeFilter = (key: keyof typeof filters) => {
     const newFilters = { ...filters, [key]: "all" };
     setFilters(newFilters);

@@ -20,6 +20,11 @@ import {
 } from "@/components/ui/select";
 import { useInterviewsList } from "@/features/interviews/hooks/use-interviews-list";
 
+/**
+ * Main View component for the Interviews List page.
+ * Renders the dashboard showing all interviews, including search/filter capabilities,
+ * a list of interview cards, and server-side pagination.
+ */
 export function InterviewsListView() {
   const {
     isModalOpen,

@@ -7,7 +7,15 @@ const createServiceError = (error: any, fallbackMessage: string): Error => {
   );
 };
 
+/**
+ * API service for managing interview entities and candidate operations.
+ * Handles fetching, creating, updating, deleting interviews, 
+ * as well as candidate result fetching and AI pipeline retries.
+ */
 export const interviewService = {
+  /**
+   * Fetches a paginated list of interviews based on provided filters.
+   */
   getInterviews: async (filters: InterviewFilters): Promise<PaginatedResponse<Interview>> => {
     const params: Record<string, string | number> = {
       page: filters.page || 0,

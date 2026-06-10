@@ -118,6 +118,10 @@
 }
 
 @layer utilities {
+  /* 
+   * Custom Scrollbar Styling
+   * Modifies the default browser scrollbar to have a rounded, subtle appearance
+   */
   .custom-scrollbar::-webkit-scrollbar {
     width: 5px;
   }
@@ -133,6 +137,10 @@
   }
 }
 
+/*
+ * Base Layer Overrides
+ * Sets default borders, font families, and background colors across the entire app
+ */
 @layer base {
   * {
     @apply border-border outline-ring/50;

@@ -1,3 +1,6 @@
+/**
+ * Retrieves a cookie value by name.
+ */
 export const getCookie = (name: string): string | null => {
   if (typeof document === "undefined") return null;
   const value = `; ${document.cookie}`;
@@ -39,6 +42,9 @@ export const removeToken = () => {
   deleteCookie("token");
 };
 
+/**
+ * Logs out the current user and redirects to the login page.
+ */
 export const logout = () => {
   removeToken();
   if (typeof window !== "undefined") {
@@ -46,6 +52,9 @@ export const logout = () => {
   }
 };
 
+/**
+ * Interface representing the structure of our decoded JWT tokens.
+ */
 export interface DecodedToken {
   role?: string;
   name?: string;

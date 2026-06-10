@@ -8,32 +8,36 @@ import { InterviewDetail, Candidate, EditInterviewData } from "@/features/interv
 import { AlertType } from "@/features/interviews/components/interview-alert-modal";
 import { hiringColorMap, internalAssessmentColorMap } from "@/features/interviews/utils/recommendation";
 
+/**
+ * Custom hook to manage state, data fetching, and business logic for the Interview Details View.
+ * Handles fetching the interview metadata, the candidate list, client-side pagination/filtering,
+ * and integration with edit/delete modals.
+ */
 export function useInterviewDetails() {
     const params = useParams();
     const id = params?.interviewId as string;
     const router = useRouter();
-
-    const [mounted, setMounted] = useState(false);
+    // Pagination and Filter States
     const [activeFilter, setActiveFilter] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
     const [entriesPerPage, setEntriesPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
 
+    // Data States
     const [interviewDetail, setInterviewDetail] = useState<InterviewDetail | null>(null);
     const [allCandidates, setAllCandidates] = useState<Candidate[]>([]);
     const [candidates, setCandidates] = useState<Candidate[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    
+    // UI & Action States
     const [retryTrigger, setRetryTrigger] = useState(0);
     const [error, setError] = useState<string | null>(null);
 
+    // Modal States
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [currentEditData, setCurrentEditData] = useState<EditInterviewData | null>(null);
     const [deleteAlertType, setDeleteAlertType] = useState<AlertType | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
 
     const isInternal = interviewDetail?.purpose === "INTERNAL_ASSESSMENT" || interviewDetail?.purpose === "INTERNAL_ASSESMENT";
     const activeColorMap = isInternal ? internalAssessmentColorMap : hiringColorMap;
@@ -70,7 +74,10 @@ export function useInterviewDetails() {
         initLoad();
     }, [id, retryTrigger]);
 
-    // Fetch filtered candidates
+    /**
+     * Re-fetches the candidates list, applying the selected recommendation filter.
+     * Note: Filter slug is resolved via backend API call.
+     */
     const fetchFilteredCandidates = async (filterValue: string) => {
         setIsLoading(true);
         try {
@@ -84,7 +91,10 @@ export function useInterviewDetails() {
         }
     };
 
-    // Multi-criteria client-side searching
+    /**
+     * Performs multi-criteria client-side searching over the currently loaded candidate list.
+     * Filters by candidate name, recommendation text, or total score.
+     */
     const filteredCandidates = useMemo(() => {
         if (!searchQuery) return candidates;
         const q = searchQuery.toLowerCase();
@@ -96,7 +106,10 @@ export function useInterviewDetails() {
         });
     }, [candidates, searchQuery]);
 
-    // Pagination calculations
+    /**
+     * Client-side pagination calculations.
+     * Derives the start/end indices and slices the filtered candidates array for the current view.
+     */
     const totalEntries = filteredCandidates.length;
     const totalPages = Math.ceil(totalEntries / entriesPerPage) || 1;
     const startIndex = (currentPage - 1) * entriesPerPage;
@@ -178,7 +191,6 @@ export function useInterviewDetails() {
 
     return {
         id,
-        mounted,
         activeFilter,
         setActiveFilter,
         searchQuery,

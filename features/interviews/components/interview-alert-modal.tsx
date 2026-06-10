@@ -4,17 +4,33 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
+/**
+ * Defines the possible states of the alert modal.
+ */
 export type AlertType = "confirmation" | "success" | "error";
 
+/**
+ * Props for the InterviewAlertModal component.
+ */
 interface InterviewAlertModalProps {
+  /** Determines if the modal is currently visible */
   isOpen: boolean;
+  /** The type of alert to display */
   type: AlertType;
+  /** The context of the action being performed */
   mode?: "create" | "update" | "delete";
+  /** If true, displays a loading spinner on the primary button */
   isLoading?: boolean;
+  /** Callback fired when the primary action (confirm/continue) is clicked */
   onPrimaryAction: () => void;
+  /** Callback fired when the secondary action (cancel/close) is clicked */
   onSecondaryAction: () => void;
 }
 
+/**
+ * Reusable alert modal for confirming actions or displaying status alerts
+ * (Success/Error) across the interview management workflow.
+ */
 export function InterviewAlertModal({ isOpen, type, mode = "create", isLoading, onPrimaryAction, onSecondaryAction }: InterviewAlertModalProps) {
   if (!isOpen) return null;
 
@@ -86,7 +102,7 @@ export function InterviewAlertModal({ isOpen, type, mode = "create", isLoading, 
   const current = content[type];
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-200 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
 

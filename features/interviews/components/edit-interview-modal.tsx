@@ -10,6 +10,9 @@ import { InterviewAlertModal, AlertType } from "./interview-alert-modal";
 import { EditInterviewData, EditInterviewModalProps } from "../types/interview";
 import { Button } from "@/components/ui/button";
 
+/**
+ * Zod schema for validating the interview edit form.
+ */
 const formSchema = z.object({
   name: z.string().min(1, "This field is required."),
   companyNamePartner: z.string().min(1, "This field is required."),
@@ -26,6 +29,11 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
+/**
+ * Modal component for editing an existing interview's details.
+ * Contains a complex form with multi-field validation using Zod and React Hook Form.
+ * Integrates with `InterviewAlertModal` to confirm successful updates.
+ */
 export function EditInterviewModal({ isOpen, onClose, availableLevels = [], initialData, onSuccess }: EditInterviewModalProps) {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [alertType, setAlertType] = React.useState<AlertType | null>(null);
@@ -146,7 +154,7 @@ export function EditInterviewModal({ isOpen, onClose, availableLevels = [], init
 
   return (
     <>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" id="editInterviewModal">
+      <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6" id="editInterviewModal">
         <div
           className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
           id="modalBackdrop"
@@ -260,7 +268,7 @@ export function EditInterviewModal({ isOpen, onClose, availableLevels = [], init
                   <input
                     {...register("number")}
                     type="number"
-                    className={`w-full h-[48px] px-4 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow bg-white text-slate-900 ${errors.number? 'border-red-500' : 'border-slate-200'}`}
+                    className={`w-full h-[48px] px-4 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow bg-white text-slate-900 ${errors.number ? 'border-red-500' : 'border-slate-200'}`}
                     placeholder="Enter number of questions"
                   />
                   {errors.number && <p className="text-red-500 text-xs mt-1">{errors.number.message}</p>}
