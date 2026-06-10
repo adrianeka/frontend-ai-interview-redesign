@@ -64,8 +64,8 @@ export function Navbar({ user }: NavbarProps) {
       {/* <div className="container mx-auto px-4 h-16 flex items-center justify-between"> */}
       {/* Logo and Nav */}
       <div className="flex items-center gap-4 md:gap-8">
-        <Link href="/" className="w-fit h-fit flex-shrink-0">
-          <Image src="/Logo.png" alt="Logo P79" width={120} height={44} className="w-[120px] h-[44px] object-cover" />
+        <Link href="/" className="w-fit h-fit shrink-0">
+          <Image src="/Logo.png" alt="Logo P79" width={120} height={44} priority className="w-[120px] h-[44px] object-cover" />
         </Link>
 
         <Separator orientation="vertical" className="hidden md:block h-8" />
@@ -81,6 +81,7 @@ export function Navbar({ user }: NavbarProps) {
               alt="Interviews"
               width={15}
               height={20}
+              style={{ height: 'auto' }}
             />
             <span className="text-[#0076D2] font-medium text-base">
               Interviews
@@ -97,6 +98,7 @@ export function Navbar({ user }: NavbarProps) {
               alt="Monitoring"
               width={15}
               height={20}
+              style={{ height: 'auto' }}
             />            <span className="text-[#8C929D] font-medium text-base">
               Monitoring
             </span>
