@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
@@ -254,7 +253,7 @@ export function InterviewDetailsView() {
                                 setCurrentPage(1);
                             }}
                         >
-                            <SelectTrigger className="w-fit min-w-16 border-0 shadow-none">
+                            <SelectTrigger className="ml-4 h-auto p-0 border-none bg-transparent hover:bg-transparent focus:ring-0 w-auto gap-1 text-xs font-medium text-slate-500 shadow-none">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>

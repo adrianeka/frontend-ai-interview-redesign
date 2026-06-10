@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { interviewService } from "@/features/interviews/services/interview-service";
 import { Interview, PaginatedResponse, EditInterviewData } from "@/features/interviews/types/interview";
 import { AlertType } from "@/features/interviews/components/interview-alert-modal";
@@ -40,7 +40,7 @@ export function useInterviewsList() {
           status: parsed.status || "all",
         };
       }
-    } catch (e) {}
+    } catch (e) { }
     return { company: "all", type: "all", level: "all", status: "all" };
   });
 

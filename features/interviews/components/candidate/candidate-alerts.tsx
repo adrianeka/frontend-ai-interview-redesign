@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TriangleAlert, Info, CircleCheck, RefreshCwIcon, Loader2 } from "lucide-react";

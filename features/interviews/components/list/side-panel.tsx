@@ -4,7 +4,7 @@ import * as React from "react";
 import { ChevronLeft, ChevronDown, Minus, Plus, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { interviewService } from "@/features/interviews/services/interview-service";
-import { Question, InterviewDetail } from "@/features/interviews/types/interview";
+import { InterviewDetail } from "@/features/interviews/types/interview";
 import { Button } from "@/components/ui/button";
 
 /**

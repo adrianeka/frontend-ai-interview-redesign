@@ -2,8 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { LayoutDashboard, Activity, ChevronDown, Grid2x2PlusIcon, ChartNoAxesColumnIncreasingIcon, ChevronDownIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ChevronDownIcon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,

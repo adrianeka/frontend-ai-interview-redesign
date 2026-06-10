@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { Pagination } from "@/components/pagination";
 import { Loader2 } from "lucide-react";
 import { Candidate } from "@/features/interviews/types/interview";

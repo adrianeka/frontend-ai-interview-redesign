@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { SlidersHorizontal } from "lucide-react";
 import {
   Select,

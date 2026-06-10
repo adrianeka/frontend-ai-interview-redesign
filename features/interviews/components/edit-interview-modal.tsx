@@ -1,13 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { X, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { interviewService } from "@/features/interviews/services/interview-service";
 import { InterviewAlertModal, AlertType } from "./interview-alert-modal";
-import { EditInterviewData, EditInterviewModalProps } from "../types/interview";
+import { EditInterviewModalProps } from "../types/interview";
 import { Button } from "@/components/ui/button";
 
 /**

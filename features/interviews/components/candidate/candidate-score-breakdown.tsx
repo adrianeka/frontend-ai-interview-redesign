@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { mapRecommendationToStatusKey } from "@/features/interviews/utils/recommendation";
 

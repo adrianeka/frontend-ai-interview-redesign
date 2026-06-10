@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { interviewService } from "@/features/interviews/services/interview-service";
@@ -28,7 +28,7 @@ export function useInterviewDetails() {
     const [allCandidates, setAllCandidates] = useState<Candidate[]>([]);
     const [candidates, setCandidates] = useState<Candidate[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    
+
     // UI & Action States
     const [retryTrigger, setRetryTrigger] = useState(0);
     const [error, setError] = useState<string | null>(null);

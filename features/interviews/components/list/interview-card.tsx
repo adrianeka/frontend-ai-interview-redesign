@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { MoreVertical, Link as LinkIcon, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
