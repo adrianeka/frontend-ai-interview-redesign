@@ -63,6 +63,7 @@ export interface InterviewCardProps {
   onClick?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
+  role: string;
 }
 
 export interface CreateInterviewModalProps {
@@ -150,5 +151,3 @@ export interface CandidateResult {
   summaryReason: string;
   answers: CandidateAnswer[];
 }
-
-
