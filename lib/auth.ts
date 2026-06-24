@@ -72,7 +72,7 @@ export const decodeToken = (token: string): DecodedToken | null => {
       atob(base64)
         .split("")
         .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-        .join("")
+        .join(""),
     );
     return JSON.parse(jsonPayload);
   } catch (error) {
@@ -85,4 +85,12 @@ export const getDecodedToken = (): DecodedToken | null => {
   const token = getToken();
   if (!token) return null;
   return decodeToken(token);
+};
+
+export const getRoleName = (): string => {
+  const decoded = getDecodedToken();
+  if (!decoded?.role) return "";
+  return (
+    decoded.role.charAt(0).toUpperCase() + decoded.role.slice(1).toLowerCase()
+  );
 };
