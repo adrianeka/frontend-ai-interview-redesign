@@ -222,6 +222,7 @@ export function InterviewsListView() {
                   onEdit={() => handleEditClick(item)}
                   onDelete={() => handleDeleteClick(item.id)}
                   role={role}
+                  isAnswered={!!item.isAnswered}
                 />
               ))}
             </div>

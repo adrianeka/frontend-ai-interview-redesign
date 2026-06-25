@@ -94,3 +94,12 @@ export const getRoleName = (): string => {
     decoded.role.charAt(0).toUpperCase() + decoded.role.slice(1).toLowerCase()
   );
 };
+
+export const getUserId = (): string => {
+  const decoded = getDecodedToken();
+  if (!decoded?.userId) return "";
+  return (
+    decoded.userId.charAt(0).toUpperCase() +
+    decoded.userId.slice(1).toLowerCase()
+  );
+};
