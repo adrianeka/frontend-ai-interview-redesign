@@ -10,10 +10,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { InterviewCardProps } from "@/features/interviews/types/interview";
 import { cn } from "@/lib/utils";
-import { Link as LinkIcon, MoreVertical, Trash2 } from "lucide-react";
+import { MoreVertical, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 
 /**
  * Renders a summary card for an individual interview session.
@@ -35,6 +34,7 @@ export function InterviewCard({
   onEdit,
   onDelete,
   role,
+  isAnswered,
 }: InterviewCardProps) {
   const router = useRouter();
 
@@ -108,22 +108,6 @@ export function InterviewCard({
             <h3 className="font-bold text-[#1F2937] text-[18px] leading-[1.2] flex-1 line-clamp-2">
               {title}
             </h3>
-
-            {/* Link Badge */}
-            <Button
-              onClick={(e) => {
-                e.stopPropagation();
-
-                if (typeof window !== "undefined" && id) {
-                  const link = `${window.location.origin}/interviews/${id}`;
-                  navigator.clipboard.writeText(link);
-                  toast.success("Link copied!");
-                }
-              }}
-              className="flex h-[26px] w-[26px] items-center justify-center rounded-[6px] bg-[#EEF2FF] shrink-0 mt-0.5 hover:bg-[#DDE5FF] transition-colors p-0"
-            >
-              <LinkIcon size={14} className="text-[#3366FF] stroke-[2.5]" />
-            </Button>
           </div>
 
           <p className="text-[13px] text-[#6B7280] leading-normal line-clamp-3 h-[60px]">
@@ -139,9 +123,7 @@ export function InterviewCard({
         <div
           className={cn(
             "flex flex-wrap transition-all duration-300",
-            isCompact
-              ? "flex-col gap-1.5 items-start"
-              : "flex-row gap-2 items-center",
+            isCompact ? "gap-1.5" : "gap-2",
           )}
         >
           {/* Hiring Badge */}
@@ -211,6 +193,7 @@ export function InterviewCard({
 
           if (id) router.push(`/interviews/${id}`);
         }}
+        disabled={role === "Candidate" && !!isAnswered}
         className="h-[44px] font-semibold bg-[#0076D2] text-[#FAFAFA] pl-5 pr-4 py-2 rounded-[8px] text-[14px] hover:bg-[#005FA3] transition-all flex items-center group"
       >
         {role === "Candidate" ? "Start Interview" : "View Result"}
