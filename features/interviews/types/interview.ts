@@ -64,6 +64,7 @@ export interface InterviewCardProps {
   onEdit?: () => void;
   onDelete?: () => void;
   role: string;
+  isAnswered: boolean;
 }
 
 export interface CreateInterviewModalProps {

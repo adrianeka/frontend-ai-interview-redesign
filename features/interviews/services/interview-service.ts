@@ -1,32 +1,43 @@
 import api from "@/lib/axios";
-import { InterviewFilters, Interview, InterviewDetail, PaginatedResponse, Candidate, CandidateResult } from "../types/interview";
+import {
+  Candidate,
+  CandidateResult,
+  Interview,
+  InterviewDetail,
+  InterviewFilters,
+  PaginatedResponse,
+} from "../types/interview";
 
 const createServiceError = (error: any, fallbackMessage: string): Error => {
   return new Error(
-    error.response?.data?.message || `${fallbackMessage}: ${error.message}`
+    error.response?.data?.message || `${fallbackMessage}: ${error.message}`,
   );
 };
 
 /**
  * API service for managing interview entities and candidate operations.
- * Handles fetching, creating, updating, deleting interviews, 
+ * Handles fetching, creating, updating, deleting interviews,
  * as well as candidate result fetching and AI pipeline retries.
  */
 export const interviewService = {
   /**
    * Fetches a paginated list of interviews based on provided filters.
    */
-  getInterviews: async (filters: InterviewFilters): Promise<PaginatedResponse<Interview>> => {
+  getInterviews: async (
+    filters: InterviewFilters,
+  ): Promise<PaginatedResponse<Interview>> => {
     const params: Record<string, string | number> = {
       page: filters.page || 0,
       size: filters.size || 10,
     };
 
     if (filters.search) params.search = filters.search;
-    if (filters.company && filters.company !== "all") params.company = filters.company;
+    if (filters.company && filters.company !== "all")
+      params.company = filters.company;
     if (filters.type && filters.type !== "all") params.type = filters.type;
     if (filters.level && filters.level !== "all") params.level = filters.level;
-    if (filters.status && filters.status !== "all") params.status = filters.status;
+    if (filters.status && filters.status !== "all")
+      params.status = filters.status;
 
     try {
       const response = await api.get("/interviews", {
@@ -49,7 +60,7 @@ export const interviewService = {
 
   createInterview: async (data: any) => {
     try {
-      const response = await api.post('/interviews', data);
+      const response = await api.post("/interviews", data);
       return response.data;
     } catch (error: any) {
       throw createServiceError(error, "Failed to create interview");
@@ -74,7 +85,10 @@ export const interviewService = {
     }
   },
 
-  getCandidates: async (interviewId: string, recommendation?: string): Promise<Candidate[]> => {
+  getCandidates: async (
+    interviewId: string,
+    recommendation?: string,
+  ): Promise<Candidate[]> => {
     try {
       const params: Record<string, string> = {};
       if (recommendation) {
@@ -89,20 +103,32 @@ export const interviewService = {
     }
   },
 
-  getCandidateResult: async (interviewId: string, candidateId: string): Promise<CandidateResult> => {
+  getCandidateResult: async (
+    interviewId: string,
+    candidateId: string,
+  ): Promise<CandidateResult> => {
     try {
-      const response = await api.get(`/answers/candidate-result/${interviewId}/${candidateId}`);
+      const response = await api.get(
+        `/answers/candidate-result/${interviewId}/${candidateId}`,
+      );
       return response.data;
     } catch (error: any) {
       throw createServiceError(error, "Failed to fetch candidate results");
     }
   },
 
-  updateAnswerTranscript: async (participantId: string, questionId: string, answerTranscript: string) => {
+  updateAnswerTranscript: async (
+    participantId: string,
+    questionId: string,
+    answerTranscript: string,
+  ) => {
     try {
-      const response = await api.put(`/answers/update-result/${participantId}/${questionId}`, {
-        answerTranscript
-      });
+      const response = await api.put(
+        `/answers/update-result/${participantId}/${questionId}`,
+        {
+          answerTranscript,
+        },
+      );
       return response.data;
     } catch (error: any) {
       throw createServiceError(error, "Failed to update answer transcript");
@@ -111,10 +137,13 @@ export const interviewService = {
 
   validateAnswer: async (participantId: string, questionId: string) => {
     try {
-      const response = await api.put(`/answers/validate/${participantId}/${questionId}`, {
-        isValidated: true,
-        validated: true
-      });
+      const response = await api.put(
+        `/answers/validate/${participantId}/${questionId}`,
+        {
+          isValidated: true,
+          validated: true,
+        },
+      );
       return response.data;
     } catch (error: any) {
       throw createServiceError(error, "Failed to validate answer");
@@ -124,7 +153,7 @@ export const interviewService = {
   downloadVideo: async (fileName: string) => {
     try {
       const response = await api.get(`/answers/download/${fileName}`, {
-        responseType: 'blob'
+        responseType: "blob",
       });
       return response.data;
     } catch (error: any) {
@@ -134,7 +163,9 @@ export const interviewService = {
 
   getStepProgress: async (interviewId: string, candidateId: string) => {
     try {
-      const response = await api.get(`/answers/step-progress/${interviewId}/${candidateId}`);
+      const response = await api.get(
+        `/answers/step-progress/${interviewId}/${candidateId}`,
+      );
       return response.data;
     } catch (error: any) {
       throw createServiceError(error, "Failed to fetch step progress");
@@ -143,7 +174,9 @@ export const interviewService = {
 
   retryStt: async (participantId: string, questionId: string) => {
     try {
-      const response = await api.put(`/answers/reprocess-stt/${participantId}/${questionId}`);
+      const response = await api.put(
+        `/answers/reprocess-stt/${participantId}/${questionId}`,
+      );
       return response.data;
     } catch (error: any) {
       throw createServiceError(error, "Failed to retry STT");
@@ -152,7 +185,9 @@ export const interviewService = {
 
   retrySttBulk: async (participantId: string) => {
     try {
-      const response = await api.put(`/answers/reprocess-stt/bulk/${participantId}`);
+      const response = await api.put(
+        `/answers/reprocess-stt/bulk/${participantId}`,
+      );
       return response.data;
     } catch (error: any) {
       throw createServiceError(error, "Failed to bulk retry STT");
@@ -165,6 +200,42 @@ export const interviewService = {
       return response.data;
     } catch (error: any) {
       throw createServiceError(error, "Failed to fetch monitoring");
+    }
+  },
+
+  uploadAnswer: async (
+    questionId: string,
+    breakTime: number,
+    answerTime: number,
+    videoFile: File,
+    signal?: AbortSignal,
+  ) => {
+    try {
+      const formData = new FormData();
+      formData.append("video", videoFile);
+
+      const response = await api.post("/answers/upload", formData, {
+        params: { questionId, breakTime, answerTime },
+        headers: { "Content-Type": "multipart/form-data" },
+        signal,
+      });
+      return response.data;
+    } catch (error: any) {
+      throw createServiceError(error, "Failed to upload answer");
+    }
+  },
+
+  getAnsweredList: async (userId: string, interviewId: string) => {
+    try {
+      const response = await api.get(
+        `/answers/list-answered/${userId}/${interviewId}`,
+      );
+      return response.data;
+    } catch (error: any) {
+      if (error.name === "CanceledError" || error.code === "ERR_CANCELED") {
+        throw error;
+      }
+      throw createServiceError(error, "Failed to fetch answered list");
     }
   },
 };
