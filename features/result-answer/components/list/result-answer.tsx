@@ -89,8 +89,8 @@ function MobileCard({
         <div className="text-right">
           <p className="text-[10px] text-slate-400">Interview Time</p>
           <p className="text-xs font-medium text-slate-700">
-            {item.interviewTime ?? "00:00"} |{" "}
-            {item.interviewDate ?? "DD/MM/YYYY"}
+            {item.timeInterview ?? "00:00"} |{" "}
+            {item.dateInterview ?? "DD/MM/YYYY"}
           </p>
         </div>
       </div>
@@ -239,8 +239,8 @@ export function ResultAnswerView() {
                             Interview Time
                           </p>
                           <p className="text-sm font-medium text-slate-700">
-                            {item.interviewTime ?? "00:00"} |{" "}
-                            {item.interviewDate ?? "DD/MM/YYYY"}
+                            {item.timeInterview ?? "00:00"} |{" "}
+                            {item.dateInterview ?? "DD/MM/YYYY"}
                           </p>
                         </TableCell>
 

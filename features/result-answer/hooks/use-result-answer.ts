@@ -35,8 +35,8 @@ export interface ResultAnswerItem {
   technicalFundamental?: number | null;
   problemSolve?: number | null;
   communication?: number | null;
-  interviewTime?: string | null;
-  interviewDate?: string | null;
+  timeInterview?: string | null;
+  dateInterview?: string | null;
 }
 
 interface PaginatedResult {

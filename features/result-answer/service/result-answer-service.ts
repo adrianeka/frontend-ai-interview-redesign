@@ -10,7 +10,7 @@ export const resultAnswerService = {
   getAnsweredList: async (userId: string, InterviewTitle: string | null) => {
     try {
       const params: Record<string, string | null> = {
-        InterviewTitle: InterviewTitle,
+        keyword: InterviewTitle,
       };
 
       const response = await api.get(
