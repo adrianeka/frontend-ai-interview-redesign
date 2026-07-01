@@ -47,6 +47,7 @@ export function useInterviewsList() {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [availableLevels, setAvailableLevels] = useState<string[]>([]);
+  const [availableCompanies, setAvailableCompanies] = useState<string[]>([]);
 
   /**
    * Fetches the paginated list of interviews from the backend based on current filters.
@@ -81,6 +82,12 @@ export function useInterviewsList() {
       const newLevels = Array.from(new Set(data.content.map(item => item.levelTarget).filter(Boolean)));
       setAvailableLevels(prev => {
         const combined = Array.from(new Set([...prev, ...newLevels]));
+        return combined as string[];
+      });
+
+      const newCompanies = Array.from(new Set(data.content.map(item => item.companyNamePartner).filter(Boolean)));
+      setAvailableCompanies(prev => {
+        const combined = Array.from(new Set([...prev, ...newCompanies]));
         return combined as string[];
       });
     }
@@ -189,6 +196,7 @@ export function useInterviewsList() {
     pageSize,
     setPageSize,
     availableLevels,
+    availableCompanies,
     fetchInterviews,
     handleEditClick,
     handleDeleteClick,

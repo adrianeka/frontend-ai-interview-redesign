@@ -18,8 +18,9 @@ import { SidePanel } from "@/features/interviews/components/list/side-panel";
 import { useInterviewsList } from "@/features/interviews/hooks/use-interviews-list";
 import { getRoleName } from "@/lib/auth";
 import { cn } from "@/lib/utils";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, ChevronDown, SlidersHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 /**
  * Main View component for the Interviews List page.
@@ -45,6 +46,7 @@ export function InterviewsListView() {
     pageSize,
     setPageSize,
     availableLevels,
+    availableCompanies,
     fetchInterviews,
     handleEditClick,
     handleDeleteClick,
@@ -59,6 +61,10 @@ export function InterviewsListView() {
   useEffect(() => {
     setRole(getRoleName());
   }, []);
+
+  const activeFiltersCount = Object.values(filters).filter(
+    (value) => value !== "all" && value !== "" && value !== undefined
+  ).length;
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 items-start overflow-x-clip">
@@ -80,27 +86,56 @@ export function InterviewsListView() {
             </p>
           </div>
 
-          {role !== "Candidate" && (
-            <Button
-              className="h-[44px] bg-[#0076D2] hover:bg-[#005FA3] text-white rounded-lg font-bold gap-2 px-6 w-[100%] sm:w-fit"
-              onClick={() => setIsModalOpen(true)}
-            >
-              <Plus size={18} />
-              New Interview
-            </Button>
-          )}
-        </div>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="h-[44px] rounded-[10px] font-medium text-[#43474F] gap-2.5 px-4 w-full sm:w-auto bg-white hover:bg-slate-50 border-[#E2E4E6]"
+                >
+                  {activeFiltersCount > 0 ? (
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#0076D2] text-[13px] text-white font-semibold">
+                      {activeFiltersCount}
+                    </span>
+                  ) : (
+                    <SlidersHorizontal size={18} className="text-[#8B939E] -ml-0.5" />
+                  )}
+                  <span className="text-[15px]">Filter</span>
+                  <ChevronDown size={20} className="text-[#8B939E] ml-1" strokeWidth={2.5} />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-[300px] sm:w-[400px] p-5 rounded-2xl border-[#E2E4E6] shadow-xl">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between pb-2 border-b border-[#E2E4E6]">
+                    <h4 className="font-semibold text-slate-800">Filter Interviews</h4>
+                  </div>
+                  <div className="pt-2">
+                    <FilterSection
+                      isSidePanelOpen={true} /* Force stacking inside the narrow popover */
+                      filters={filters}
+                      onFiltersChange={(newFilters) => {
+                        setFilters(newFilters);
+                        setPage(0);
+                      }}
+                      availableLevels={availableLevels}
+                      availableCompanies={availableCompanies}
+                    />
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
 
-        {/* Filters */}
-        <FilterSection
-          isSidePanelOpen={!!selectedInterview}
-          filters={filters}
-          onFiltersChange={(newFilters) => {
-            setFilters(newFilters);
-            setPage(0);
-          }}
-          availableLevels={availableLevels}
-        />
+            {role !== "Candidate" && (
+              <Button
+                className="h-[44px] bg-[#0076D2] hover:bg-[#005FA3] text-white rounded-lg font-bold gap-2 px-6 w-full sm:w-auto"
+                onClick={() => setIsModalOpen(true)}
+              >
+                <Plus size={18} />
+                New Interview
+              </Button>
+            )}
+          </div>
+        </div>
 
         {/* List Meta */}
         <div className="flex items-center justify-between mb-6 pb-2">

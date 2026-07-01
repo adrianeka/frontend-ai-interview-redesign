@@ -27,6 +27,8 @@ interface FilterSectionProps {
   onFiltersChange: (filters: any) => void;
   /** List of dynamically available level targets */
   availableLevels?: string[];
+  /** List of dynamically available companies */
+  availableCompanies?: string[];
 }
 
 /**
@@ -36,7 +38,8 @@ export function FilterSection({
   isSidePanelOpen,
   filters,
   onFiltersChange,
-  availableLevels = []
+  availableLevels = [],
+  availableCompanies = []
 }: FilterSectionProps) {
   const baseTriggerClass =
     "!h-[48px] bg-slate-50/50 rounded-[6px] border border-[#E2E4E6] px-3 flex items-center gap-2 text-[#43474F] font-medium hover:bg-white hover:border-[#D5D9DD] transition-all focus:ring-0 focus:ring-offset-0";
@@ -64,9 +67,11 @@ export function FilterSection({
           </SelectTrigger>
           <SelectContent position="popper" sideOffset={6} className="rounded-[15px] border-[#E2E4E6] p-1.5 shadow-xl min-w-[200px]">
             <SelectItem value="all" className="rounded-[10px] py-2.5 cursor-pointer">Show All</SelectItem>
-            <SelectItem value="Hitopia" className="rounded-[10px] py-2.5 cursor-pointer">Hitopia</SelectItem>
-            <SelectItem value="IZENO" className="rounded-[10px] py-2.5 cursor-pointer">IZENO</SelectItem>
-            <SelectItem value="OCBC" className="rounded-[10px] py-2.5 cursor-pointer">OCBC</SelectItem>
+            {availableCompanies.map(company => (
+              <SelectItem key={company} value={company} className="rounded-[10px] py-2.5 cursor-pointer">
+                {company}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
@@ -104,23 +109,6 @@ export function FilterSection({
                 {lvl}
               </SelectItem>
             ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className={cn("w-full", !isSidePanelOpen && "flex-1")}>
-        <label className="block text-[13px] font-medium text-[#43474F] mb-[6px] ml-1">
-          Status
-        </label>
-        <Select value={filters.status} onValueChange={(val) => updateFilter("status", val)}>
-          <SelectTrigger className={getTriggerClass()}>
-            <SlidersHorizontal className="h-4 w-4 text-[#43474F] shrink-0" />
-            <SelectValue placeholder="Show All" />
-          </SelectTrigger>
-          <SelectContent position="popper" sideOffset={6} className="rounded-[15px] border-[#E2E4E6] p-1.5 shadow-xl min-w-[180px]">
-            <SelectItem value="all" className="rounded-[10px] py-2.5 cursor-pointer">Show All</SelectItem>
-            <SelectItem value="DRAFT" className="rounded-[10px] py-2.5 cursor-pointer">Draft</SelectItem>
-            <SelectItem value="PUBLISHED" className="rounded-[10px] py-2.5 cursor-pointer">Published</SelectItem>
           </SelectContent>
         </Select>
       </div>
