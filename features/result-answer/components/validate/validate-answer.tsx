@@ -106,7 +106,7 @@ export function ValidateAnswer({
   };
 
   return (
-    <div className="min-h-[75vh] bg-[#F5F6F8] flex items-center justify-center p-6">
+    <div className="min-h-[75vh] bg-[#F5F6F8] flex items-center justify-center">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full md:w-[90vw] lg:w-[80vw] xl:w-[70vw] items-stretch">
         <div className="col-span-1 sm:col-span-2 rounded-[1rem] border border-[#E2E4E6] bg-[#FAFAFA] p-4 sm:p-6">
           <AnalysisSummary
