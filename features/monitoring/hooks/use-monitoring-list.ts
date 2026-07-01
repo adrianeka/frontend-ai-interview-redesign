@@ -18,9 +18,9 @@ export function useMonitoringList() {
     setIsLoading(true);
     try {
       const data = await monitoringService.getTasks(filters);
-      setTasks(data.content);
-      setTotalElements(data.totalElements);
-      setTotalPages(data.totalPages);
+      setTasks(data.content ?? []);
+      setTotalElements(data.totalElements ?? 0);
+      setTotalPages(data.totalPages ?? 0);
     } catch (error) {
       console.error("Failed to fetch monitoring tasks", error);
     } finally {
