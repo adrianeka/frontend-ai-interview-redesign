@@ -1,12 +1,16 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
+import { useParams } from "next/navigation";
 import { useExamSession } from "../../hooks/use-exam-interview";
 import { ExamCompleted } from "./exam-completed";
 import { ExamQuestionCard } from "./exam-question-card";
 import { ExamSidebar } from "./exam-sidebar";
 
 export function ExamSessionView() {
+  const params = useParams();
+  const interviewId = params?.interviewId as string;
+
   const {
     interviewDetail,
     isLoading,
@@ -21,6 +25,7 @@ export function ExamSessionView() {
     cancelSubmit,
     answeredIds,
     audioLevel,
+    candidateId,
   } = useExamSession();
 
   const activeQuestion = interviewDetail?.questions?.find(
@@ -42,7 +47,11 @@ export function ExamSessionView() {
     (interviewDetail?.questions?.length ?? 0) > 0 &&
     interviewDetail?.questions?.every((q) => answeredIds.has(q.id));
 
-  if (allAnswered) return <ExamCompleted />;
+  if (allAnswered) {
+    return (
+      <ExamCompleted interviewId={interviewId} candidateId={candidateId} />
+    );
+  }
 
   return (
     <div className="min-h-[75vh] bg-[#F5F6F8] flex items-center justify-center p-6">
