@@ -1,20 +1,18 @@
 "use client";
 
-import * as React from "react";
-import Link from "next/link";
-import { ChevronDownIcon } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getDecodedToken, logout } from "@/lib/auth";
+import { ChevronDownIcon } from "lucide-react";
 import Image from "next/image";
-import { Separator } from "./ui/separator";
-import { Button } from "./ui/button";
+import Link from "next/link";
+import * as React from "react";
 import { Badge } from "./ui/badge";
-import { logout, getDecodedToken } from "@/lib/auth";
 
 /**
  * Props for the Navbar component.
@@ -45,7 +43,8 @@ export function Navbar({ user }: NavbarProps) {
       if (decoded?.name) setUserName(decoded.name);
       if (decoded?.role) {
         setUserRole(
-          decoded.role.charAt(0).toUpperCase() + decoded.role.slice(1).toLowerCase()
+          decoded.role.charAt(0).toUpperCase() +
+            decoded.role.slice(1).toLowerCase(),
         );
       }
     }
@@ -67,45 +66,15 @@ export function Navbar({ user }: NavbarProps) {
       {/* Logo and Nav */}
       <div className="flex items-center gap-4 md:gap-8">
         <Link href="/" className="w-fit h-fit shrink-0">
-          <Image src="/Logo.png" alt="Logo P79" width={120} height={44} priority className="w-[120px] h-[44px] object-cover" />
+          <Image
+            src="/Logo.png"
+            alt="Logo P79"
+            width={120}
+            height={44}
+            priority
+            className="w-[120px] h-[44px] object-cover"
+          />
         </Link>
-
-        <Separator orientation="vertical" className="hidden md:block h-8" />
-
-        <nav className="flex items-center space-x-2 md:space-x-3">
-          <Button
-            variant="outline"
-            size="lg"
-            className="bg-[#F1F9FA] border-2 border-[#0076D2] px-2 md:px-4 py-3 w-auto md:w-[140px] h-[40px] md:h-[44px]"
-          >
-            <Image
-              src='/InterviewsNavbar.svg'
-              alt="Interviews"
-              width={15}
-              height={20}
-              style={{ height: 'auto' }}
-            />
-            <span className="text-[#0076D2] font-medium text-base">
-              Interviews
-            </span>
-          </Button>
-
-          <Button
-            variant="outline"
-            size="lg"
-            className="bg-transparent border-2 border-[#E2E4E6] px-2 md:px-4 py-3 w-auto md:w-[140px] h-[40px] md:h-[44px] hidden sm:flex"
-          >
-            <Image
-              src='/MonitoringNavbar.svg'
-              alt="Monitoring"
-              width={15}
-              height={20}
-              style={{ height: 'auto' }}
-            />            <span className="text-[#8C929D] font-medium text-base">
-              Monitoring
-            </span>
-          </Button>
-        </nav>
       </div>
 
       {/* User Profile */}
@@ -114,7 +83,10 @@ export function Navbar({ user }: NavbarProps) {
           <div className="flex items-center gap-3">
             <Avatar className="h-10 w-10 border border-[#E2E4E6]">
               <AvatarImage
-                src={user?.avatarUrl || "https://cdn.rafled.com/anime-icons/images/374yi72bsJLqPnyn3085StHiuZXNgKAc.jpg"}
+                src={
+                  user?.avatarUrl ||
+                  "https://cdn.rafled.com/anime-icons/images/374yi72bsJLqPnyn3085StHiuZXNgKAc.jpg"
+                }
                 alt="Profile"
               />
 
@@ -122,9 +94,7 @@ export function Navbar({ user }: NavbarProps) {
             </Avatar>
 
             <div className="hidden sm:flex flex-col items-start justify-center">
-              <p className="text-sm font-medium text-[#212121]">
-                {userName}
-              </p>
+              <p className="text-sm font-medium text-[#212121]">{userName}</p>
 
               <Badge className="text-[#4BAC87] text-xs px-2 py-1 border border-[#C9EBDE] bg-[#EEF8F4]">
                 {userRole}
@@ -137,7 +107,10 @@ export function Navbar({ user }: NavbarProps) {
         <DropdownMenuContent align="end" className="w-56">
           <DropdownMenuItem>Profile</DropdownMenuItem>
           <DropdownMenuItem>Settings</DropdownMenuItem>
-          <DropdownMenuItem className="text-destructive" onClick={() => logout()}>
+          <DropdownMenuItem
+            className="text-destructive"
+            onClick={() => logout()}
+          >
             Logout
           </DropdownMenuItem>
         </DropdownMenuContent>
