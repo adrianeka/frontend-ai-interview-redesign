@@ -4,6 +4,7 @@ import {
   MonitoringPageResponse,
   MonitoringFilters,
 } from "../types/monitoring-types";
+import { getRoleName, getUserId } from "@/lib/auth";
 
 export const monitoringService = {
   /**
@@ -26,13 +27,22 @@ export const monitoringService = {
       params.sortBy = ["status"];
     }
 
-    const response = await api.get<MonitoringPageResponse>("/monitoring", {
+    const role = getRoleName();
+    let url = `/monitoring`;
+    
+    if (role === "Candidate") {
+      const userId = getUserId();
+      params.userId = userId;
+    }
+
+    const response = await api.get<MonitoringPageResponse>(url, {
       params,
     });
 
-    // If filtering by status, filter client-side since backend doesn't support status filter directly
+    const content = response.data?.content ?? [];
+
     if (filters.status && filters.status !== "all") {
-      const filtered = response.data.content.filter(
+      const filtered = content.filter(
         (task: MonitoringTask) => task.status === filters.status
       );
       return {
@@ -42,6 +52,6 @@ export const monitoringService = {
       };
     }
 
-    return response.data;
+    return { ...response.data, content };
   },
 };
