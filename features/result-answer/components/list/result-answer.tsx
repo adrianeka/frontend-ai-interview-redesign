@@ -16,6 +16,7 @@ import {
 } from "@/features/result-answer/hooks/use-result-answer";
 import { getRoleName, getUserId } from "@/lib/auth";
 import { ChevronRight, Loader2, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const BASE_BADGE =
@@ -99,6 +100,7 @@ function MobileCard({
 }
 
 export function ResultAnswerView() {
+  const router = useRouter();
   const [userId, setUserId] = useState("");
   const [_role, setRole] = useState("");
 
@@ -119,7 +121,7 @@ export function ResultAnswerView() {
   } = useResultAnswer(userId);
 
   const handleRowClick = (_item: ResultAnswerItem) => {
-    // router.push(`/result-answer/${item.interviewId}/${item.candidateId}`)
+    router.push(`/result-answer/${_item.interviewId}/${_item.candidateId}`);
   };
 
   return (

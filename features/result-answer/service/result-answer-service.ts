@@ -27,4 +27,18 @@ export const resultAnswerService = {
       throw createServiceError(error, "Failed to fetch answered list");
     }
   },
+
+  getAnsweredDetail: async (interviewId: string, candidateId: string) => {
+    try {
+      const response = await api.get(
+        `/answers/candidate-result/${interviewId}/${candidateId}`,
+      );
+      return response.data;
+    } catch (error: any) {
+      if (error.name === "CanceledError" || error.code === "ERR_CANCELED") {
+        throw error;
+      }
+      throw createServiceError(error, "Failed to fetch answered list");
+    }
+  },
 };

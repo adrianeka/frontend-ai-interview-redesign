@@ -150,6 +150,15 @@ export const interviewService = {
     }
   },
 
+  validateBulk: async (participantId: string) => {
+    try {
+      const response = await api.put(`/answers/validate/bulk/${participantId}`);
+      return response.data;
+    } catch (error: any) {
+      throw createServiceError(error, "Failed to validate answer");
+    }
+  },
+
   downloadVideo: async (fileName: string) => {
     try {
       const response = await api.get(`/answers/download/${fileName}`, {
