@@ -16,7 +16,7 @@ const navItems = [
     label: "Monitoring",
     href: "/monitoring",
     icon: MonitorSmartphone,
-    disabled: true,
+    disabled: false,
   },
 ];
 

@@ -16,7 +16,7 @@ export default function PrivateLayout({
       <Navbar />
       <div className="flex flex-1">
         <Sidebar />
-        <main className="flex-1 bg-[#F5F5F5] p-4">{children}</main>
+        <main className="flex-1 bg-[#F5F5F5] p-4 min-w-0">{children}</main>
       </div>
       <Footer />
     </div>
