@@ -10,7 +10,7 @@ export const resultAnswerService = {
   getAnsweredList: async (userId: string, InterviewTitle: string | null) => {
     try {
       const params: Record<string, string | null> = {
-        InterviewTitle: InterviewTitle,
+        keyword: InterviewTitle,
       };
 
       const response = await api.get(
@@ -18,6 +18,20 @@ export const resultAnswerService = {
         {
           params,
         },
+      );
+      return response.data;
+    } catch (error: any) {
+      if (error.name === "CanceledError" || error.code === "ERR_CANCELED") {
+        throw error;
+      }
+      throw createServiceError(error, "Failed to fetch answered list");
+    }
+  },
+
+  getAnsweredDetail: async (interviewId: string, candidateId: string) => {
+    try {
+      const response = await api.get(
+        `/answers/candidate-result/${interviewId}/${candidateId}`,
       );
       return response.data;
     } catch (error: any) {

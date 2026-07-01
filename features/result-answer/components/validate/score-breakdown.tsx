@@ -1,0 +1,74 @@
+"use client";
+
+import { getRecommendationStyle } from "../../utils/helper";
+import { ScoreBar } from "./score-bar";
+
+interface ScoreBreakdownProps {
+  totalScore: number;
+  recommendation?: string;
+  technicalScore: number;
+  problemSolvingScore: number;
+  communicationScore: number;
+}
+
+export function ScoreBreakdown({
+  totalScore,
+  recommendation,
+  technicalScore,
+  problemSolvingScore,
+  communicationScore,
+}: ScoreBreakdownProps) {
+  const recommendationStyle = getRecommendationStyle(recommendation);
+
+  return (
+    <div className="mb-6">
+      <div className="flex items-center gap-3 mb-4">
+        <span className="text-[12px] text-slate-400 shrink-0">
+          Candidate&apos;s Score Breakdown
+        </span>
+        <div className="h-px flex-1 bg-[#E2E4E6]" />
+      </div>
+
+      <div className="flex items-center gap-2 mb-4">
+        <span className="text-sm text-slate-500 font-medium">Final Score</span>{" "}
+        <span className="text-sm text-slate-500 font-bold">
+          {Math.round(totalScore)}
+        </span>
+        {recommendation && (
+          <span
+            style={{
+              color: recommendationStyle.color,
+              backgroundColor: recommendationStyle.bg,
+              border: `1px solid ${recommendationStyle.border}`,
+              fontSize: 11,
+              fontWeight: 500,
+              padding: "2px 12px",
+              borderRadius: 9999,
+              display: "inline-block",
+            }}
+          >
+            {recommendation}
+          </span>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <ScoreBar
+          label="Technical Skill"
+          weight={technicalScore}
+          value={technicalScore}
+        />
+        <ScoreBar
+          label="Problem Solving"
+          weight={problemSolvingScore}
+          value={problemSolvingScore}
+        />
+        <ScoreBar
+          label="Communication"
+          weight={communicationScore}
+          value={communicationScore}
+        />
+      </div>
+    </div>
+  );
+}

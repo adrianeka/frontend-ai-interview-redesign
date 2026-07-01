@@ -16,6 +16,7 @@ import {
 } from "@/features/result-answer/hooks/use-result-answer";
 import { getRoleName, getUserId } from "@/lib/auth";
 import { ChevronRight, Loader2, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const BASE_BADGE =
@@ -89,8 +90,8 @@ function MobileCard({
         <div className="text-right">
           <p className="text-[10px] text-slate-400">Interview Time</p>
           <p className="text-xs font-medium text-slate-700">
-            {item.interviewTime ?? "00:00"} |{" "}
-            {item.interviewDate ?? "DD/MM/YYYY"}
+            {item.timeInterview ?? "00:00"} |{" "}
+            {item.dateInterview ?? "DD/MM/YYYY"}
           </p>
         </div>
       </div>
@@ -99,6 +100,7 @@ function MobileCard({
 }
 
 export function ResultAnswerView() {
+  const router = useRouter();
   const [userId, setUserId] = useState("");
   const [_role, setRole] = useState("");
 
@@ -119,7 +121,7 @@ export function ResultAnswerView() {
   } = useResultAnswer(userId);
 
   const handleRowClick = (_item: ResultAnswerItem) => {
-    // router.push(`/result-answer/${item.interviewId}/${item.candidateId}`)
+    router.push(`/result-answer/${_item.interviewId}/${_item.candidateId}`);
   };
 
   return (
@@ -239,8 +241,8 @@ export function ResultAnswerView() {
                             Interview Time
                           </p>
                           <p className="text-sm font-medium text-slate-700">
-                            {item.interviewTime ?? "00:00"} |{" "}
-                            {item.interviewDate ?? "DD/MM/YYYY"}
+                            {item.timeInterview ?? "00:00"} |{" "}
+                            {item.dateInterview ?? "DD/MM/YYYY"}
                           </p>
                         </TableCell>
 

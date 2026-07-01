@@ -3,8 +3,21 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
-export function ExamCompleted() {
+interface ExamCompletedProps {
+  interviewId: string;
+  candidateId: string | null;
+}
+
+export function ExamCompleted({
+  interviewId,
+  candidateId,
+}: ExamCompletedProps) {
   const router = useRouter();
+
+  const handleGoToValidate = () => {
+    if (!candidateId) return;
+    router.push(`/result-answer/${interviewId}/${candidateId}`);
+  };
 
   return (
     <div className="min-h-[75vh] bg-[#F5F6F8] flex items-center justify-center p-6">
@@ -31,8 +44,9 @@ export function ExamCompleted() {
         <div className="border-t border-[#F2F2F2] -mx-7"></div>
         <div className="px-8 py-5">
           <Button
-            onClick={() => router.push("/result-answer")}
-            className="w-full h-[2.75rem] bg-[#0076D2] hover:bg-[#005FA3] text-white rounded-[0.625rem] font-semibold text-[0.875rem]"
+            onClick={handleGoToValidate}
+            disabled={!candidateId}
+            className="w-full h-[2.75rem] bg-[#0076D2] hover:bg-[#005FA3] text-white rounded-[0.625rem] font-semibold text-[0.875rem] disabled:opacity-50"
           >
             Go to Validate
           </Button>

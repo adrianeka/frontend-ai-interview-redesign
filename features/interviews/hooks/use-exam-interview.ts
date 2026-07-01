@@ -1,3 +1,4 @@
+import { resultAnswerService } from "@/features/result-answer/service/result-answer-service";
 import { getUserId } from "@/lib/auth";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -22,6 +23,7 @@ export function useExamSession() {
   const [answerTime, setAnswerTime] = useState(0);
   const [answeredIds, setAnsweredIds] = useState<Set<string>>(new Set());
   const [audioLevel, setAudioLevel] = useState(0);
+  const [candidateId, setCandidateId] = useState<string | null>(null);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -31,6 +33,7 @@ export function useExamSession() {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const animFrameRef = useRef<number | null>(null);
+  const candidateIdFetchedRef = useRef(false);
 
   const fetchDetail = async () => {
     if (!id) return;
@@ -51,6 +54,22 @@ export function useExamSession() {
     } catch (err) {
       console.error(err);
       setAnsweredIds(new Set());
+    }
+  };
+
+  const fetchCandidateId = async () => {
+    if (candidateIdFetchedRef.current) return;
+    candidateIdFetchedRef.current = true;
+
+    const userId = getUserId();
+    if (!userId) return;
+
+    try {
+      const list = await resultAnswerService.getAnsweredList(userId, null);
+      const foundCandidateId = list?.[0]?.candidateId ?? null;
+      setCandidateId(foundCandidateId);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -78,6 +97,10 @@ export function useExamSession() {
     };
     load();
   }, [id]);
+
+  useEffect(() => {
+    fetchCandidateId();
+  }, []);
 
   const resetPhase = () => {
     clearTimer();
@@ -231,5 +254,6 @@ export function useExamSession() {
     cancelSubmit,
     answeredIds,
     audioLevel,
+    candidateId,
   };
 }
