@@ -48,6 +48,7 @@ export function useInterviewsList() {
   const [pageSize, setPageSize] = useState(10);
   const [availableLevels, setAvailableLevels] = useState<string[]>([]);
   const [availableCompanies, setAvailableCompanies] = useState<string[]>([]);
+  const [isFilterOptionsLoading, setIsFilterOptionsLoading] = useState(false);
 
   /**
    * Fetches the paginated list of interviews from the backend based on current filters.
@@ -77,21 +78,27 @@ export function useInterviewsList() {
     fetchInterviews();
   }, [fetchInterviews]);
 
+  /**
+   * Fetches all distinct filter options (levels & companies) once on mount.
+   * This ensures dropdowns always show ALL available options across all pages,
+   * not just the options visible in the current paginated view.
+   */
   useEffect(() => {
-    if (data?.content) {
-      const newLevels = Array.from(new Set(data.content.map(item => item.levelTarget).filter(Boolean)));
-      setAvailableLevels(prev => {
-        const combined = Array.from(new Set([...prev, ...newLevels]));
-        return combined as string[];
-      });
+    const fetchFilterOptions = async () => {
+      setIsFilterOptionsLoading(true);
+      try {
+        const options = await interviewService.getFilterOptions();
+        setAvailableLevels(options.levels);
+        setAvailableCompanies(options.companies);
+      } catch (error) {
+        console.error("Failed to fetch filter options:", error);
+      } finally {
+        setIsFilterOptionsLoading(false);
+      }
+    };
 
-      const newCompanies = Array.from(new Set(data.content.map(item => item.companyNamePartner).filter(Boolean)));
-      setAvailableCompanies(prev => {
-        const combined = Array.from(new Set([...prev, ...newCompanies]));
-        return combined as string[];
-      });
-    }
-  }, [data]);
+    fetchFilterOptions();
+  }, []);
 
   /**
    * Opens the edit modal and populates it with detailed interview data.
@@ -197,6 +204,7 @@ export function useInterviewsList() {
     setPageSize,
     availableLevels,
     availableCompanies,
+    isFilterOptionsLoading,
     fetchInterviews,
     handleEditClick,
     handleDeleteClick,
