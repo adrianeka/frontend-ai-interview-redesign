@@ -96,6 +96,11 @@ export interface InterviewFilters {
   size?: number;
 }
 
+export interface InterviewFilterOptions {
+  levels: string[];
+  companies: string[];
+}
+
 export interface PaginatedResponse<T> {
   content: T[];
   totalPages: number;

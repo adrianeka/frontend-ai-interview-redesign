@@ -4,6 +4,7 @@ import {
   CandidateResult,
   Interview,
   InterviewDetail,
+  InterviewFilterOptions,
   InterviewFilters,
   PaginatedResponse,
 } from "../types/interview";
@@ -46,6 +47,33 @@ export const interviewService = {
       return response.data;
     } catch (error: any) {
       throw createServiceError(error, "Failed to fetch interviews");
+    }
+  },
+
+  /**
+   * Fetches all distinct filter option values (levels and companies) available
+   * across all interviews. Uses a large page size to ensure all records are covered.
+   * This avoids the issue where filter options only reflect the current page's data.
+   */
+  getFilterOptions: async (): Promise<InterviewFilterOptions> => {
+    try {
+      const response = await api.get("/interviews", {
+        params: { page: 0, size: 1000 },
+      });
+
+      const content: Interview[] = response.data?.content ?? response.data ?? [];
+
+      const levels = Array.from(
+        new Set(content.map((i) => i.levelTarget).filter(Boolean))
+      ) as string[];
+
+      const companies = Array.from(
+        new Set(content.map((i) => i.companyNamePartner).filter(Boolean))
+      ) as string[];
+
+      return { levels, companies };
+    } catch (error: any) {
+      throw createServiceError(error, "Failed to fetch filter options");
     }
   },
 
