@@ -34,6 +34,7 @@ import { InterviewFilterGroup } from "@/features/interviews/components/details/i
 import { InterviewCandidateList } from "@/features/interviews/components/details/interview-candidate-list";
 import { useInterviewDetails } from "@/features/interviews/hooks/use-interview-details";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 /**
  * Main View component for the Interview Details page.
@@ -79,6 +80,8 @@ export function InterviewDetailsView() {
         setRetryTrigger,
         router
     } = useInterviewDetails();
+
+    const hasCandidates = allCandidates && allCandidates.length > 0;
 
     if (error) {
         return (
@@ -164,20 +167,30 @@ export function InterviewDetailsView() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="rounded-xl border-[#E2E4E6]">
                                 <DropdownMenuItem
-                                    className="flex items-center gap-2 font-medium py-2 cursor-pointer text-[#707784]"
+                                    className={cn(
+                                        "flex items-center gap-2 font-medium py-2 text-[#707784]",
+                                        hasCandidates ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+                                    )}
+                                    title={hasCandidates ? "Cannot edit: candidates exist" : ""}
+                                    disabled={hasCandidates}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        handleEditClick();
+                                        if (!hasCandidates) handleEditClick();
                                     }}
                                 >
                                     <PencilIcon className="w-4 h-4" /> Edit
                                 </DropdownMenuItem>
 
                                 <DropdownMenuItem
-                                    className="gap-2 text-destructive font-medium py-2 cursor-pointer"
+                                    className={cn(
+                                        "gap-2 text-destructive font-medium py-2",
+                                        hasCandidates ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+                                    )}
+                                    title={hasCandidates ? "Cannot delete: candidates exist" : ""}
+                                    disabled={hasCandidates}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        handleDeleteClick();
+                                        if (!hasCandidates) handleDeleteClick();
                                     }}
                                 >
                                     <Trash2Icon className="w-4 h-4" /> Delete
