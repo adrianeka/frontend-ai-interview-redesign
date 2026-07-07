@@ -14,8 +14,8 @@ import { Button } from "@/components/ui/button";
  */
 const formSchema = z.object({
   name: z.string().min(1, "This field is required."),
-  companyNamePartner: z.string().min(1, "This field is required."),
-  description: z.string().min(1, "This field is required."),
+  companyNamePartner: z.string().optional(),
+  description: z.string().optional(),
   context: z.string().min(1, "This field is required."),
   objective: z.string().min(1, "This field is required."),
   purpose: z.string().min(1, "This field is required."),
@@ -23,7 +23,7 @@ const formSchema = z.object({
   roleTarget: z.string().min(1, "This field is required."),
   levelTarget: z.string().min(1, "This field is required."),
   technology: z.string().min(1, "This field is required."),
-  language: z.string().min(1, "This field is required."),
+  language: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -197,7 +197,7 @@ export function EditInterviewModal({ isOpen, onClose, availableLevels = [], init
               </div>
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Partner's Company Name <span className="text-red-500">*</span>
+                  Partner's Company Name
                 </label>
                 <input
                   {...register("companyNamePartner")}
@@ -209,7 +209,7 @@ export function EditInterviewModal({ isOpen, onClose, availableLevels = [], init
               </div>
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Description <span className="text-red-500">*</span>
+                  Description
                 </label>
                 <textarea
                   {...register("description")}
@@ -303,7 +303,7 @@ export function EditInterviewModal({ isOpen, onClose, availableLevels = [], init
 
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Language <span className="text-red-500">*</span>
+                  Language
                 </label>
                 <div className="relative w-[609px]">
                   <select {...register("language")} className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow appearance-none bg-white text-slate-900 ${errors.language ? 'border-red-500' : 'border-slate-200'}`}>

@@ -22,12 +22,15 @@ import { Loader2, Plus, ChevronDown, SlidersHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
+import { useRouter } from "next/navigation";
+
 /**
  * Main View component for the Interviews List page.
  * Renders the dashboard showing all interviews, including search/filter capabilities,
  * a list of interview cards, and server-side pagination.
  */
 export function InterviewsListView() {
+  const router = useRouter();
   const {
     isModalOpen,
     setIsModalOpen,
@@ -71,7 +74,7 @@ export function InterviewsListView() {
       <div
         className={cn(
           "shrink-0 rounded-2xl border border-[#E2E4E6] bg-[#FAFAFA] p-6 transition-all duration-500 ease-in-out overflow-hidden",
-          selectedInterview ? "lg:w-[calc(100%-474px)] w-full" : "w-full",
+          selectedInterview && role !== "Candidate" ? "lg:w-[calc(100%-474px)] w-full" : "w-full",
         )}
       >
         {/* Title and Action */}
@@ -230,7 +233,7 @@ export function InterviewsListView() {
             <div
               className={cn(
                 "grid gap-6 transition-all duration-500 ease-in-out",
-                selectedInterview
+                selectedInterview && role !== "Candidate"
                   ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3"
                   : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
               )}
@@ -250,10 +253,16 @@ export function InterviewsListView() {
                   }
                   level={item.levelTarget}
                   description={item.description}
-                  isCompact={!!selectedInterview}
+                  isCompact={!!selectedInterview && role !== "Candidate"}
                   isEditable={(item as any).isEditable ?? true}
                   isDeletable={(item as any).isDeletable ?? true}
-                  onClick={() => setSelectedInterview(item)}
+                  onClick={() => {
+                    if (role === "Candidate") {
+                      router.push(`/interviews/${item.id}`);
+                    } else {
+                      setSelectedInterview(item);
+                    }
+                  }}
                   onEdit={() => handleEditClick(item)}
                   onDelete={() => handleDeleteClick(item.id)}
                   role={role}
@@ -283,7 +292,7 @@ export function InterviewsListView() {
         )}
       </div>
 
-      {selectedInterview && (
+      {selectedInterview && role !== "Candidate" && (
         <SidePanel
           interviewId={selectedInterview.id}
           onClose={() => setSelectedInterview(null)}

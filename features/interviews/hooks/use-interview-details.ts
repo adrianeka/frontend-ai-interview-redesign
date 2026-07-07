@@ -136,6 +136,10 @@ export function useInterviewDetails() {
 
     const handleEditClick = () => {
         if (!interviewDetail) return;
+        if (allCandidates.length > 0) {
+            toast.warning("Cannot edit interview that already has candidates.");
+            return;
+        }
         setCurrentEditData({
             id: interviewDetail.id,
             name: interviewDetail.name,
@@ -147,12 +151,18 @@ export function useInterviewDetails() {
             roleTarget: interviewDetail.roleTarget,
             levelTarget: interviewDetail.levelTarget,
             technology: interviewDetail.technology,
-            number: (interviewDetail as any).number || 0,
+            number: Array.isArray(interviewDetail.questions) ? interviewDetail.questions.length : (parseInt((interviewDetail as any).number, 10) || 0),
+            language: interviewDetail.language || "EN",
+            isEditable: (interviewDetail as any).isEditable ?? true,
         });
         setIsEditModalOpen(true);
     };
 
     const handleDeleteClick = () => {
+        if (allCandidates.length > 0) {
+            toast.warning("Cannot delete interview that already has candidates.");
+            return;
+        }
         setDeleteAlertType("confirmation");
     };
 
