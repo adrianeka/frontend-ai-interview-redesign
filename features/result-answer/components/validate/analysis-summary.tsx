@@ -8,9 +8,9 @@ interface AnalysisSummaryProps {
   recommendation?: string;
   totalScore?: number;
   summaryReason?: string;
-  technicalScore: number;
-  problemSolvingScore: number;
-  communicationScore: number;
+  technicalScore: number | null | undefined;
+  problemSolvingScore: number | null | undefined;
+  communicationScore: number | null | undefined;
 }
 
 export function AnalysisSummary({

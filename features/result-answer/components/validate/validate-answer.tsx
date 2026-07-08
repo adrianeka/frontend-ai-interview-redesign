@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   AnswerDetailItem,
   useResultAnswerDetail,
@@ -31,6 +31,16 @@ export function ValidateAnswer({
   const [validatingId, setValidatingId] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [isDoneValidating, setIsDoneValidating] = useState(false);
+  const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Cleanup polling interval saat komponen di-unmount
+  useEffect(() => {
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
+    };
+  }, []);
 
   if (isLoading) {
     return (
@@ -64,25 +74,9 @@ export function ValidateAnswer({
   const allValidated = totalQuestions > 0 && validatedCount === totalQuestions;
   const isCompleted = Boolean(data.recommendation && data.totalScore);
 
-  const avgTechnicalScore =
-    totalQuestions > 0
-      ? sortedAnswers.reduce(
-          (acc, a) => acc + (a.technicalFundamentalScore ?? 0),
-          0,
-        ) / totalQuestions
-      : 0;
-  const avgProblemSolvingScore =
-    totalQuestions > 0
-      ? sortedAnswers.reduce(
-          (acc, a) => acc + (a.problemSolvingScore ?? 0),
-          0,
-        ) / totalQuestions
-      : 0;
-  const avgCommunicationScore =
-    totalQuestions > 0
-      ? sortedAnswers.reduce((acc, a) => acc + (a.communicationScore ?? 0), 0) /
-        totalQuestions
-      : 0;
+  const avgTechnicalScore = data.avgTechnicalFundamentalScore;
+  const avgProblemSolvingScore = data.avgProblemSolvingScore;
+  const avgCommunicationScore = data.avgCommunicationScore;
 
   const handleValidate = async (answer: AnswerDetailItem) => {
     setValidatingId(answer.questionId);
@@ -101,10 +95,53 @@ export function ValidateAnswer({
 
   const handleDoneValidate = async () => {
     setIsDoneValidating(true);
-    await refetch();
-    setIsDoneValidating(false);
-  };
 
+    try {
+      // Ambil data pertama kali setelah tombol diklik
+      const initialResult = await refetch();
+
+      // Jika grading sudah selesai dari awal, tidak perlu polling
+      if (initialResult?.recommendation && initialResult?.totalScore) {
+        setIsDoneValidating(false);
+        return;
+      }
+
+      // Setup Polling Loop: cek status setiap 3 detik, max 60 detik
+      let attempts = 0;
+      const maxAttempts = 20;
+
+      pollingIntervalRef.current = setInterval(async () => {
+        attempts++;
+        const currentResult = await refetch();
+
+        const isFinished = Boolean(currentResult?.recommendation && currentResult?.totalScore);
+
+        // Cek apakah ada error grading dari data monitoring
+        const hasGradingError = currentResult?.answers.some((a: any) =>
+          a.monitorings?.some((m: any) =>
+            (m.status === "ERROR" || m.status === "FAILED") && m.taskName?.toLowerCase().includes("grading")
+          )
+        );
+
+        if (isFinished || hasGradingError || attempts >= maxAttempts) {
+          if (pollingIntervalRef.current) {
+            clearInterval(pollingIntervalRef.current);
+            pollingIntervalRef.current = null;
+          }
+          setIsDoneValidating(false);
+
+          if (hasGradingError) {
+            alert("AI Grading failed. Please check the error message in the monitoring section.");
+          } else if (attempts >= maxAttempts && !isFinished) {
+            alert("AI Grading is taking longer than expected. Please wait a moment and refresh the page manually.");
+          }
+        }
+      }, 3000);
+
+    } catch (err) {
+      setIsDoneValidating(false);
+    }
+  };
   return (
     <div className="min-h-[75vh] bg-[#F5F6F8] flex items-center justify-center">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full md:w-[90vw] lg:w-[80vw] xl:w-[70vw] items-stretch">
