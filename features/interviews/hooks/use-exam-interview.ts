@@ -4,7 +4,6 @@ import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { interviewService } from "../services/interview-service";
 import { InterviewDetail } from "../types/interview";
-import { toast } from "sonner";
 
 type Phase = "break" | "answer";
 
@@ -23,7 +22,6 @@ export function useExamSession() {
   const [breakTime, setBreakTime] = useState(0);
   const [answerTime, setAnswerTime] = useState(0);
   const [answeredIds, setAnsweredIds] = useState<Set<string>>(new Set());
-  const [localSubmittedIds, setLocalSubmittedIds] = useState<Set<string>>(new Set());
   const [audioLevel, setAudioLevel] = useState(0);
   const [candidateId, setCandidateId] = useState<string | null>(null);
 
@@ -78,17 +76,14 @@ export function useExamSession() {
   useEffect(() => {
     if (interviewDetail?.questions) {
       const first = interviewDetail.questions.find(
-        (q) => !answeredIds.has(q.id) && !localSubmittedIds.has(q.id),
+        (q) => !answeredIds.has(q.id),
       );
       if (first) {
         setActiveQuestionId(first.id);
         resetPhase();
-      } else if (interviewDetail.questions.length > 0) {
-        // All answered
-        setActiveQuestionId(null);
       }
     }
-  }, [answeredIds, interviewDetail, localSubmittedIds]);
+  }, [answeredIds]);
 
   useEffect(() => {
     if (!id) return;
@@ -159,7 +154,7 @@ export function useExamSession() {
       };
       tick();
 
-      const recorder = new MediaRecorder(stream, { videoBitsPerSecond: 250000 });
+      const recorder = new MediaRecorder(stream);
       mediaRecorderRef.current = recorder;
       recorder.ondataavailable = (e) => {
         if (e.data.size > 0) chunksRef.current.push(e.data);
@@ -175,8 +170,6 @@ export function useExamSession() {
   const cancelSubmit = async () => {
     abortControllerRef.current?.abort();
     setIsSubmitting(false);
-
-    chunksRef.current = []; // Prevent old video chunks from merging with new ones
 
     setAnswerTime(0);
     clearTimer();
@@ -232,13 +225,6 @@ export function useExamSession() {
         videoFile,
         abortController.signal,
       );
-      
-      setLocalSubmittedIds((prev) => {
-        const newSet = new Set(prev);
-        newSet.add(activeQuestionId);
-        return newSet;
-      });
-
       await fetchAnswered();
       if (!candidateId) {
         await fetchCandidateId(true);
@@ -252,12 +238,6 @@ export function useExamSession() {
         return;
       }
       console.error(err);
-      const errMsg = err?.response?.data?.message || err?.message || "Unknown error";
-      if (errMsg.includes("timeout") || errMsg.includes("Network Error")) {
-        toast.error("Upload timeout. The file might be too large or your connection is unstable.");
-      } else {
-        toast.error(`Failed to submit answer: ${errMsg}`);
-      }
     } finally {
       setIsSubmitting(false);
     }
