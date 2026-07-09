@@ -153,6 +153,9 @@ export interface CandidateResult {
   interviewId: string;
   name: string;
   totalScore: number;
+  avgTechnicalFundamentalScore: number;
+  avgProblemSolvingScore: number;
+  avgCommunicationScore: number;
   recommendation: string;
   summaryReason: string;
   answers: CandidateAnswer[];

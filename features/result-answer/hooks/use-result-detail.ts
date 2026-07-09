@@ -32,6 +32,9 @@ export interface ResultAnswerDetail {
   interviewId: string;
   name: string;
   totalScore: number | null;
+  avgTechnicalFundamentalScore: number | null;
+  avgProblemSolvingScore: number | null;
+  avgCommunicationScore: number | null;
   recommendation: string | null;
   summaryReason: string | null;
   answers: AnswerDetailItem[];
@@ -91,6 +94,7 @@ export function useResultAnswerDetail(
         candidateId,
       );
       setData(result);
+      return result;
     } catch (err: any) {
       if (err.name === "CanceledError" || err.code === "ERR_CANCELED") return;
       setError(err.message ?? "Something went wrong");

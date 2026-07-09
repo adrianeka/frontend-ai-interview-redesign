@@ -32,6 +32,7 @@ export function ValidateAnswer({
   const [savingId, setSavingId] = useState<string | null>(null);
   const [isDoneValidating, setIsDoneValidating] = useState(false);
 
+
   if (isLoading) {
     return (
       <div className="h-[400px] flex items-center justify-center text-slate-400 text-sm">
@@ -62,27 +63,11 @@ export function ValidateAnswer({
   const totalQuestions = sortedAnswers.length;
   const validatedCount = sortedAnswers.filter((a) => a.isValidated).length;
   const allValidated = totalQuestions > 0 && validatedCount === totalQuestions;
-  const isCompleted = Boolean(data.recommendation && data.totalScore);
+  const isCompleted = Boolean(data.recommendation && data.totalScore !== null);
 
-  const avgTechnicalScore =
-    totalQuestions > 0
-      ? sortedAnswers.reduce(
-          (acc, a) => acc + (a.technicalFundamentalScore ?? 0),
-          0,
-        ) / totalQuestions
-      : 0;
-  const avgProblemSolvingScore =
-    totalQuestions > 0
-      ? sortedAnswers.reduce(
-          (acc, a) => acc + (a.problemSolvingScore ?? 0),
-          0,
-        ) / totalQuestions
-      : 0;
-  const avgCommunicationScore =
-    totalQuestions > 0
-      ? sortedAnswers.reduce((acc, a) => acc + (a.communicationScore ?? 0), 0) /
-        totalQuestions
-      : 0;
+  const avgTechnicalScore = data.avgTechnicalFundamentalScore;
+  const avgProblemSolvingScore = data.avgProblemSolvingScore;
+  const avgCommunicationScore = data.avgCommunicationScore;
 
   const handleValidate = async (answer: AnswerDetailItem) => {
     setValidatingId(answer.questionId);
@@ -101,10 +86,28 @@ export function ValidateAnswer({
 
   const handleDoneValidate = async () => {
     setIsDoneValidating(true);
-    await refetch();
-    setIsDoneValidating(false);
-  };
 
+    try {
+      // Trigger satu kali refetch untuk memastikan data terbaru
+      const result = await refetch();
+
+      // Jika grading sudah selesai (mungkin data sudah ada), tampilkan hasil
+      if (result?.recommendation && result?.totalScore !== null) {
+        setIsDoneValidating(false);
+        return;
+      }
+
+      // Grading sedang berjalan di background — tampilkan pesan sukses
+      // Pengguna tidak perlu menunggu di halaman ini karena grading async
+      // Halaman akan otomatis menampilkan hasil jika di-refresh nanti
+    } catch (err) {
+      // Jika gagal, lepaskan loading state agar user bisa coba lagi
+      setIsDoneValidating(false);
+    }
+    // isDoneValidating sengaja tidak di-set false di sini agar tombol tetap
+    // terkunci dan pesan "Processing AI Grading..." tetap tampil sebagai
+    // konfirmasi visual bahwa data sudah terkirim.
+  };
   return (
     <div className="min-h-[75vh] bg-[#F5F6F8] flex items-center justify-center">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full md:w-[90vw] lg:w-[80vw] xl:w-[70vw] items-stretch">

@@ -3,11 +3,12 @@
 interface ScoreBarProps {
   label: string;
   weight: number;
-  value: number;
+  value: number | null | undefined;
 }
 
 export function ScoreBar({ label, weight, value }: ScoreBarProps) {
-  const clamped = Math.max(0, Math.min(100, value));
+  const hasValue = value !== null && value !== undefined && value !== "";
+  const clamped = hasValue ? Math.max(0, Math.min(100, Number(value))) : 0;
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -21,37 +22,45 @@ export function ScoreBar({ label, weight, value }: ScoreBarProps) {
       >
         {label} <span style={{ color: "#94A3B8" }}>({weight}%)</span>
       </span>
-      <div
-        style={{
-          flex: "1 1 0%",
-          minWidth: 0,
-          height: 8,
-          borderRadius: 9999,
-          backgroundColor: "#E2E4E6",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            height: "100%",
-            width: `${clamped}%`,
-            borderRadius: 9999,
-            backgroundColor: "#5BC8D9",
-            transition: "width 0.3s ease",
-          }}
-        />
-      </div>
-      <span
-        style={{
-          fontSize: 12,
-          color: "#64748B",
-          width: 36,
-          textAlign: "right",
-          flexShrink: 0,
-        }}
-      >
-        {Math.round(clamped)}%
-      </span>
+      {hasValue ? (
+        <>
+          <div
+            style={{
+              flex: "1 1 0%",
+              minWidth: 0,
+              height: 8,
+              borderRadius: 9999,
+              backgroundColor: "#E2E4E6",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                height: "100%",
+                width: `${clamped}%`,
+                borderRadius: 9999,
+                backgroundColor: "#5BC8D9",
+                transition: "width 0.3s ease",
+              }}
+            />
+          </div>
+          <span
+            style={{
+              fontSize: 12,
+              color: "#64748B",
+              width: 36,
+              textAlign: "right",
+              flexShrink: 0,
+            }}
+          >
+            {Number(value).toFixed(1).replace(/\.0$/, "")}%
+          </span>
+        </>
+      ) : (
+        <span style={{ fontSize: 14, color: "#8C929D", fontWeight: 500 }}>
+          No data yet
+        </span>
+      )}
     </div>
   );
 }
