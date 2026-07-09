@@ -85,9 +85,9 @@ export function CandidateScoreBreakdown({
       <div className="flex items-center mb-2">
         <span className="text-[#43474F] font-semibold text-base w-48">Final Score</span>
         <span className="text-[#8C929D] font-semibold text-base">
-          {totalScore ? Number(totalScore).toFixed(1).replace(/\.0$/, "") : "No data yet"}
+          {totalScore !== null && totalScore !== undefined && totalScore !== "" ? Number(totalScore).toFixed(1).replace(/\.0$/, "") : "No data yet"}
         </span>
-        {totalScore && recommendation && (() => {
+        {totalScore !== null && totalScore !== undefined && recommendation && (() => {
           const rec = recommendation;
           const mappedKey = mapRecommendationToStatusKey(rec);
           const colorCfg = mappedKey && activeColorMap[mappedKey]

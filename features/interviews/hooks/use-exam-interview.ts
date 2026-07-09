@@ -59,8 +59,8 @@ export function useExamSession() {
     }
   };
 
-  const fetchCandidateId = async () => {
-    if (candidateIdFetchedRef.current) return;
+  const fetchCandidateId = async (force = false) => {
+    if (!force && candidateIdFetchedRef.current) return;
     candidateIdFetchedRef.current = true;
 
     const userId = getUserId();
@@ -240,6 +240,9 @@ export function useExamSession() {
       });
 
       await fetchAnswered();
+      if (!candidateId) {
+        await fetchCandidateId(true);
+      }
     } catch (err: any) {
       if (
         err.name === "CanceledError" ||
@@ -273,6 +276,7 @@ export function useExamSession() {
     videoRef,
     cancelSubmit,
     answeredIds,
+    localSubmittedIds,
     audioLevel,
     candidateId,
   };
