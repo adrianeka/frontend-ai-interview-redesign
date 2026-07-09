@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+"use client";
+
+import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -8,9 +10,7 @@ import {
   Loader2,
   CornerDownRightIcon,
   PencilIcon,
-  DownloadIcon,
-  Clock,
-  VideoOff
+  DownloadIcon
 } from "lucide-react";
 
 /**
@@ -49,29 +49,6 @@ interface CandidateAnswerItemProps {
 }
 
 /**
- * Derives a specific human-readable error label from the monitoring taskName.
- */
-function getErrorLabel(taskName?: string, messageError?: string): string {
-  if (messageError) {
-    const msgLower = messageError.toLowerCase();
-    if (msgLower.includes("object does not exist") || msgLower.includes("minio") || msgLower.includes("download file")) {
-      return "Video File Missing (Storage 404)";
-    }
-  }
-  if (!taskName) return "Processing Error";
-  const lower = taskName.toLowerCase();
-  if (lower.includes("speech") || lower.includes("stt") || lower.includes("convert")) {
-    return "Speech-to-Text Conversion Error";
-  }
-  if (lower.includes("insert") || lower.includes("save") || lower.includes("answer")) {
-    return "Answer Table Insertion Error";
-  }
-  if (lower.includes("grading")) return "Grading Error";
-  if (lower.includes("validation")) return "Validation Error";
-  return taskName;
-}
-
-/**
  * Renders an individual candidate answer including the question text, video recording,
  * STT transcript, and individual AI grading scores (Technical, Problem Solving, Communication).
  * Also provides controls for editing the transcript, downloading the video, and toggling validation.
@@ -93,29 +70,15 @@ export function CandidateAnswerItem({
   retryingQuestionId,
   handleRetryStt
 }: CandidateAnswerItemProps) {
-  const [videoError, setVideoError] = useState(false);
-
   const monStatus = (() => {
     if (answer.isValidated) return { type: "success", label: "Validated" };
     if (!answer.monitorings || answer.monitorings.length === 0) return { type: "muted", label: "Pending" };
     const err = answer.monitorings.find((m: any) => m.status === "ERROR" || m.status === "FAILED" || m.messageError);
-    if (err) {
-      // Tampilkan label error yang spesifik berdasarkan taskName proses yang gagal
-      const errorLabel = getErrorLabel(err.taskName, err.messageError);
-      return { type: "danger", label: errorLabel };
-    }
+    if (err) return { type: "danger", label: "Error" };
     const allSuccess = answer.monitorings.every((m: any) => m.status === "SUCCESS");
     if (allSuccess) return { type: "success", label: "Success" };
     return { type: "muted", label: "Pending" };
   })();
-
-  // Apakah ada proses yang sedang berjalan (in-progress atau belum dimulai)
-  const isAwaitingTranscription = !answer.isValidated && !answer.answerTranscript;
-
-  // Apakah ada error monitoring untuk tombol Retry (semua tipe error, bukan hanya STT)
-  const hasAnyError = answer.monitorings?.some(
-    (m: any) => m.status === "ERROR" || m.status === "FAILED"
-  );
 
   const badgeCfg = statusColorMap[monStatus.type] || statusColorMap["muted"];
   const BadgeIcon = badgeCfg.icon;
@@ -123,22 +86,22 @@ export function CandidateAnswerItem({
   return (
     <div className="flex flex-col lg:flex-row gap-6 px-3">
       {/* Video Player or Placeholder */}
-      {answer.videoUrl && !videoError ? (
+      {answer.videoUrl ? (
         <video
           src={answer.videoUrl}
           controls
           preload="none"
           className="w-full lg:w-[501px] h-[320px] rounded-lg object-cover shrink-0 bg-black shadow-sm"
           poster="https://placehold.co/501x320?text=Interview+Recording"
-          onError={() => setVideoError(true)}
         />
       ) : (
         <div
-          className="w-full lg:w-[501px] h-[320px] rounded-lg relative overflow-hidden flex flex-col items-center justify-center p-6 shrink-0 bg-gray-200 border-2 border-dashed border-[#E2E4E6]"
+          className="w-full lg:w-[501px] h-[320px] rounded-lg relative overflow-hidden flex flex-col justify-end p-6 shrink-0 bg-gray-200"
+          style={{ backgroundImage: 'url(https://placehold.co/501x320?text=No+Video+Available)', backgroundSize: 'cover' }}
         >
-          <div className="flex flex-col items-center gap-2 text-muted-foreground text-sm font-medium">
-            <VideoOff className="w-8 h-8 text-red-400" />
-            <span>Video file is missing or corrupted on storage server</span>
+          <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
+          <div className="relative z-10 flex items-center justify-center h-full text-white font-medium">
+            No Video Recording Available
           </div>
         </div>
       )}
@@ -147,7 +110,7 @@ export function CandidateAnswerItem({
       <div className="flex flex-col gap-6 flex-1">
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-3">
               <h3 className="text-[#43474F] font-bold text-base">Question {answer.questionNumber || index + 1}</h3>
               <Badge
                 style={{
@@ -173,22 +136,6 @@ export function CandidateAnswerItem({
                   {monStatus.label}
                 </span>
               </Badge>
-
-              {/* Tombol Retry — muncul untuk SEMUA tipe error monitoring */}
-              {hasAnyError && !answer.isValidated && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="border-red-400 text-red-500 hover:bg-red-50 h-7 px-2.5 text-xs gap-1.5"
-                  disabled={retryingQuestionId === answer.questionId}
-                  onClick={() => handleRetryStt(answer.participantId, answer.questionId)}
-                >
-                  {retryingQuestionId === answer.questionId
-                    ? <Loader2 className="w-3 h-3 animate-spin" />
-                    : null}
-                  Retry
-                </Button>
-              )}
             </div>
 
             <div className="flex items-center gap-3">
@@ -242,6 +189,19 @@ export function CandidateAnswerItem({
                   </Label>
                 </div>
               )}
+
+              {answer.monitorings?.some((m: any) => (m.status === "ERROR" || m.status === "FAILED") && m.taskName?.toLowerCase().includes("stt")) && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-red-500 text-red-500 hover:bg-red-50"
+                  disabled={retryingQuestionId === answer.questionId}
+                  onClick={() => handleRetryStt(answer.participantId, answer.questionId)}
+                >
+                  {retryingQuestionId === answer.questionId ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
+                  Retry
+                </Button>
+              )}
             </div>
           </div>
 
@@ -285,12 +245,6 @@ export function CandidateAnswerItem({
                 {answer.answerTranscript}
               </p>
             </div>
-          ) : isAwaitingTranscription ? (
-            /* Placeholder saat menunggu transkripsi — lebih informatif dari sekadar teks kecil */
-            <div className="bg-[#F8FAFB] border border-dashed border-[#CBD5E1] rounded-md p-3 flex items-center gap-2 mt-1">
-              <Clock className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
-              <span className="text-[#94A3B8] text-sm italic">Awaiting transcription</span>
-            </div>
           ) : (
             <p className="text-[#A9ADB5] text-xs italic mt-1">No transcript recorded</p>
           )}
@@ -332,4 +286,3 @@ export function CandidateAnswerItem({
     </div>
   );
 }
-

@@ -236,9 +236,17 @@ export function useCandidateInterview() {
   const totalAnswers = sortedAnswers.length;
   const validatedCount = sortedAnswers.filter((a) => a.isValidated).length;
 
-  const avgTechnical = candidateResult?.avgTechnicalFundamentalScore || 0;
-  const avgProblemSolving = candidateResult?.avgProblemSolvingScore || 0;
-  const avgCommunication = candidateResult?.avgCommunicationScore || 0;
+  const avgTechnical = totalAnswers
+    ? sortedAnswers.reduce((acc, a) => acc + (a.technicalFundamentalScore || 0), 0) / totalAnswers
+    : 0;
+
+  const avgProblemSolving = totalAnswers
+    ? sortedAnswers.reduce((acc, a) => acc + (a.problemSolvingScore || 0), 0) / totalAnswers
+    : 0;
+
+  const avgCommunication = totalAnswers
+    ? sortedAnswers.reduce((acc, a) => acc + (a.communicationScore || 0), 0) / totalAnswers
+    : 0;
 
   const step1Status = stepProgress?.transcribeAndIntegrationAnswer ? "completed" : "active";
   const step2Status = stepProgress?.validateAnswer ? "completed" : (step1Status === "completed" ? "active" : "disabled");
@@ -260,24 +268,7 @@ export function useCandidateInterview() {
     (monitoringData || []).some((m: any) => (m.status === "ERROR" || m.status === "FAILED") && m.taskName?.toLowerCase().includes("grading"));
 
   const failedMonitoringItems = (monitoringData || []).filter(
-    (m: any) => {
-      const isFailed = m.status === "FAILED" || m.status === "ERROR" || m.messageError;
-      if (!isFailed) return false;
-
-      // Sembunyikan error jika seluruh alur sudah selesai dan sukses dipetakan
-      if (stepProgress?.resultMappingAnswer) {
-        return false;
-      }
-
-      // Sembunyikan error jika pertanyaan terkait sudah divalidasi oleh admin
-      if (m.questionId) {
-        const correspondingAnswer = candidateResult?.answers.find((a: any) => a.questionId === m.questionId);
-        if (correspondingAnswer?.isValidated) {
-          return false;
-        }
-      }
-      return true;
-    }
+    (m: any) => m.status === "FAILED" || m.status === "ERROR" || m.messageError
   );
 
   return {
