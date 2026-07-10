@@ -1,3 +1,9 @@
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Created hook for monitoring list data fetching
+*/
 import { useState, useEffect, useCallback } from "react";
 import { monitoringService } from "../services/monitoring-service";
 import { MonitoringTask, MonitoringFilters } from "../types/monitoring-types";
@@ -54,3 +60,6 @@ export function useMonitoringList() {
     totalPages,
   };
 }
+/*
+edit end
+*/

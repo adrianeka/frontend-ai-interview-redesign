@@ -42,6 +42,12 @@ import { cn } from "@/lib/utils";
  * to the InterviewCandidateList component.
  * Integrates directly with the `useInterviewDetails` hook for state and action dispatching.
  */
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Disabled edit and delete dropdown items when candidates exist
+*/
 export function InterviewDetailsView() {
     const {
         id,
@@ -345,3 +351,6 @@ export function InterviewDetailsView() {
         </Card>
     );
 }
+/*
+edit end
+*/

@@ -14,6 +14,12 @@ interface ValidateAnswerProps {
   candidateId: string;
 }
 
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Changed async grading completion flow, translated messages to Indonesian, and fetched average scores directly from the API response
+*/
 export function ValidateAnswer({
   interviewId,
   candidateId,
@@ -160,3 +166,6 @@ export function ValidateAnswer({
     </div>
   );
 }
+/*
+edit end
+*/

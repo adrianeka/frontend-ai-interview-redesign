@@ -1,3 +1,9 @@
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Created MonitoringView component layout and data fetching logic
+*/
 "use client";
 
 import { useMonitoringList } from "../hooks/use-monitoring-list";
@@ -318,3 +324,6 @@ export function MonitoringView() {
     </div>
   );
 }
+/*
+edit end
+*/

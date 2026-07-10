@@ -18,6 +18,12 @@ interface CandidateSidebarProps {
   onDoneValidate: () => void;
 }
 
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Added Loader2 and updated text for the validation submission button
+*/
 export function CandidateSidebar({
   companyName,
   candidateName,
@@ -109,3 +115,6 @@ export function CandidateSidebar({
     </div>
   );
 }
+/*
+edit end
+*/

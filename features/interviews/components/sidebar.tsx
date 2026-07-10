@@ -16,7 +16,16 @@ const navItems = [
     label: "Monitoring",
     href: "/monitoring",
     icon: MonitorSmartphone,
+    /*
+    edit start
+    by: Zahra Hilyatul J
+    date: 2026-06-29
+    description: Enabled Monitoring nav item
+    */
     disabled: false,
+    /*
+    edit end
+    */
   },
 ];
 

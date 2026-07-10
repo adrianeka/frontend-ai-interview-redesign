@@ -1,3 +1,9 @@
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Created register service
+*/
 import api from "@/lib/axios";
 
 /**
@@ -26,3 +32,6 @@ export interface RegisterPayload {
 export async function register(payload: RegisterPayload): Promise<void> {
   await api.post("/auth/register", payload);
 }
+/*
+edit end
+*/

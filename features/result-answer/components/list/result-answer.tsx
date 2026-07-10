@@ -99,6 +99,12 @@ function MobileCard({
   );
 }
 
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Translated error and empty state messages to Indonesian and made them more user friendly
+*/
 export function ResultAnswerView() {
   const router = useRouter();
   const [userId, setUserId] = useState("");

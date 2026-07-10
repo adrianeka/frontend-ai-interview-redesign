@@ -7,6 +7,12 @@ import { ExamCompleted } from "./exam-completed";
 import { ExamQuestionCard } from "./exam-question-card";
 import { ExamSidebar } from "./exam-sidebar";
 
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Added localSubmittedIds to correctly evaluate allAnswered status immediately after submitting
+*/
 export function ExamSessionView() {
   const params = useParams();
   const interviewId = params?.interviewId as string;
@@ -81,3 +87,6 @@ export function ExamSessionView() {
     </div>
   );
 }
+/*
+edit end
+*/

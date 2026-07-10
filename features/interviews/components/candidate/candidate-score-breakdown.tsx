@@ -31,6 +31,12 @@ interface CandidateScoreBreakdownProps {
  * Includes the final total score, the recommendation badge, and
  * the individual sub-scores (Technical, Problem Solving, Communication).
  */
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Extracted renderSkillRow helper function, fixed formatting and derived type handling for scores
+*/
 export function CandidateScoreBreakdown({
   totalScore,
   recommendation,
@@ -46,7 +52,7 @@ export function CandidateScoreBreakdown({
   };
 
   const renderSkillRow = (label: string, weight: number, value: number | null | undefined) => {
-    const hasValue = value !== null && value !== undefined && value !== "";
+    const hasValue = value !== null && value !== undefined;
     return (
       <div className="flex items-center gap-4 w-full">
         <div className="w-48 text-base shrink-0 flex items-center">
@@ -85,7 +91,7 @@ export function CandidateScoreBreakdown({
       <div className="flex items-center mb-2">
         <span className="text-[#43474F] font-semibold text-base w-48">Final Score</span>
         <span className="text-[#8C929D] font-semibold text-base">
-          {totalScore !== null && totalScore !== undefined && totalScore !== "" ? Number(totalScore).toFixed(1).replace(/\.0$/, "") : "No data yet"}
+          {totalScore !== null && totalScore !== undefined ? Number(totalScore).toFixed(1).replace(/\.0$/, "") : "No data yet"}
         </span>
         {totalScore !== null && totalScore !== undefined && recommendation && (() => {
           const rec = recommendation;
@@ -115,3 +121,6 @@ export function CandidateScoreBreakdown({
     </div>
   );
 }
+/*
+edit end
+*/

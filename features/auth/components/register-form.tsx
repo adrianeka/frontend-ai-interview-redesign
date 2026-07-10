@@ -13,6 +13,12 @@ import { register } from "@/features/auth/services/register";
  * Submits form data to the backend /auth/register endpoint and redirects
  * to the login page on success.
  */
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Added complete registration form state handling, validation, API integration, error/success states, and UI fields
+*/
 export const RegisterForm = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -167,3 +173,6 @@ export const RegisterForm = () => {
     </div>
   );
 };
+/*
+edit end
+*/

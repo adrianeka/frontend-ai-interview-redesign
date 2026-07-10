@@ -6,8 +6,14 @@ interface ScoreBarProps {
   value: number | null | undefined;
 }
 
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Added hasValue check and "No data yet" state for empty score values
+*/
 export function ScoreBar({ label, weight, value }: ScoreBarProps) {
-  const hasValue = value !== null && value !== undefined && value !== "";
+  const hasValue = value !== null && value !== undefined;
   const clamped = hasValue ? Math.max(0, Math.min(100, Number(value))) : 0;
 
   return (
@@ -64,3 +70,6 @@ export function ScoreBar({ label, weight, value }: ScoreBarProps) {
     </div>
   );
 }
+/*
+edit end
+*/

@@ -76,6 +76,12 @@ function getErrorLabel(taskName?: string, messageError?: string): string {
  * STT transcript, and individual AI grading scores (Technical, Problem Solving, Communication).
  * Also provides controls for editing the transcript, downloading the video, and toggling validation.
  */
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Added error states for video missing, retry STT button in UI, and awaiting transcription placeholder
+*/
 export function CandidateAnswerItem({
   answer,
   index,
@@ -332,4 +338,7 @@ export function CandidateAnswerItem({
     </div>
   );
 }
+/*
+edit end
+*/
 

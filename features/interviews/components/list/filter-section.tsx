@@ -34,6 +34,12 @@ interface FilterSectionProps {
 /**
  * Renders the filter controls (Company, Type, Level, Status) for the interview list.
  */
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Restructured FilterSection to support usage inside a Popover
+*/
 export function FilterSection({
   isSidePanelOpen,
   filters,
@@ -116,3 +122,6 @@ export function FilterSection({
     </div>
   );
 }
+/*
+edit end
+*/
