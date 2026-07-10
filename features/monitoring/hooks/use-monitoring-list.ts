@@ -7,6 +7,7 @@ export function useMonitoringList() {
   const [isLoading, setIsLoading] = useState(true);
   const [totalElements, setTotalElements] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<MonitoringFilters>({
     search: "",
     status: "all",
@@ -16,13 +17,15 @@ export function useMonitoringList() {
 
   const fetchTasks = useCallback(async () => {
     setIsLoading(true);
+    setError(null);
     try {
       const data = await monitoringService.getTasks(filters);
       setTasks(data.content ?? []);
       setTotalElements(data.totalElements ?? 0);
       setTotalPages(data.totalPages ?? 0);
-    } catch (error) {
-      console.error("Failed to fetch monitoring tasks", error);
+    } catch (err: any) {
+      console.error("Failed to fetch monitoring tasks", err);
+      setError(err.message ?? "Failed to fetch monitoring tasks");
     } finally {
       setIsLoading(false);
     }
@@ -42,6 +45,7 @@ export function useMonitoringList() {
   return {
     tasks,
     isLoading,
+    error,
     filters,
     setFilters,
     removeFilter,

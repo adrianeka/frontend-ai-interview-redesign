@@ -43,16 +43,16 @@ export function ValidateAnswer({
 
   if (error) {
     return (
-      <div className="text-center py-20 text-red-400 font-medium text-sm">
-        {error}
+      <div className="text-center py-20 text-slate-500 font-medium text-sm">
+        Gagal memuat data jawaban kandidat. Silakan coba lagi nanti.
       </div>
     );
   }
 
   if (!data) {
     return (
-      <div className="text-center py-20 text-slate-400 font-medium text-sm">
-        Data not found.
+      <div className="text-center py-20 text-slate-500 font-medium text-sm">
+        Data jawaban kandidat tidak ditemukan.
       </div>
     );
   }

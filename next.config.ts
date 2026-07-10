@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '500mb'
     },
     proxyTimeout: 120000,
-    middlewareClientMaxBodySize: '500mb'
+    proxyClientMaxBodySize: '500mb'
   },
   async rewrites() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://ai-interview.jiwamu.de/api";
