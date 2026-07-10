@@ -1,3 +1,9 @@
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Created service for fetching monitoring tasks
+*/
 import api from "@/lib/axios";
 import {
   MonitoringTask,
@@ -55,3 +61,6 @@ export const monitoringService = {
     return { ...response.data, content };
   },
 };
+/*
+edit end
+*/

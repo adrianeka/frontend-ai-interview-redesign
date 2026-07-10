@@ -16,7 +16,16 @@ export default function PrivateLayout({
       <Navbar />
       <div className="flex flex-1">
         <Sidebar />
+        {/*
+        edit start
+        by: Zahra Hilyatul J
+        date: 2026-06-29
+        description: Added min-w-0 to main content layout
+        */}
         <main className="flex-1 bg-[#F5F5F5] p-4 min-w-0">{children}</main>
+        {/*
+        edit end
+        */}
       </div>
       <Footer />
     </div>

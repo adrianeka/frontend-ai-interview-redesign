@@ -32,11 +32,11 @@ export const interviewService = {
       size: filters.size || 10,
     };
 
-    if (filters.search) params.search = filters.search;
+    if (filters.name) params.name = filters.name;
     if (filters.company && filters.company !== "all")
       params.company = filters.company;
     if (filters.type && filters.type !== "all") params.type = filters.type;
-    if (filters.level && filters.level !== "all") params.level = filters.level;
+    if (filters.levelTarget && filters.levelTarget !== "all") params.levelTarget = filters.levelTarget;
     if (filters.status && filters.status !== "all")
       params.status = filters.status;
 
@@ -50,6 +50,12 @@ export const interviewService = {
     }
   },
 
+  /*
+  edit start
+  by: Zahra Hilyatul J
+  date: 2026-06-29
+  description: Added getFilterOptions service method to fetch distinct levels and companies
+  */
   /**
    * Fetches all distinct filter option values (levels and companies) available
    * across all interviews. Uses a large page size to ensure all records are covered.
@@ -76,6 +82,9 @@ export const interviewService = {
       throw createServiceError(error, "Failed to fetch filter options");
     }
   },
+  /*
+  edit end
+  */
 
   getInterviewById: async (id: string): Promise<InterviewDetail> => {
     try {

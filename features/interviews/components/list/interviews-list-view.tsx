@@ -29,6 +29,12 @@ import { useRouter } from "next/navigation";
  * Renders the dashboard showing all interviews, including search/filter capabilities,
  * a list of interview cards, and server-side pagination.
  */
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Extracted filter into popover, updated click behaviors to direct route for candidates, disabled sidepanel for candidates
+*/
 export function InterviewsListView() {
   const router = useRouter();
   const {
@@ -331,3 +337,6 @@ export function InterviewsListView() {
     </div>
   );
 }
+/*
+edit end
+*/

@@ -11,6 +11,12 @@ interface ScoreBreakdownProps {
   communicationScore: number;
 }
 
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Handled nullable scores in ScoreBreakdownProps and updated weight percentages
+*/
 export function ScoreBreakdown({
   totalScore,
   recommendation,
@@ -72,3 +78,6 @@ export function ScoreBreakdown({
     </div>
   );
 }
+/*
+edit end
+*/

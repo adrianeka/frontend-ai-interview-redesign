@@ -99,6 +99,12 @@ function MobileCard({
   );
 }
 
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Translated error and empty state messages to Indonesian and made them more user friendly
+*/
 export function ResultAnswerView() {
   const router = useRouter();
   const [userId, setUserId] = useState("");
@@ -181,12 +187,14 @@ export function ResultAnswerView() {
             <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
           </div>
         ) : error ? (
-          <div className="text-center py-20 text-red-400 font-medium text-sm">
-            {error}
+          <div className="text-center py-20 text-slate-500 font-medium text-sm">
+            Gagal memuat data hasil wawancara. Silakan coba lagi nanti.
           </div>
         ) : !data || data.content.length === 0 ? (
-          <div className="text-center py-20 text-slate-400 font-medium">
-            No results found.
+          <div className="text-center py-20 text-slate-500 font-medium text-sm">
+            {filters.interviewTitle
+              ? "Hasil wawancara tidak ditemukan."
+              : "Belum ada riwayat hasil wawancara."}
           </div>
         ) : (
           <>

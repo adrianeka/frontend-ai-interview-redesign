@@ -8,6 +8,12 @@ import { toast } from "sonner";
 
 type Phase = "break" | "answer";
 
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Added localSubmittedIds state and recording constraints to improve answer submission feedback loop
+*/
 export function useExamSession() {
   const params = useParams();
   const id = params?.interviewId as string;
@@ -277,3 +283,6 @@ export function useExamSession() {
     candidateId,
   };
 }
+/*
+edit end
+*/

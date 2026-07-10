@@ -19,6 +19,12 @@ const statusColorMap: Record<string, { color: string; bgColor: string; outline: 
  * Connects to the backend to retrieve candidate details, answers, and STT/Grading pipeline monitoring statuses.
  * Also exposes methods to retry failed background jobs.
  */
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Refactored average score calculations and failed monitoring items filtering
+*/
 export function useCandidateInterview() {
   const params = useParams();
   const router = useRouter();
@@ -310,3 +316,6 @@ export function useCandidateInterview() {
     statusColorMap
   };
 }
+/*
+edit end
+*/

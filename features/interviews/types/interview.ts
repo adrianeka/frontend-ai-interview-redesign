@@ -87,19 +87,28 @@ export interface InterviewDetail extends Interview {
 }
 
 export interface InterviewFilters {
-  search?: string;
+  name?: string;
   company?: string;
+  levelTarget?: string;
   type?: string;
-  level?: string;
   status?: string;
   page?: number;
   size?: number;
 }
 
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Added InterviewFilterOptions interface
+*/
 export interface InterviewFilterOptions {
   levels: string[];
   companies: string[];
 }
+/*
+edit end
+*/
 
 export interface PaginatedResponse<T> {
   content: T[];
@@ -150,9 +159,22 @@ export interface CandidateAnswer {
 }
 
 export interface CandidateResult {
+  id: string;
   interviewId: string;
   name: string;
   totalScore: number;
+  /*
+  edit start
+  by: Zahra Hilyatul J
+  date: 2026-06-29
+  description: Added detailed average score fields
+  */
+  avgTechnicalFundamentalScore: number;
+  avgProblemSolvingScore: number;
+  avgCommunicationScore: number;
+  /*
+  edit end
+  */
   recommendation: string;
   summaryReason: string;
   answers: CandidateAnswer[];

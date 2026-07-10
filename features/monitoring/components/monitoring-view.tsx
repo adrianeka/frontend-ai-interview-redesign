@@ -1,3 +1,9 @@
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Created MonitoringView component layout and data fetching logic
+*/
 "use client";
 
 import { useMonitoringList } from "../hooks/use-monitoring-list";
@@ -117,6 +123,7 @@ export function MonitoringView() {
   const {
     tasks,
     isLoading,
+    error,
     filters,
     setFilters,
     totalElements,
@@ -217,9 +224,15 @@ export function MonitoringView() {
           <div className="h-[400px] flex items-center justify-center">
             <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
           </div>
+        ) : error ? (
+          <div className="text-center py-20 text-slate-500 font-medium text-sm">
+            Gagal memuat data monitoring. Silakan coba lagi nanti.
+          </div>
         ) : tasks.length === 0 ? (
-          <div className="text-center py-20 text-slate-400 font-medium">
-            No tasks found matching your filter.
+          <div className="text-center py-20 text-slate-500 font-medium text-sm">
+            {filters.search || (filters.status && filters.status !== "all")
+              ? "Proses monitoring tidak ditemukan."
+              : "Belum ada proses monitoring yang berjalan."}
           </div>
         ) : (
           <>
@@ -311,3 +324,6 @@ export function MonitoringView() {
     </div>
   );
 }
+/*
+edit end
+*/

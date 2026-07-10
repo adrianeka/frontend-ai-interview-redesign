@@ -13,6 +13,12 @@ interface AnalysisSummaryProps {
   communicationScore: number;
 }
 
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Made score props nullable and updated condition to handle null scores correctly
+*/
 export function AnalysisSummary({
   recommendation,
   totalScore,

@@ -15,6 +15,12 @@ import { Input } from "@/components/ui/input";
  * Client-side form component for registering a new user account.
  * Includes basic validation and password visibility toggles.
  */
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Added complete registration form state handling, validation, API integration, error/success states, and UI fields
+*/
 export const RegisterForm = () => {
   const [showPassword, setShowPassword] =
     useState(false);
@@ -179,3 +185,6 @@ export const RegisterForm = () => {
     </div>
   );
 };
+/*
+edit end
+*/

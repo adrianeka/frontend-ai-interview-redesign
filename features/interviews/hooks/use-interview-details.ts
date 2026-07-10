@@ -13,6 +13,12 @@ import { hiringColorMap, internalAssessmentColorMap } from "@/features/interview
  * Handles fetching the interview metadata, the candidate list, client-side pagination/filtering,
  * and integration with edit/delete modals.
  */
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Added constraints to prevent editing and deleting interviews with active candidates
+*/
 export function useInterviewDetails() {
     const params = useParams();
     const id = params?.interviewId as string;
@@ -239,3 +245,6 @@ export function useInterviewDetails() {
         router
     };
 }
+/*
+edit end
+*/

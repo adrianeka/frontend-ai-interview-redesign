@@ -10,6 +10,12 @@ import { AlertType } from "@/features/interviews/components/interview-alert-moda
  * Handles server-side pagination, fetching interview lists, local storage filtering,
  * and state management for editing/deleting interviews.
  */
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Extracted filter options fetching logic to a distinct service call instead of relying on paginated data
+*/
 export function useInterviewsList() {
   // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -214,3 +220,6 @@ export function useInterviewsList() {
     removeFilter
   };
 }
+/*
+edit end
+*/

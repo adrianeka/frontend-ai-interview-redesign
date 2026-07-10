@@ -42,6 +42,12 @@ export interface InterviewInfo {
   roleTarget: string;
 }
 
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Added average scores to ResultAnswerDetail interface and modified fetch logic to return data directly
+*/
 export function useResultAnswerDetail(
   interviewId: string,
   candidateId: string,
@@ -172,3 +178,6 @@ export function useResultAnswerDetail(
     isRetrySttBulk,
   };
 }
+/*
+edit end
+*/

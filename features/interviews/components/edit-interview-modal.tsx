@@ -9,6 +9,12 @@ import { InterviewAlertModal, AlertType } from "./interview-alert-modal";
 import { EditInterviewModalProps } from "../types/interview";
 import { Button } from "@/components/ui/button";
 
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Made companyNamePartner, description, and language optional in formSchema and UI
+*/
 /**
  * Zod schema for validating the interview edit form.
  */
@@ -366,3 +372,6 @@ export function EditInterviewModal({ isOpen, onClose, availableLevels = [], init
     </>
   );
 }
+/*
+edit end
+*/

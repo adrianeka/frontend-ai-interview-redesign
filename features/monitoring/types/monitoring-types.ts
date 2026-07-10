@@ -1,3 +1,9 @@
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Created types for monitoring features
+*/
 // Matches MonitoringResponse schema from backend
 export interface MonitoringTask {
   id: string;
@@ -30,3 +36,6 @@ export interface MonitoringFilters {
   page?: number;
   size?: number;
 }
+/*
+edit end
+*/

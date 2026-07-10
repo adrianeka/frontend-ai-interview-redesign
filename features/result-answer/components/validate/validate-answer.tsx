@@ -14,6 +14,12 @@ interface ValidateAnswerProps {
   candidateId: string;
 }
 
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-06-29
+description: Changed async grading completion flow, translated messages to Indonesian, and fetched average scores directly from the API response
+*/
 export function ValidateAnswer({
   interviewId,
   candidateId,
@@ -42,16 +48,16 @@ export function ValidateAnswer({
 
   if (error) {
     return (
-      <div className="text-center py-20 text-red-400 font-medium text-sm">
-        {error}
+      <div className="text-center py-20 text-slate-500 font-medium text-sm">
+        Gagal memuat data jawaban kandidat. Silakan coba lagi nanti.
       </div>
     );
   }
 
   if (!data) {
     return (
-      <div className="text-center py-20 text-slate-400 font-medium text-sm">
-        Data not found.
+      <div className="text-center py-20 text-slate-500 font-medium text-sm">
+        Data jawaban kandidat tidak ditemukan.
       </div>
     );
   }
@@ -157,3 +163,6 @@ export function ValidateAnswer({
     </div>
   );
 }
+/*
+edit end
+*/
