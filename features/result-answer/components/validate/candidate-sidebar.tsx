@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, MapPin, Loader2 } from "lucide-react";
+import { CheckCircle2, MapPin } from "lucide-react";
 import { AnswerDetailItem } from "../../hooks/use-result-detail";
 
 interface CandidateSidebarProps {
@@ -106,10 +106,9 @@ export function CandidateSidebar({
         <Button
           disabled={!allValidated || isDoneValidating}
           onClick={onDoneValidate}
-          className="w-full bg-[#0076D2] hover:bg-[#005FA3] text-white rounded-[0.625rem] px-6 disabled:bg-slate-200 disabled:text-slate-400 flex items-center justify-center gap-2"
+          className="w-full bg-[#0076D2] hover:bg-[#005FA3] text-white rounded-[0.625rem] px-6 disabled:bg-slate-200 disabled:text-slate-400"
         >
-          {isDoneValidating && <Loader2 className="w-4 h-4 animate-spin" />}
-          {isDoneValidating ? "Processing AI Grading..." : "Done Validate"}
+          {isDoneValidating ? "Waiting Result..." : "Done Validate"}
         </Button>
       )}
     </div>

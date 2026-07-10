@@ -8,9 +8,9 @@ interface AnalysisSummaryProps {
   recommendation?: string;
   totalScore?: number;
   summaryReason?: string;
-  technicalScore: number | null | undefined;
-  problemSolvingScore: number | null | undefined;
-  communicationScore: number | null | undefined;
+  technicalScore: number;
+  problemSolvingScore: number;
+  communicationScore: number;
 }
 
 /*
@@ -27,7 +27,7 @@ export function AnalysisSummary({
   problemSolvingScore,
   communicationScore,
 }: AnalysisSummaryProps) {
-  if (recommendation && totalScore !== undefined && totalScore !== null) {
+  if (recommendation && totalScore) {
     const summaryStyle = getSummaryStyle(recommendation);
 
     return (

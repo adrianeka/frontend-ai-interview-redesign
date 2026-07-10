@@ -30,7 +30,6 @@ export function ExamSessionView() {
     videoRef,
     cancelSubmit,
     answeredIds,
-    localSubmittedIds,
     audioLevel,
     candidateId,
   } = useExamSession();
@@ -52,7 +51,7 @@ export function ExamSessionView() {
 
   const allAnswered =
     (interviewDetail?.questions?.length ?? 0) > 0 &&
-    interviewDetail?.questions?.every((q) => answeredIds.has(q.id) || localSubmittedIds.has(q.id));
+    interviewDetail?.questions?.every((q) => answeredIds.has(q.id));
 
   if (allAnswered) {
     return (

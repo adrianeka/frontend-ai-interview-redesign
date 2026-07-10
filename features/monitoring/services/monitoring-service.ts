@@ -28,9 +28,9 @@ export const monitoringService = {
       params.search = filters.search;
     }
 
-    // status filter: send to backend if not "all"
+    // status filter: only send to backend if not "all"
     if (filters.status && filters.status !== "all") {
-      params.status = filters.status;
+      params.sortBy = ["status"];
     }
 
     const role = getRoleName();
@@ -46,6 +46,17 @@ export const monitoringService = {
     });
 
     const content = response.data?.content ?? [];
+
+    if (filters.status && filters.status !== "all") {
+      const filtered = content.filter(
+        (task: MonitoringTask) => task.status === filters.status
+      );
+      return {
+        ...response.data,
+        content: filtered,
+        numberOfElements: filtered.length,
+      };
+    }
 
     return { ...response.data, content };
   },

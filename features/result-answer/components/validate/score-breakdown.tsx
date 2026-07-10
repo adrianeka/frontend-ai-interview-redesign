@@ -6,9 +6,9 @@ import { ScoreBar } from "./score-bar";
 interface ScoreBreakdownProps {
   totalScore: number;
   recommendation?: string;
-  technicalScore: number | null | undefined;
-  problemSolvingScore: number | null | undefined;
-  communicationScore: number | null | undefined;
+  technicalScore: number;
+  problemSolvingScore: number;
+  communicationScore: number;
 }
 
 /*
@@ -38,7 +38,7 @@ export function ScoreBreakdown({
       <div className="flex items-center gap-2 mb-4">
         <span className="text-sm text-slate-500 font-medium">Final Score</span>{" "}
         <span className="text-sm text-slate-500 font-bold">
-          {Number(totalScore).toFixed(1).replace(/\.0$/, "")}%
+          {Math.round(totalScore)}
         </span>
         {recommendation && (
           <span
@@ -61,17 +61,17 @@ export function ScoreBreakdown({
       <div className="flex flex-col gap-3">
         <ScoreBar
           label="Technical Skill"
-          weight={50}
+          weight={technicalScore}
           value={technicalScore}
         />
         <ScoreBar
           label="Problem Solving"
-          weight={30}
+          weight={problemSolvingScore}
           value={problemSolvingScore}
         />
         <ScoreBar
           label="Communication"
-          weight={20}
+          weight={communicationScore}
           value={communicationScore}
         />
       </div>
