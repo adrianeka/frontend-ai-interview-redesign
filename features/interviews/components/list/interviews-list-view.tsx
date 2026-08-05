@@ -66,9 +66,11 @@ export function InterviewsListView() {
   } = useInterviewsList();
 
   const [role, setRole] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setRole(getRoleName());
+    setIsMounted(true);
   }, []);
 
   const activeFiltersCount = Object.values(filters).filter(
@@ -102,7 +104,7 @@ export function InterviewsListView() {
                   variant="outline" 
                   className="h-[44px] rounded-[10px] font-medium text-[#43474F] gap-2.5 px-4 w-full sm:w-auto bg-white hover:bg-slate-50 border-[#E2E4E6]"
                 >
-                  {activeFiltersCount > 0 ? (
+                  {isMounted && activeFiltersCount > 0 ? (
                     <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#0076D2] text-[13px] text-white font-semibold">
                       {activeFiltersCount}
                     </span>
@@ -199,7 +201,7 @@ export function InterviewsListView() {
 
         {/* Filter Badges */}
         <div className="flex flex-wrap gap-2 mb-5">
-          {Object.entries(filters).map(([key, value]) => {
+          {isMounted && Object.entries(filters).map(([key, value]) => {
             if (value === "all") return null;
 
             return (

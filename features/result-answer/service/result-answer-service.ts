@@ -41,4 +41,16 @@ export const resultAnswerService = {
       throw createServiceError(error, "Failed to fetch answered list");
     }
   },
+
+  getViolations: async (participantId: string) => {
+    try {
+      const response = await api.get(`/v1/participants/${participantId}/violations`);
+      return response.data;
+    } catch (error: any) {
+      if (error.name === "CanceledError" || error.code === "ERR_CANCELED") {
+        throw error;
+      }
+      throw createServiceError(error, "Failed to fetch violations");
+    }
+  },
 };

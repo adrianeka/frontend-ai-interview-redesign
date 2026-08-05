@@ -22,6 +22,7 @@ export type Recommendation =
 export interface ResultAnswerItem {
   interviewId: string;
   candidateId: string;
+  participantId: string;
   interviewName: string;
   name: string;
   totalScore: number | null;
@@ -37,6 +38,8 @@ export interface ResultAnswerItem {
   communication?: number | null;
   timeInterview?: string | null;
   dateInterview?: string | null;
+  isFlagged?: boolean;
+  isAutoTerminated?: boolean;
 }
 
 interface PaginatedResult {

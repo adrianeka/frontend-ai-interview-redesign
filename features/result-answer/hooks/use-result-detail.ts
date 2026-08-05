@@ -10,6 +10,17 @@ export interface AnswerMonitoring {
   messageError: string | null;
 }
 
+export interface ViolationItem {
+  id: string;
+  participantId: string;
+  questionId: string | null;
+  questionText: string | null;
+  violationType: string;
+  timestamp: string;
+  details: string | null;
+  kpiMapping: string | null;
+}
+
 export interface AnswerDetailItem {
   questionId: string;
   participantId: string;
@@ -34,6 +45,9 @@ export interface ResultAnswerDetail {
   totalScore: number | null;
   recommendation: string | null;
   summaryReason: string | null;
+  // edit start — added isAutoTerminated from backend for HR dashboard disqualified badge (2026-07-22)
+  isAutoTerminated: boolean | null;
+  // edit end
   answers: AnswerDetailItem[];
 }
 
@@ -53,6 +67,7 @@ export function useResultAnswerDetail(
   candidateId: string,
 ) {
   const [data, setData] = useState<ResultAnswerDetail | null>(null);
+  const [violations, setViolations] = useState<ViolationItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -92,11 +107,16 @@ export function useResultAnswerDetail(
     setError(null);
 
     try {
-      const result = await resultAnswerService.getAnsweredDetail(
-        interviewId,
-        candidateId,
-      );
+      const result = await resultAnswerService.getAnsweredDetail(interviewId, candidateId);
+      
+      let violationsData = [];
+      if (result?.answers?.length > 0) {
+        const participantId = result.answers[0].participantId;
+        violationsData = await resultAnswerService.getViolations(participantId).catch(() => []);
+      }
+
       setData(result);
+      setViolations(violationsData || []);
     } catch (err: any) {
       if (err.name === "CanceledError" || err.code === "ERR_CANCELED") return;
       setError(err.message ?? "Something went wrong");
@@ -165,6 +185,7 @@ export function useResultAnswerDetail(
 
   return {
     data,
+    violations,
     isLoading,
     error,
     refetch: fetchDetail,

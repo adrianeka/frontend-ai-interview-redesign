@@ -9,8 +9,9 @@ import {
   Clock,
   CornerDownRightIcon,
   X,
+  AlertTriangle,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { AnswerDetailItem } from "../../hooks/use-result-detail";
 import { ConfirmValidateModal } from "./confirm-validate-modal";
 
@@ -20,6 +21,7 @@ interface QuestionCardProps {
   onSaveTranscript: (text: string) => Promise<void>;
   isValidating: boolean;
   isSaving: boolean;
+  playRequest?: { questionId: string; time: number } | null;
 }
 
 export function QuestionCard({
@@ -28,10 +30,20 @@ export function QuestionCard({
   onSaveTranscript,
   isValidating,
   isSaving,
+  playRequest,
 }: QuestionCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(answer.answerTranscript);
   const [showConfirm, setShowConfirm] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (playRequest?.questionId === answer.questionId && videoRef.current) {
+      videoRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      videoRef.current.currentTime = playRequest.time;
+      videoRef.current.play().catch(e => console.error("Playback failed", e));
+    }
+  }, [playRequest, answer.questionId]);
 
   const handleSave = async () => {
     await onSaveTranscript(draft);
@@ -60,10 +72,11 @@ export function QuestionCard({
 
       <div className="py-5 border-b border-[#E2E4E6] last:border-0">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="col-span-1 overflow-hidden bg-slate-900 rounded-xl">
+          <div className="col-span-1 rounded-xl">
             <video
+              ref={videoRef}
               src={answer.videoUrl}
-              className="max-w-[320px] aspect-[320/204] object-cover rounded-xl"
+              className="max-w-[320px] aspect-[320/204] object-cover rounded-xl w-full bg-slate-900"
               controls
               preload="metadata"
             />
@@ -93,7 +106,16 @@ export function QuestionCard({
               )}
             </div>
 
-            <p className="text-sm text-slate-500 mb-3">{answer.questionText}</p>
+            <p className="text-sm text-slate-500 mb-2">{answer.questionText}</p>
+
+            {/* Assume there's an isFlagged or hasViolation flag for the question answer */}
+            {/* For demonstration, we'll conditionally render this based on some mocked logic or just a boolean if backend provides it */}
+            {(answer as any).hasViolation && (
+              <Badge className="bg-red-50 text-red-600 border-red-200 text-xs py-0.5 px-2 w-fit mb-3 flex items-center gap-1.5 font-semibold hover:bg-red-100 transition-colors">
+                <AlertTriangle className="w-3.5 h-3.5" />
+                Cheating Detected
+              </Badge>
+            )}
 
             {isEditing ? (
               <div className="mb-4">

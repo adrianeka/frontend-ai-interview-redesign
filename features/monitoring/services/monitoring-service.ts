@@ -28,10 +28,21 @@ export const monitoringService = {
       params.search = filters.search;
     }
 
-    // status filter: only send to backend if not "all"
+    /*
+    edit start
+    by: Zahra
+    date: 2026-07-17
+    description: Fixed status filter — previously the status was NOT sent to the
+                 backend and was instead filtered client-side on only the current
+                 page's data, causing incorrect results and wrong pagination counts.
+                 Backend already supports ?status=FAILED etc., so we send it directly.
+    */
     if (filters.status && filters.status !== "all") {
-      params.sortBy = ["status"];
+      params.status = filters.status;
     }
+    /*
+    edit end
+    */
 
     const role = getRoleName();
     let url = `/monitoring`;
@@ -45,22 +56,13 @@ export const monitoringService = {
       params,
     });
 
-    const content = response.data?.content ?? [];
-
-    if (filters.status && filters.status !== "all") {
-      const filtered = content.filter(
-        (task: MonitoringTask) => task.status === filters.status
-      );
-      return {
-        ...response.data,
-        content: filtered,
-        numberOfElements: filtered.length,
-      };
-    }
-
-    return { ...response.data, content };
+    return {
+      ...response.data,
+      content: response.data?.content ?? [],
+    };
   },
 };
+
 /*
 edit end
 */

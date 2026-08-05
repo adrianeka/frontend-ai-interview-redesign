@@ -132,6 +132,8 @@ export interface Candidate {
   avgTechnicalFundamentalScore: number;
   avgCommunicationScore: number;
   avgProblemSolvingScore: number;
+  isFlagged: boolean;
+  isAutoTerminated: boolean;
 }
 
 export interface CandidateMonitoring {

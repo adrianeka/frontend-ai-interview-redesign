@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { AlertTriangle, Loader2, RefreshCw } from "lucide-react";
 
 type Props = {
   phase: "break" | "answer";
@@ -10,6 +10,19 @@ type Props = {
   activeIndex: number;
   questionText?: string;
   isSubmitting: boolean;
+  /*
+  edit start
+  by: Zahra
+  date: 2026-07-17
+  description: Added uploadError and retryUpload props so the card can show
+               a retry banner when the video upload fails, instead of silently
+               losing the recording.
+  */
+  uploadError: string | null;
+  retryUpload: () => void;
+  /*
+  edit end
+  */
   handleStart: () => void;
   submitAnswer: () => void;
   cancelSubmit: () => void;
@@ -30,6 +43,8 @@ export function ExamQuestionCard({
   activeIndex,
   questionText,
   isSubmitting,
+  uploadError,
+  retryUpload,
   handleStart,
   submitAnswer,
   cancelSubmit,
@@ -55,35 +70,93 @@ export function ExamQuestionCard({
             <h2 className="text-[1.5rem] font-bold text-[#2D2F35] leading-[1.5]">
               Question {activeIndex + 1}
             </h2>
-            <p className="text-[1rem] sm:text-[1.25rem] font-normal text-[#43474F] mb-2">
+            <p className="text-[1rem] sm:text-[1.25rem] font-normal text-[#43474F] mb-2 select-none">
               {questionText}
             </p>
           </div>
-          <div className="flex items-center justify-end gap-3 mt-10">
-            {isSubmitting && (
-              <Button
-                variant="outline"
-                onClick={cancelSubmit}
-                className="h-[2.375rem] px-5 rounded-[0.625rem] border-[#E24B4A] text-[#E24B4A] hover:bg-[#FCEBEB] hover:text-[#E24B4A] font-medium text-[0.875rem]"
-              >
-                Cancel
-              </Button>
-            )}
-            <Button
-              onClick={submitAnswer}
-              disabled={isSubmitting}
-              className="h-[2.375rem] px-5 rounded-[0.625rem] bg-[#0076D2] hover:bg-[#005FA3] text-white font-medium text-[0.875rem] min-w-[8.75rem]"
-            >
-              {isSubmitting ? (
-                <span className="flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Processing...
-                </span>
-              ) : (
-                "Done Answering"
+
+          {/*
+          edit start
+          by: Zahra
+          date: 2026-07-17
+          description: Upload failure banner with retry button. Shown instead of the normal
+                       submit button area when an upload error is detected, so candidates
+                       can re-send their recording without having to re-record.
+          */}
+          {uploadError ? (
+            <div className="mt-6 rounded-[0.75rem] border border-[#FCA5A5] bg-[#FEF2F2] p-4 flex flex-col gap-3">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-[#DC2626] mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-[0.875rem] font-semibold text-[#991B1B]">
+                    Upload Failed — Your Recording is Still Saved
+                  </p>
+                  <p className="text-[0.8125rem] text-[#B91C1C] mt-0.5">
+                    Your answer was recorded but could not be sent due to a
+                    connection issue. Please check your internet and tap
+                    &quot;Retry Upload&quot; to send it.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-3">
+                {isSubmitting && (
+                  <Button
+                    variant="outline"
+                    onClick={cancelSubmit}
+                    className="h-[2.375rem] px-5 rounded-[0.625rem] border-[#E24B4A] text-[#E24B4A] hover:bg-[#FCEBEB] hover:text-[#E24B4A] font-medium text-[0.875rem]"
+                  >
+                    Cancel
+                  </Button>
+                )}
+                <Button
+                  onClick={retryUpload}
+                  disabled={isSubmitting}
+                  className="h-[2.375rem] px-5 rounded-[0.625rem] bg-[#DC2626] hover:bg-[#B91C1C] text-white font-medium text-[0.875rem] min-w-[9rem]"
+                >
+                  {isSubmitting ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Uploading...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <RefreshCw className="w-4 h-4" />
+                      Retry Upload
+                    </span>
+                  )}
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-end gap-3 mt-10">
+              {isSubmitting && (
+                <Button
+                  variant="outline"
+                  onClick={cancelSubmit}
+                  className="h-[2.375rem] px-5 rounded-[0.625rem] border-[#E24B4A] text-[#E24B4A] hover:bg-[#FCEBEB] hover:text-[#E24B4A] font-medium text-[0.875rem]"
+                >
+                  Cancel
+                </Button>
               )}
-            </Button>
-          </div>
+              <Button
+                onClick={submitAnswer}
+                disabled={isSubmitting}
+                className="h-[2.375rem] px-5 rounded-[0.625rem] bg-[#0076D2] hover:bg-[#005FA3] text-white font-medium text-[0.875rem] min-w-[8.75rem]"
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Processing...
+                  </span>
+                ) : (
+                  "Done Answering"
+                )}
+              </Button>
+            </div>
+          )}
+          {/*
+          edit end
+          */}
         </>
       )}
     </div>

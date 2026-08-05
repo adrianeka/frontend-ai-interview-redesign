@@ -3,7 +3,13 @@
 import React from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, ArrowLeftIcon, MapPinIcon, TriangleAlert } from "lucide-react";
+import { Loader2, ArrowLeftIcon, MapPinIcon, TriangleAlert, AlertTriangle, PlayCircle } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { useCandidateInterview } from "@/features/interviews/hooks/use-candidate-interview";
 import { CandidateProgressStepper } from "@/features/interviews/components/candidate/candidate-progress-stepper";
@@ -52,8 +58,40 @@ export function CandidateInterviewView() {
     isRetryingBulk,
     handleRetrySttBulk,
     router,
-    statusColorMap
+    statusColorMap,
+    violations
   } = useCandidateInterview();
+
+  const [playRequest, setPlayRequest] = React.useState<{ questionId: string; time: number } | null>(null);
+
+  const getViolationIcon = (type: string) => {
+    if (type === "LEAVE_FULLSCREEN") return "↗";
+    if (type === "TAB_SWITCH") return "⇋";
+    return "⚠";
+  };
+
+  const parseRelativeTime = (details: string | null) => {
+    if (!details) return null;
+    const match = details.match(/\[(\d+)s\]/);
+    if (match && match[1]) {
+      return parseInt(match[1], 10);
+    }
+    return null;
+  };
+
+  const formatSeconds = (sec: number) => {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
+  const formatTime = (isoString: string) => {
+    try {
+      return new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit", hour12: true }).format(new Date(isoString));
+    } catch {
+      return "--:-- AM";
+    }
+  };
 
   if (isLoading) {
     return (
@@ -100,8 +138,29 @@ export function CandidateInterviewView() {
               {candidateResult.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
             </div>
             <div className="flex flex-col gap-1 flex-1">
-              <h1 className="text-[22px] font-bold text-[#2D2F35] leading-snug">
+              <h1 className="text-[22px] font-bold text-[#2D2F35] leading-snug flex items-center gap-2">
                 {candidateResult.name}
+                {candidateResult.isAutoTerminated ? (
+                  <Badge
+                    variant="outline"
+                    style={{ borderColor: "#7F1D1D", color: "#fff", backgroundColor: "#7F1D1D" }}
+                    className="text-[9px] uppercase font-bold py-0 px-2 h-5 leading-none"
+                  >
+                    DISQUALIFIED
+                  </Badge>
+                ) : violations.length > 0 ? (
+                  <Badge
+                    variant="outline"
+                    style={{ borderColor: "#E84E2C", color: "#E84E2C", backgroundColor: "#FFEEEA" }}
+                    className="text-[10px] uppercase font-bold py-0 px-2 h-5"
+                  >
+                    Violation Detected
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="border-emerald-500 bg-emerald-50 text-emerald-600 font-semibold hover:bg-emerald-50">
+                    CLEAN
+                  </Badge>
+                )}
               </h1>
               <div className="flex flex-wrap items-center gap-1.5 text-base">
                 <span className="text-[#A9ADB5] font-medium">Interview Role</span>
@@ -138,6 +197,66 @@ export function CandidateInterviewView() {
             isRetryingBulk={isRetryingBulk}
             onRetryBulk={handleRetrySttBulk}
           />
+
+          {/* Integrity Report Accordion */}
+          {violations.length > 0 && (
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="integrity" className="border border-destructive/20 rounded-lg bg-destructive/5 px-4 overflow-hidden">
+                <AccordionTrigger className="hover:no-underline py-3">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-destructive">
+                    <AlertTriangle className="w-4 h-4" />
+                    Integrity Report
+                    <span className="ml-2 bg-destructive/10 text-destructive px-2 py-0.5 rounded-full text-xs font-bold">
+                      {violations.length} VIOLATION{violations.length > 1 ? "S" : ""}
+                    </span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pb-3 text-sm text-foreground space-y-3">
+                  <div className="flex flex-col gap-3">
+                    {violations.map((v) => {
+                      const relTime = parseRelativeTime(v.details);
+                      return (
+                        <div key={v.id} className="flex flex-col gap-1.5 p-3 bg-background rounded-md border border-destructive/10">
+                          <div className="flex justify-between items-start">
+                            <span className="font-medium text-destructive flex items-center gap-2">
+                              <span className="text-xs font-bold">{formatTime(v.timestamp)}</span>
+                              <span className="text-red-400 font-bold">{getViolationIcon(v.violationType)}</span>
+                              <span className="text-destructive font-semibold">
+                                {v.violationType === "LEAVE_FULLSCREEN" ? "Left Fullscreen" : 
+                                 v.violationType === "TAB_SWITCH" ? "Tab Switch" : v.violationType}
+                              </span>
+                            </span>
+                            {relTime !== null && v.questionId && (
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => setPlayRequest({ questionId: v.questionId!, time: relTime })}
+                                className="h-6 text-xs text-primary hover:text-primary/90 hover:bg-primary/10 px-2"
+                              >
+                                <PlayCircle className="w-3.5 h-3.5 mr-1" /> Play @ {formatSeconds(relTime)}
+                              </Button>
+                            )}
+                          </div>
+                          <div className="flex flex-col gap-0.5 mt-1">
+                            {v.questionText && (
+                              <span className="text-xs text-muted-foreground">
+                                <span className="font-semibold">Question:</span> {v.questionText}
+                              </span>
+                            )}
+                            {v.details && (
+                              <span className="text-xs text-muted-foreground">
+                                <span className="font-semibold">Details:</span> {v.details}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          )}
         </div>
 
         {/* Score Breakdown Section */}
@@ -197,6 +316,8 @@ export function CandidateInterviewView() {
                   handleValidateAnswer={handleValidateAnswer}
                   retryingQuestionId={retryingQuestionId}
                   handleRetryStt={handleRetryStt}
+                  playRequest={playRequest}
+                  violations={violations}
                 />
 
                 {index < sortedAnswers.length - 1 && (

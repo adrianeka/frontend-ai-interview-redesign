@@ -210,7 +210,6 @@ export function MonitoringView() {
                       <SelectItem value="SUCCESS">Success</SelectItem>
                       <SelectItem value="FAILED">Failed</SelectItem>
                       <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-                      <SelectItem value="PENDING">Pending</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

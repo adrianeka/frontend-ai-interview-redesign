@@ -7,6 +7,7 @@ import { CheckIcon, XIcon, ClockIcon } from "lucide-react";
 import { interviewService } from "@/features/interviews/services/interview-service";
 import { CandidateResult, InterviewDetail } from "@/features/interviews/types/interview";
 import { hiringColorMap, internalAssessmentColorMap } from "@/features/interviews/utils/recommendation";
+import { resultAnswerService } from "@/features/result-answer/service/result-answer-service";
 
 const statusColorMap: Record<string, { color: string; bgColor: string; outline: string; icon: React.ElementType }> = {
   "success": { color: "#4BAC87", bgColor: "#EEF8F4", outline: "#C9EBDE", icon: CheckIcon },
@@ -45,6 +46,7 @@ export function useCandidateInterview() {
   const [isRetryingStt, setIsRetryingStt] = useState(false);
   const [isRetryingGrading, setIsRetryingGrading] = useState(false);
   const [isRetryingBulk, setIsRetryingBulk] = useState(false);
+  const [violations, setViolations] = useState<any[]>([]);
 
   // Derived States
   const [hasPendingTasks, setHasPendingTasks] = useState(false);
@@ -79,8 +81,12 @@ export function useCandidateInterview() {
         }
       }
       if (participantId) {
-        const monitoring = await interviewService.getMonitoring(participantId);
+        const [monitoring, violationsData] = await Promise.all([
+          interviewService.getMonitoring(participantId).catch(() => []),
+          resultAnswerService.getViolations(participantId).catch(() => [])
+        ]);
         setMonitoringData(monitoring);
+        setViolations(violationsData || []);
       }
     } catch (err: any) {
       console.error(err);
@@ -209,8 +215,14 @@ export function useCandidateInterview() {
           }
         }
         if (participantId) {
-          const monitoring = await interviewService.getMonitoring(participantId);
+          const [monitoring, violationsData] = await Promise.all([
+            interviewService.getMonitoring(participantId).catch(() => []),
+            resultAnswerService.getViolations(participantId).catch(() => [])
+          ]);
           setMonitoringData(monitoring);
+          setViolations(violationsData || []);
+        } else {
+          setViolations([]);
         }
       } catch (err: any) {
         console.error("Error loading candidate results:", err);
@@ -313,7 +325,8 @@ export function useCandidateInterview() {
     isRetryingBulk,
     handleRetrySttBulk,
     router,
-    statusColorMap
+    statusColorMap,
+    violations
   };
 }
 /*

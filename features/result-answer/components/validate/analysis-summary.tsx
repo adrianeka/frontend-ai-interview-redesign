@@ -27,7 +27,7 @@ export function AnalysisSummary({
   problemSolvingScore,
   communicationScore,
 }: AnalysisSummaryProps) {
-  if (recommendation && totalScore) {
+  if (recommendation != null && totalScore != null) {
     const summaryStyle = getSummaryStyle(recommendation);
 
     return (

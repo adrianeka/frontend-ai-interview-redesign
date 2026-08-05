@@ -9,7 +9,13 @@ export const getCookie = (name: string): string | null => {
   return null;
 };
 
-export const setCookie = (name: string, value: string, days = 7) => {
+/*
+edit start
+by: Zahra Hilyatul J
+date: 2026-07-20
+description: Fix cookie expiration to 1 day to match backend JWT and add brute-force cookie deletion to prevent infinite redirect loop
+*/
+export const setCookie = (name: string, value: string, days = 1) => {
   if (typeof document === "undefined") return;
   let expires = "";
   if (days) {
@@ -17,13 +23,20 @@ export const setCookie = (name: string, value: string, days = 7) => {
     date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
     expires = `; expires=${date.toUTCString()}`;
   }
-  document.cookie = `${name}=${value || ""}${expires}; path=/; SameSite=Lax; Secure`;
+  const secureFlag = window.location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `${name}=${value || ""}${expires}; path=/; SameSite=Lax${secureFlag}`;
 };
 
 export const deleteCookie = (name: string) => {
   if (typeof document === "undefined") return;
+  // WAJIB: Hapus semua kombinasi agar tidak terjebak glitch infinite loop
+  document.cookie = `${name}=; Max-Age=-99999999; path=/`;
+  document.cookie = `${name}=; Max-Age=-99999999; path=/; SameSite=Lax`;
   document.cookie = `${name}=; Max-Age=-99999999; path=/; SameSite=Lax; Secure`;
 };
+/*
+edit end
+*/
 
 export const isAuthenticated = () => {
   return !!getToken();

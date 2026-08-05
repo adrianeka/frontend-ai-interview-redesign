@@ -46,6 +46,8 @@ interface CandidateAnswerItemProps {
   handleValidateAnswer: (questionId: string, participantId: string) => Promise<void>;
   retryingQuestionId: string | null;
   handleRetryStt: (participantId: string, questionId: string) => Promise<void>;
+  playRequest?: { questionId: string; time: number } | null;
+  violations?: any[];
 }
 
 /**
@@ -97,9 +99,22 @@ export function CandidateAnswerItem({
   validatingQuestionId,
   handleValidateAnswer,
   retryingQuestionId,
-  handleRetryStt
+  handleRetryStt,
+  playRequest,
+  violations = []
 }: CandidateAnswerItemProps) {
   const [videoError, setVideoError] = useState(false);
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+
+  React.useEffect(() => {
+    if (playRequest?.questionId === answer.questionId && videoRef.current) {
+      videoRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      videoRef.current.currentTime = playRequest.time;
+      videoRef.current.play().catch(e => console.error("Playback failed", e));
+    }
+  }, [playRequest, answer.questionId]);
+
+  const hasQuestionViolation = violations.some(v => v.questionId === answer.questionId);
 
   const monStatus = (() => {
     if (answer.isValidated) return { type: "success", label: "Validated" };
@@ -131,6 +146,7 @@ export function CandidateAnswerItem({
       {/* Video Player or Placeholder */}
       {answer.videoUrl && !videoError ? (
         <video
+          ref={videoRef}
           src={answer.videoUrl}
           controls
           preload="none"
@@ -179,6 +195,16 @@ export function CandidateAnswerItem({
                   {monStatus.label}
                 </span>
               </Badge>
+
+              {hasQuestionViolation && (
+                <Badge
+                  variant="outline"
+                  style={{ borderColor: "#E84E2C", color: "#E84E2C", backgroundColor: "#FFEEEA" }}
+                  className="text-[12px] uppercase font-bold py-0 px-2 h-5"
+                >
+                  Violation Detected
+                </Badge>
+              )}
 
               {/* Tombol Retry — muncul untuk SEMUA tipe error monitoring */}
               {hasAnyError && !answer.isValidated && (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   AnswerDetailItem,
   useResultAnswerDetail,
@@ -26,6 +26,7 @@ export function ValidateAnswer({
 }: ValidateAnswerProps) {
   const {
     data,
+    violations,
     isLoading,
     error,
     interviewInfo,
@@ -37,6 +38,21 @@ export function ValidateAnswer({
   const [validatingId, setValidatingId] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [isDoneValidating, setIsDoneValidating] = useState(false);
+  const [playRequest, setPlayRequest] = useState<{questionId: string, time: number} | null>(null);
+  const pollingRef = useRef<NodeJS.Timeout | null>(null);
+
+  // If result not yet available, poll every 10s until it is
+  const resultReady = Boolean(data?.recommendation != null && data?.totalScore != null);
+  useEffect(() => {
+    if (!resultReady && !isLoading && !error) {
+      pollingRef.current = setInterval(() => {
+        refetch();
+      }, 60_000);
+    }
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, [resultReady, isLoading, error, refetch]);
 
   if (isLoading) {
     return (
@@ -56,11 +72,27 @@ export function ValidateAnswer({
 
   if (!data) {
     return (
-      <div className="text-center py-20 text-slate-500 font-medium text-sm">
-        Data jawaban kandidat tidak ditemukan.
+      <div className="min-h-[75vh] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-6 max-w-md text-center px-6">
+          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center animate-pulse">
+            <span className="text-4xl">⏳</span>
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-foreground mb-2">Hasil Sedang Diproses</h2>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              Jawaban Anda sedang dalam proses penilaian oleh HR. Halaman ini akan diperbarui secara otomatis saat hasil sudah tersedia.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground/60">
+            <span className="inline-block w-2 h-2 rounded-full bg-primary animate-ping" />
+            Memeriksa status setiap 10 detik...
+          </div>
+        </div>
       </div>
     );
   }
+
+  // Removed blocking pending screen because HR needs to see this page to validate the answers.
 
   const sortedAnswers = [...data.answers].sort(
     (a, b) => a.questionNumber - b.questionNumber,
@@ -68,7 +100,7 @@ export function ValidateAnswer({
   const totalQuestions = sortedAnswers.length;
   const validatedCount = sortedAnswers.filter((a) => a.isValidated).length;
   const allValidated = totalQuestions > 0 && validatedCount === totalQuestions;
-  const isCompleted = Boolean(data.recommendation && data.totalScore);
+  const isCompleted = Boolean(data.recommendation != null && data.totalScore != null);
 
   const avgTechnicalScore =
     totalQuestions > 0
@@ -140,6 +172,7 @@ export function ValidateAnswer({
                 onSaveTranscript={(text) => handleSaveTranscript(answer, text)}
                 isValidating={validatingId === answer.questionId}
                 isSaving={savingId === answer.questionId}
+                playRequest={playRequest}
               />
             ))}
           </div>
@@ -156,7 +189,11 @@ export function ValidateAnswer({
             totalQuestions={totalQuestions}
             allValidated={allValidated}
             isDoneValidating={isDoneValidating}
+            isGradingInProgress={allValidated && !isCompleted}
             onDoneValidate={handleDoneValidate}
+            violations={violations}
+            isAutoTerminated={data.isAutoTerminated ?? false}
+            onPlayViolation={(qId, time) => setPlayRequest({ questionId: qId, time })}
           />
         </div>
       </div>

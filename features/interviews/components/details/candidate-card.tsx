@@ -61,7 +61,30 @@ export function CandidateCard({ candidate, interviewId, activeColorMap }: Candid
         <div className="flex flex-col sm:flex-row w-full gap-3 sm:gap-0 items-start sm:items-center justify-between pr-4">
           {/* Candidate Name & Score Breakdown */}
           <div className="flex flex-col gap-1 sm:gap-2 justify-center flex-1">
-            <p className="text-[#43474F] font-semibold text-lg">{candidate.name}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-[#43474F] font-semibold text-lg">{candidate.name}</p>
+              {candidate.isAutoTerminated ? (
+                <Badge
+                  variant="outline"
+                  style={{ borderColor: "#7F1D1D", color: "#fff", backgroundColor: "#7F1D1D" }}
+                  className="text-[9px] uppercase font-bold py-0 px-2 h-5 leading-none"
+                >
+                  DISQUALIFIED
+                </Badge>
+              ) : candidate.isFlagged ? (
+                <Badge
+                  variant="outline"
+                  style={{ borderColor: "#E84E2C", color: "#E84E2C", backgroundColor: "#FFEEEA" }}
+                  className="text-[10px] uppercase font-bold py-0 px-2 h-5"
+                >
+                  Violation Detected
+                </Badge>
+              ) : (
+                <Badge className="bg-emerald-100 text-emerald-600 hover:bg-emerald-100 border-emerald-200 text-[10px] uppercase font-bold py-0 px-2 h-5">
+                  Clean
+                </Badge>
+              )}
+            </div>
             <p className="text-sm">
               <span className="text-[#8C929D]">
                 Technical ({formatScore(candidate.avgTechnicalFundamentalScore)}%)  •  Problem Solving ({formatScore(candidate.avgProblemSolvingScore)}%)  •  Communication ({formatScore(candidate.avgCommunicationScore)}%)
